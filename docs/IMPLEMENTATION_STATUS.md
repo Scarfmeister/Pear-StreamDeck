@@ -2,7 +2,7 @@
 
 Current stage: **Stage 3 — Playlist capability investigation and API spike**.
 
-State: **Stage 3 complete and locally validated; GitHub checkpoint pending.**
+State: **Stage 3 complete, committed, and pushed.**
 
 ## Repository and checkpoint
 
@@ -10,7 +10,7 @@ State: **Stage 3 complete and locally validated; GitHub checkpoint pending.**
 - Branch: `dev/pear-port`; default branch: `master`.
 - Upstream: [XeroxDev/YTMD-StreamDeck](https://github.com/XeroxDev/YTMD-StreamDeck).
 - Stage 3 starting commit: [`c2517df638486d359f1de4469d42f7d1dbd5c897`](https://github.com/Scarfmeister/Pear-StreamDeck/commit/c2517df638486d359f1de4469d42f7d1dbd5c897).
-- Stage 3 tested documentation checkpoint SHA: pending validation/commit.
+- Stage 3 tested documentation checkpoint SHA: [`382c9c43ea1038410b67ba855c4e9aa8e504eba6`](https://github.com/Scarfmeister/Pear-StreamDeck/commit/382c9c43ea1038410b67ba855c4e9aa8e504eba6).
 - Stage 3 changes are documentation only. Client/runtime/tests remain at `060a2e376f23d65427fd045dc1106ab00ea399f7`.
 - The follow-up status-record commit records that tested SHA and CI result. A file cannot contain the hash of the commit containing its own final bytes; the final report also identifies the final branch head.
 
@@ -41,7 +41,9 @@ The baseline remains buildable. Stage 3 changed six Markdown files only. No new 
 | Documentation/preservation | Pass; 15 local Markdown links/anchors, authored whitespace, original spec byte equality/hash, original license hash, upstream ancestry. Default branch and Pear audit clone unchanged. |
 | Native source/data consistency | Pass; one matching playlist header, distinct normal/shuffle command kinds and params, native router fields, recorded script hash. Static/read-only checks only; no playback. |
 | Pear/host/device playlist tests | Not run; the extension and later client do not exist yet. Required tests are planned explicitly. |
-| GitHub checkpoint CI | Pending push; record the run after it completes. |
+| GitHub checkpoint CI | Pass; [run 37181074791](https://github.com/Scarfmeister/Pear-StreamDeck/actions/runs/37181074791), install/type checks/39 tests/build/manifest validation/pack/artifact upload. |
+
+The connected GitHub integration pushed the investigation commit. Its tree exactly matched the local validated tree, `3d70853b7650975cd669644f505a9f858af0234f`. The local branch was synchronized only after clean-worktree/tree-equality checks. This final status-record commit records the tested checkpoint and successful CI; the final branch head is also supplied in the stage report. No upstream/default branch, Pear source, PR, or release was changed.
 
 ## Completed Stage 2 work
 
