@@ -6,7 +6,7 @@ Audit date: 2026-10-04 UTC / 2026-10-03 America/Chicago.
 
 `PROJECT_SPEC.md` preserves the supplied specification byte-for-byte. Its SHA-256 is `798be8f52331034021c925dea263c7adba4b46c2b36e20b4309647e2dfd5436b`.
 
-The current Stage 1 instruction controls this checkpoint. The original instruction to finish the port and prepare a final PR applies to later work. This stage permits documentation and small build/identity changes. Do not implement the Pear client, port the actions, change Pear, or open a PR here.
+Stage 1 authorized the audit and bootstrap. The current Stage 2 instruction authorizes the shared Pear client, host settings integration, and client tests. It excludes the full action port and playlist startup. The original instruction to finish the port and prepare a final PR applies to later work. Do not change Pear or open a PR at this checkpoint.
 
 Work in `Scarfmeister/Pear-StreamDeck` on `dev/pear-port`. `origin` is the fork; `upstream` is `XeroxDev/YTMD-StreamDeck`. Preserve the default branch, upstream history, and original MIT license. Never push to upstream.
 
@@ -91,3 +91,43 @@ The canonical manifest retains Elgato's supported Windows/macOS entries. A later
 Generic inherited icons remain for baseline verification. No separate per-asset provenance list was found. Final icons need generic media symbols and documented redistribution rights. Do not copy YouTube/Google marks. The old PSD and promotional thumbnail are not approved as final assets here.
 
 OBS export stays excluded. The inherited `2.3.0` version remains a baseline identifier; select the first Pear release version during release preparation.
+
+## D009 — Stage 2 runtime boundary
+
+Build/watch now use `src/pear-plugin.ts` and `src/pear-pi.ts`. One plugin-owned `PearSession` creates one `PearClient`. It waits for Stream Deck global settings, merges credential writes into that record, and routes PI connection/status/reauthorize messages. The PI creates no Pear client, HTTP request, or socket. Status payloads contain no credentials. The host socket is distinct from the one Pear socket.
+
+The twelve inherited action classes and old PI classes remain dormant source for the action-port stage. Neither active bundle imports them. Keys show “Actions pending” and presses give an alert; there are no playback handlers or playlist startup. The preview connection panel is English only. Action settings and translated Pear UI belong to the later action/UI work.
+
+Keep the companion package temporarily as a **development-only** dependency to type-check that dormant source. This is not its complete removal from the lockfile. Remove it and `legacy-guards.ts` when the source port no longer needs those types. The guards use real runtime narrowing and fix all 14 inherited TypeScript errors without lowering compiler strictness. Production bundles and the production dependency graph exclude the companion and Socket.IO.
+
+## D010 — Versioned settings and explicit approval recovery
+
+Store settings under the global `pear` key with `schemaVersion: 1`, host, numeric port, protocol, and an optional `credential` containing `accessToken`, endpoint origin, and client ID. Preserve unrelated global fields. Never import legacy top-level YTMD credentials. Normalize localhost to `127.0.0.1`; accept bare hostnames, IPv4, or IPv6, and reject embedded credentials, URLs, paths, and invalid ports. HTTP is the default; HTTPS uses WSS and the host's normal certificate trust.
+
+Probe `GET /api/v1/song`, a fast cached route that can return 204 before playback. Without credentials, success means no token is required. An unauthorized probe starts one `POST /auth/io.github.scarfmeister.pear-streamdeck`. Validate `{accessToken}`, persist a token bound to that exact endpoint/client, and confirm it through another protected probe. A successful token-bearing probe confirms that credential works; it cannot establish whether the server has since disabled auth.
+
+Persist an `authBlocked: interrupted` marker before sending an approval request. Clear it on success. Denial, malformed approval, interrupted/timeout approval, saved-token 401/403, or WS close 1008 requires explicit Reauthorize. This prevents repeated dialogs even across host restarts. Aborting a local request cannot dismiss Pear's outstanding dialog; a late response is ignored. Repeated Reauthorize while approval is pending is a no-op. Endpoint changes clear the old credential and block marker; saving the same endpoint preserves them.
+
+Stream Deck's global-settings write has no persistence acknowledgment in this framework. The adapter submits the write immediately and handles synchronous failures; physical restart tests must verify host persistence. It ignores up to 16 pending own-write echoes so a delayed in-progress marker cannot undo a completed approval. No token, response body, header, or token-bearing URL enters diagnostic logs or PI status messages.
+
+## D011 — Confirmed state, bounded networking, and failure behavior
+
+REST routes are constrained to `/api/v1`; `/auth/{id}` is separate. Requests omit ambient browser credentials, reject redirects, attach bearer headers only when a token is available, send JSON only for bodies, and accept empty 204 responses. Errors carry a safe code/status instead of raw server/native error text. Ordinary REST timeout: 8 seconds. Approval timeout: 120 seconds. WS initial snapshot timeout: 15 seconds.
+
+Opening a socket is insufficient. Require a valid flat `PLAYER_INFO` before connected/ready. Validate the seven audited events, finite numeric ranges, boolean fields, song metadata, and repeat enum. Reject malformed/oversized messages and ignore unknown event types. Snapshots and song records are frozen. Omitted fields do not erase prior metadata. Disconnection marks state unready; the next attempt starts with unknown fields and accepts no old-generation callbacks.
+
+`ready` means an accepted API snapshot, **not** independently verified renderer readiness. Pear's startup cache defaults remain an upstream limitation. Do not interpret REST 204 as a confirmed state change. `request` and clamped `setVolume` provide the client foundation; volume-step queues and higher-level action semantics remain later work.
+
+Reconnect uses one timer and one current socket generation: 1/2/4/8/16/30 seconds, ±20% jitter, at most 30 seconds. Reset the retry count only on a valid snapshot. A numeric probe `Retry-After` for 429 can extend the wait to at most 300 seconds. Stop, endpoint changes, and auth failure cancel requests/timers and close the socket. Playback commands are sent once and never automatically replayed. A failed ordinary request leaves confirmed state intact; unauthorized requests halt the session.
+
+There is no continuous REST polling or invented heartbeat. A browser close/error path and the initial deadline drive recovery. A silent established TCP half-open connection cannot be promptly detected without a supported heartbeat; test normal restarts and disconnects on each host.
+
+Read like state once after a snapshot and on video changes, with an explicit refresh method for future rating commands. Coalesce concurrent reads, discard responses for old tracks, and leave missing/malformed rating data unknown without breaking the socket. Same-track external rating changes remain a Pear 3.12.0 gap. Coalesce outage, malformed-message, command-error, and subscriber-error logs; position events do not log.
+
+## D012 — Test runner and release limits
+
+Use Node.js 24's built-in `node:test` with the existing esbuild to bundle TypeScript tests. No new runtime transport or test framework is needed. Update Node type declarations to 24 and remove unused Mocha/Chai/nyc/jsdom/ts-node/esm tooling. CI now checks all source and test types and runs the suite before packaging.
+
+Use injected fetch/socket/settings/timer implementations to exercise approval, cancellation, state, and backoff without real sleeps. Execute the actual browser entry bundles in isolated VM contexts to check host registration, token persistence messages, PI routing, dormant-action behavior, and cleanup. These tests do not establish real Pear, Elgato, OpenDeck, WebView, certificate, or hardware behavior.
+
+Stage 2 has no client implementation blocker. Full dependency audit still has development-only findings in old companion and commit-hook tooling. Production audit is clear; this does not mean the whole dependency tree is clear. Keep the remaining development cleanup and physical acceptance in the release gate. No release, final PR, or next-stage action work is authorized here.

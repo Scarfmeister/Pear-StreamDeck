@@ -148,7 +148,7 @@ All UUID suffixes below use `io.github.scarfmeister.pear-streamdeck`.
 | Updated `DefaultAction` / plugin entry | Inject the client, render on appearance, dispose context subscriptions, surface concise errors. |
 | Updated PI classes/settings interfaces | Global connection/status/reauthorize and per-action settings; remove companion singleton/library fetch/PIN UI. |
 
-These are implementation targets, not source files created in this stage. Keep the client independent of the Stream Deck framework so its tests can mock fetch, sockets, persistence, and timers.
+This map records the Stage 1 targets. Stage 2 implements the foundation listed below. Keep the client independent of the Stream Deck framework so its tests can mock fetch, sockets, persistence, and timers.
 
 ## Dependency and obsolete-code plan
 
@@ -167,6 +167,24 @@ These are implementation targets, not source files created in this stage. Keep t
 | Asset PSD, inline Repeat blobs, old promotional thumbnail | No separate provenance list; generic sampled controls look reusable under repository notice | Create/document consistent generic final icons; avoid Google/YouTube branding. |
 
 See `IMPLEMENTATION_STATUS.md` for exact baseline checks and inherited compiler errors. See `MANUAL_TESTING.md` for hardware, authentication, reconnect, and native startup acceptance.
+
+## Stage 2 foundation implementation
+
+The pinned Pear 3.12.0 auth/REST/WebSocket sources were reread before implementation. The earlier action map remains future work. Current modules:
+
+| File | Implemented responsibility |
+| --- | --- |
+| `src/pear/config.ts` | Host/port/protocol validation, v1/auth/WS URLs, endpoint-bound versioned settings. |
+| `src/pear/rest-client.ts` | Shared native fetch layer, bearer/JSON headers, empty bodies, safe errors, timeout/abort. |
+| `src/pear/auth.ts` | Approval-response validation and unauthorized-response classification. |
+| `src/pear/state.ts`, `websocket.ts` | Frozen snapshots, song/rating model, seven flat events, partial updates, volume clamping. |
+| `src/pear/runtime.ts`, `reconnect.ts` | Native browser socket wrapper, injectable timers, bounded backoff. |
+| `src/pear/pear-client.ts` | One lifecycle/auth/state owner, subscriptions, command foundation, bounded rating refresh, generation cleanup. |
+| `src/streamdeck/pear-session.ts` | One shared client, global settings persistence/merge, own-write echo handling, safe PI status. |
+| `src/pear-plugin.ts`, `pear-pi.ts` | Active HTML entry points and host message routing; actions deliberately pending. |
+| `tests/`, `scripts/test.js` | Deterministic unit and browser-entry VM tests using Node's test runner and esbuild. |
+
+Build/watch no longer import `ytmd.ts`, `ytmd-pi.ts`, the old actions, or their companion transport. The old package remains only for development type checking of dormant source. The 14 baseline type errors are fixed with narrow guards; no Pear playback/playlist action is implemented. See D009–D012 for settings schema, timeouts, approval recovery, startup-cache limitations, and test scope.
 
 ## Primary sources
 
