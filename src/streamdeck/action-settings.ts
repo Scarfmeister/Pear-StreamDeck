@@ -1,6 +1,7 @@
 import {ActionTypes} from '../interfaces/enums';
 import {isRecord} from '../pear/config';
 import {parsePlaylistInput, PLAYLIST_STARTUP_MODES, playlistStartupMode, PlaylistStartupMode} from '../pear/playlist';
+import {savePlaylistSelector} from './playlist-selector-settings';
 
 export type TrackInfoFormat = 'TITLE' | 'ARTIST' | 'TITLE_ARTIST' | 'ALBUM' | 'TITLE_ARTIST_ALBUM';
 export const TRACK_INFO_FORMATS: readonly TrackInfoFormat[] = ['TITLE', 'ARTIST', 'TITLE_ARTIST', 'ALBUM', 'TITLE_ARTIST_ALBUM'];
@@ -25,6 +26,7 @@ export function saveActionSettings(action: string, current: unknown, edit: unkno
     const patch = isRecord(edit) ? edit : {};
     switch (action) {
         case ActionTypes.VOLUME_DOWN:
+        case ActionTypes.VOLUME_DIAL:
         case ActionTypes.VOLUME_UP: {
             const steps = validVolumeStep(patch.steps);
             if (steps === undefined) throw new Error('Volume step must be a whole percentage from 1 to 100.');
@@ -39,6 +41,7 @@ export function saveActionSettings(action: string, current: unknown, edit: unkno
             const {playlistUrl: _url, ...rest} = existing;
             return {...rest, playlistId, startupMode: playlistStartupMode(patch)};
         }
+        case ActionTypes.PLAYLIST_SELECTOR: return savePlaylistSelector(current, edit);
         default: throw new Error('This action has no per-action settings.');
     }
 }

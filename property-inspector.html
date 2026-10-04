@@ -4,7 +4,12 @@
     <title>Pear Desktop Connector — Settings</title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="sdpi.css">
-    <style>[hidden] { display: none !important; }</style>
+    <style>
+        [hidden] { display: none !important; }
+        .playlist-entry { margin: 12px 0; border: 1px solid #666; padding: 8px; }
+        .playlist-entry button { margin: 4px; }
+        .playlist-entry img { vertical-align: middle; object-fit: contain; }
+    </style>
     <script src="bundle-pi.js"></script>
 </head>
 <body>
@@ -16,6 +21,13 @@
                 <input class="sdpi-item-value" type="number" id="volumeStep" min="1" max="100" step="1" value="5">
             </div>
             <p>Whole percentages from 1 to 100. Default: 5%. Volume stays within 0–100%.</p>
+        </section>
+        <section id="selectorSettings" hidden>
+            <p>Configure up to 16 playlists. Rotate to select; press to play. Selection is saved per dial.</p>
+            <div id="selectorEntries"></div>
+            <button id="selectorAdd" type="button">Add playlist</button>
+            <p>Names: 1–64 characters. Optional images: PNG or JPEG up to 24 KiB, stored with this action.</p>
+            <p>Follow Shuffle State reads Pear's real shuffle state when pressed. Native playlist execution in all modes requires the Stage 7 Pear API extension.</p>
         </section>
         <section id="trackInfoSettings" hidden>
             <div class="sdpi-item">
@@ -50,7 +62,10 @@
         <div class="sdpi-item"><button class="sdpi-item-value" id="actionSave">Save action settings</button></div>
         <p id="actionMessage" role="status" aria-live="polite"></p>
     </section>
-    <p>Connection settings apply to all Pear actions. Dedicated dials are planned for a later stage.</p>
+    <p id="dialHelp" hidden>Clockwise increases volume or skips to the next track; counter-clockwise decreases volume or goes to the previous track.
+        Volume press toggles mute; Transport press plays or pauses. Playlist Selector rotation changes the selected entry.
+        A short touch refreshes the display; a hold does nothing. Clear custom host title/icon overrides to see Pear's display.</p>
+    <p>Connection settings apply to all Pear keys and dials.</p>
     <div class="sdpi-item">
         <div class="sdpi-item-label">Connection</div>
         <strong class="sdpi-item-value" id="globalConnectionStatus">Waiting for plugin</strong>

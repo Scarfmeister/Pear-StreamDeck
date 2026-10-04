@@ -188,6 +188,12 @@ The pinned Pear 3.12.0 auth/REST/WebSocket sources were reread before implementa
 
 Build/watch no longer import `ytmd.ts`, `ytmd-pi.ts`, the old actions, or their companion transport. The old package remains only for development type checking of dormant source. The 14 baseline type errors are fixed with narrow guards; no Pear playback/playlist action is implemented. See D009–D012 for settings schema, timeouts, approval recovery, startup-cache limitations, and test scope.
 
+## Stage 6 encoder implementation
+
+The Stage 1 action/module tables above are historical plans. Stage 4/5 implemented shared commands, keys, action settings, and the guarded playlist interface. Stage 6 adds `src/actions/pear-dial-actions.ts` with one shared-client subscription, `src/streamdeck/touch-events.ts` for the framework's touch typing gap, and selector settings/editor modules beside the centralized action validator. The active plugin routes Encoder lifecycle/rotation/release/touch to this controller; the PI still opens no Pear transport.
+
+Dedicated encoder UUIDs now exist. Old Play/Pause and Volume Up encoder UUIDs remain aliases for placed profiles. Volume uses the already bounded confirmed-state command queue, replacing the planned extra timer; Transport bounds pending detents without waiting for position ticks. Selector rotation persists one local index through ordinary host settings; it does not create dynamic host stack entries. `$B1` and packaged `dial-layout.json` cover feedback. Exact framework/OpenDeck/renderer source verification, limits, and test boundaries are in [Stream Deck Plus SDK research](research/stream-deck-plus-sdk.md) and D016. Native playlist execution remains blocked on the separate Stage 7 extension; live hosts/hardware and Linux packaging remain unverified.
+
 ## Primary sources
 
 - [YTMD baseline source](https://github.com/XeroxDev/YTMD-StreamDeck/tree/8b0c3320ce59b741b3165a1c8ac3a54b66c2c97a) and [license](https://github.com/XeroxDev/YTMD-StreamDeck/blob/8b0c3320ce59b741b3165a1c8ac3a54b66c2c97a/LICENSE).

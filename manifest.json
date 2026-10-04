@@ -44,11 +44,12 @@
       ],
       "DisableAutomaticStates": true,
       "Encoder": {
-        "layout": "$B1",
+        "layout": "dial-layout.json",
         "StackColor": "#AABBCC",
         "TriggerDescription": {
           "Rotate": "Switch song",
-          "Push": "Plays or Pauses the current song"
+          "Push": "Plays or Pauses the current song",
+          "Touch": "Refresh display"
         }
       },
       "SupportedInMultiActions": true,
@@ -177,7 +178,8 @@
         "StackColor": "#AABBCC",
         "TriggerDescription": {
           "Rotate": "Volume control",
-          "Push": "Mute"
+          "Push": "Mute",
+          "Touch": "Refresh display"
         }
       },
       "SupportedInMultiActions": true,
@@ -248,6 +250,60 @@
       "SupportedInMultiActions": true,
       "Tooltip": "Play a selected playlist",
       "UUID": "io.github.scarfmeister.pear-streamdeck.play-playlist"
+    },
+    {
+      "Icon": "icons/volume-on",
+      "Name": "Volume Dial",
+      "States": [{"Image": "icons/volume-on"}],
+      "Controllers": ["Encoder"],
+      "Encoder": {
+        "layout": "$B1",
+        "StackColor": "#5D9981",
+        "TriggerDescription": {
+          "Rotate": "Adjust volume by the configured step",
+          "Push": "Toggle mute",
+          "Touch": "Refresh display"
+        }
+      },
+      "SupportedInMultiActions": false,
+      "Tooltip": "Rotate for volume; press to mute. Shows confirmed Pear volume and mute.",
+      "UUID": "io.github.scarfmeister.pear-streamdeck.volume-dial"
+    },
+    {
+      "Icon": "icons/music-play",
+      "Name": "Transport Dial",
+      "States": [{"Image": "icons/music-play"}],
+      "Controllers": ["Encoder"],
+      "Encoder": {
+        "layout": "dial-layout.json",
+        "StackColor": "#5D9981",
+        "TriggerDescription": {
+          "Rotate": "Clockwise next track; counter-clockwise previous track",
+          "Push": "Play or pause",
+          "Touch": "Refresh display"
+        }
+      },
+      "SupportedInMultiActions": false,
+      "Tooltip": "Rotate to change tracks; press to play or pause. Shows confirmed Pear playback.",
+      "UUID": "io.github.scarfmeister.pear-streamdeck.transport-dial"
+    },
+    {
+      "Icon": "icons/music-play",
+      "Name": "Playlist Selector Dial",
+      "States": [{"Image": "icons/music-play"}],
+      "Controllers": ["Encoder"],
+      "Encoder": {
+        "layout": "dial-layout.json",
+        "StackColor": "#5D9981",
+        "TriggerDescription": {
+          "Rotate": "Select a configured playlist",
+          "Push": "Play the selected playlist",
+          "Touch": "Refresh display"
+        }
+      },
+      "SupportedInMultiActions": false,
+      "Tooltip": "Select and play a named playlist. Native execution requires the Stage 7 Pear API extension.",
+      "UUID": "io.github.scarfmeister.pear-streamdeck.playlist-selector"
     }
   ],
   "CodePath": "action.html",

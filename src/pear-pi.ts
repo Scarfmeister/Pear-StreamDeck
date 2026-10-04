@@ -3,6 +3,7 @@ import {isRecord} from './pear/config';
 import {ActionTypes} from './interfaces/enums';
 import {saveActionSettings, trackInfoFormat, volumeStep} from './streamdeck/action-settings';
 import {playlistInput, playlistStartupMode} from './pear/playlist';
+import {PlaylistSelectorEditor} from './streamdeck/playlist-selector-editor';
 
 class PearPi extends StreamDeckPropertyInspectorHandler {
     constructor() { super(); }
@@ -23,6 +24,7 @@ class PearPi extends StreamDeckPropertyInspectorHandler {
     private playlistInputElement: HTMLInputElement;
     private startupInput: HTMLSelectElement;
     private actionMessage: HTMLElement;
+    private selector?: PlaylistSelectorEditor;
 
     // The retained framework omits action and assumes the PI UUID is the action context.
     override requestSettings(): void {
@@ -61,13 +63,20 @@ class PearPi extends StreamDeckPropertyInspectorHandler {
         this.startupInput = document.getElementById('playlistStartupMode') as HTMLSelectElement;
         this.actionMessage = document.getElementById('actionMessage') as HTMLElement;
         const action = this.actionInfo.action;
-        const volume = action === ActionTypes.VOLUME_UP || action === ActionTypes.VOLUME_DOWN;
+        const volume = action === ActionTypes.VOLUME_UP || action === ActionTypes.VOLUME_DOWN || action === ActionTypes.VOLUME_DIAL;
         const track = action === ActionTypes.SONG_INFO;
         const playlist = action === ActionTypes.PLAY_PLAYLIST;
+        const selector = action === ActionTypes.PLAYLIST_SELECTOR;
         (document.getElementById('volumeSettings') as HTMLElement).hidden = !volume;
         (document.getElementById('trackInfoSettings') as HTMLElement).hidden = !track;
         (document.getElementById('playlistSettings') as HTMLElement).hidden = !playlist;
-        (document.getElementById('actionSettings') as HTMLElement).hidden = !volume && !track && !playlist;
+        (document.getElementById('selectorSettings') as HTMLElement).hidden = !selector;
+        (document.getElementById('dialHelp') as HTMLElement).hidden = !selector && action !== ActionTypes.VOLUME_DIAL && action !== ActionTypes.TRANSPORT_DIAL;
+        (document.getElementById('actionSettings') as HTMLElement).hidden = !volume && !track && !playlist && !selector;
+        if (selector) this.selector = new PlaylistSelectorEditor(document.getElementById('selectorEntries') as HTMLElement,
+            document.getElementById('selectorAdd') as HTMLButtonElement,
+            () => { this.actionDirty = true; this.actionMessage.textContent = ''; },
+            text => { this.actionMessage.textContent = text; });
         for (const input of [this.volumeInput, this.formatInput, this.playlistInputElement, this.startupInput]) {
             input.addEventListener('input', () => { this.actionDirty = true; this.actionMessage.textContent = ''; });
         }
@@ -75,7 +84,7 @@ class PearPi extends StreamDeckPropertyInspectorHandler {
         this.renderActionSettings();
         (document.getElementById('actionSave') as HTMLButtonElement).onclick = () => {
             try {
-                const settings = saveActionSettings(action, this.actionSettings, {steps: this.volumeInput.value,
+                const settings = saveActionSettings(action, this.actionSettings, this.selector?.edits() ?? {steps: this.volumeInput.value,
                     displayFormat: this.formatInput.value, playlistInput: this.playlistInputElement.value,
                     startupMode: this.startupInput.value});
                 this.setSettings(settings);
@@ -104,6 +113,7 @@ class PearPi extends StreamDeckPropertyInspectorHandler {
         const input = playlistInput(this.actionSettings);
         this.playlistInputElement.value = typeof input === 'string' ? input : '';
         this.startupInput.value = playlistStartupMode(this.actionSettings);
+        this.selector?.render(this.actionSettings);
     }
 
     @SDOnPiEvent('sendToPropertyInspector')
@@ -112,7 +122,7 @@ class PearPi extends StreamDeckPropertyInspectorHandler {
         if (!isRecord(payload) || !this.connection) return;
         if (payload.type === 'pear-connection-saved') { this.dirty = false; return; }
         if (payload.type === 'pear-playlist-status') {
-            if (this.actionInfo.action === ActionTypes.PLAY_PLAYLIST && typeof payload.message === 'string') {
+            if ([ActionTypes.PLAY_PLAYLIST, ActionTypes.PLAYLIST_SELECTOR].includes(this.actionInfo.action as ActionTypes) && typeof payload.message === 'string') {
                 this.actionMessage.textContent = payload.message;
             }
             return;

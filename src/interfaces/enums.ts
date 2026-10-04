@@ -10,5 +10,8 @@ export enum ActionTypes {
     SONG_INFO = 'io.github.scarfmeister.pear-streamdeck.song-info',
     SHUFFLE = 'io.github.scarfmeister.pear-streamdeck.shuffle',
     REPEAT = 'io.github.scarfmeister.pear-streamdeck.repeat',
-    PLAY_PLAYLIST = 'io.github.scarfmeister.pear-streamdeck.play-playlist'
+    PLAY_PLAYLIST = 'io.github.scarfmeister.pear-streamdeck.play-playlist',
+    VOLUME_DIAL = 'io.github.scarfmeister.pear-streamdeck.volume-dial',
+    TRANSPORT_DIAL = 'io.github.scarfmeister.pear-streamdeck.transport-dial',
+    PLAYLIST_SELECTOR = 'io.github.scarfmeister.pear-streamdeck.playlist-selector'
 }
