@@ -1,0 +1,17 @@
+# Stage 5 playlist input, settings, and client boundary
+
+Reviewed 2026-10-04 before implementing the client interface. Sources: repository [Stage 3 investigation](../PLAYLIST_API_SPIKE.md), [D013](../DECISIONS.md#d013--stage-3-playlist-extension-contract) at Stage 5 starting commit `15bb236f17c69e49ee6002c004f992e4d1ae5f8e`, and its pinned Pear 3.12.0 commit `3f599b42724be827db51cd4689996dc3e48a9561`. No new live native-playback research or Pear modifications were performed.
+
+## Conclusions and implementation effect
+
+Unmodified Pear exposes neither normal playlist startup nor true native Shuffle Play. Stage 5 explicitly authorizes the Stream Deck configuration/parser/interface and fake-contract tests in advance of Stage 7. These tests prove request construction and failure handling, not current Pear capability or native playback.
+
+`src/pear/playlist.ts` implements D013's exact host allowlist, supported playlist/watch paths (single video path for `youtu.be`), HTTP(S), one `list`, case-preserved IDs matching `[A-Za-z0-9_-]{1,256}`, and decode-once semantics. It never strips a guessed prefix or uses `v`/a video path instead of `list`. Additional conservative input limits: 4096 characters, no nondefault URL port, embedded userinfo (including empty userinfo), backslash, interior whitespace, malformed percent escape, or invalid encoded UTF-8. Standard URL normalization applies to host/default ports. Unrelated valid query fields/fragments are ignored. These choices are local validation policy, not claims about all URLs YouTube accepts.
+
+The per-action record stores canonical `playlistId` and `startupMode`; the default is `FOLLOW_SHUFFLE_STATE`. Saving removes legacy `playlistUrl` and preserves unrelated fields. Reading a nonempty legacy URL takes precedence over its potentially stale ID; an invalid URL fails without reverting to that old ID. Invalid/missing old mode defaults to Follow. Records change only on explicit Save, so opening settings never triggers playback or writes every action.
+
+`PearClient.startPlaylist(input, mode)` holds one active operation, captures known Follow state at activation, allows one bounded shuffle read for a nullable model gap, and sends one authenticated D013 POST. Always modes do not need a shuffle read. Generation changes prevent a delayed read starting a playlist at a new endpoint. Exactly HTTP 200 with matching ID/boolean/`dispatched` is accepted; no optimistic song/shuffle update occurs. An absent route (404) or unavailable native capability (501) reports the Stage 7 extension requirement. Other failures alert; ambiguous transport/dispatch responses warn that playback may have started. No response bodies/native strings enter user errors or logs, and no reconnect/retry/fallback replays a startup.
+
+## Assumptions and unresolved questions
+
+Both startup modes remain blocked on the Stage 7 Pear implementation and its signed-in/native acceptance. A 501 can also mean a compatible extension cannot resolve native controls; installing a patch alone is not proof those controls work. The client conservatively treats 502/504 as ambiguous because the shared REST error boundary deliberately omits server bodies. Host write submission does not prove disk persistence. Valid 3.12.0 snapshots supply boolean shuffle; unknown-shuffle tests fault-inject the nullable shared-model gap without claiming null is a valid WebSocket message. Manual tests must verify URL/ID editing, persistence, unavailable playlists, mode semantics, dispatch-only response, and no preliminary wrong track.

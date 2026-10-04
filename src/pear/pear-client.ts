@@ -1,5 +1,5 @@
 import {AuthenticationState, isUnauthorized, parseAuthorizationResponse} from './auth';
-import {endpointKey, normalizeSettings, PEAR_CLIENT_ID, PearSettings, websocketUrl} from './config';
+import {endpointKey, isRecord, normalizeSettings, PEAR_CLIENT_ID, PearSettings, websocketUrl} from './config';
 import {reconnectDelay} from './reconnect';
 import {FailureCode, PearRequestError, PearRestClient} from './rest-client';
 import {browserSocket, PearSocket, Scheduler, SocketFactory, systemScheduler} from './runtime';
@@ -7,6 +7,15 @@ import {clampVolume, emptyPlayerState, LikeState, mergePlayerState, parseLikeSta
     PearPlayerState, StateField} from './state';
 import {parsePearMessage} from './websocket';
 import {PearCommands} from './commands';
+import {parsePlaylistInput, PlaylistDispatch, playlistShuffle, playlistStartupMode, PlaylistStartupMode} from './playlist';
+
+export class PearPlaylistError extends Error {
+    constructor(readonly reason: 'extension-required' | 'unconfirmed') {
+        super(reason === 'extension-required'
+            ? 'Native playlist startup requires the compatible Pear API extension from Stage 7 (including native controls).'
+            : 'Playlist startup could not be confirmed. Playback may have started; no automatic retry was sent.');
+    }
+}
 
 export type ConnectionState = 'stopped' | 'connecting' | 'authorizing' | 'awaiting-snapshot' |
     'connected' | 'retrying' | 'authorization-required' | 'error';
@@ -57,6 +66,7 @@ export class PearClient {
     private likeRead?: {generation: number; promise: Promise<LikeState | null>};
     private likeReadAgain = false;
     private readonly fieldRevisions = {volume: 0, shuffle: 0, repeat: 0};
+    private playlistOperation?: object;
 
     constructor(settings: unknown = {}, options: PearClientOptions = {}) {
         this.settings = normalizeSettings(settings);
@@ -114,14 +124,14 @@ export class PearClient {
     }
 
     /** Requests are sent once. Never automatically replay a playback command. */
-    async request(method: 'GET' | 'POST', path: string, body?: unknown): Promise<unknown> {
+    async request(method: 'GET' | 'POST', path: string, body?: unknown, successStatus?: number): Promise<unknown> {
         if (!this.running || this.snapshot.connection !== 'connected' || !this.controller) {
             throw new PearRequestError('not-connected');
         }
         const generation = this.generation;
         try {
             const result = await this.rest.api(this.settings, path, {method, body,
-                accessToken: this.settings.credential?.accessToken, signal: this.controller.signal});
+                accessToken: this.settings.credential?.accessToken, signal: this.controller.signal, successStatus});
             if (!this.current(generation)) throw new PearRequestError('aborted');
             this.commandFailureLogged = false;
             return result;
@@ -139,6 +149,49 @@ export class PearClient {
 
     setVolume(volume: number): Promise<unknown> {
         return this.request('POST', 'volume', {volume: clampVolume(volume)});
+    }
+
+    /** Stage 7 contract only. One native startup request; dispatch is not playback confirmation. */
+    async startPlaylist(input: unknown, mode: PlaylistStartupMode = 'FOLLOW_SHUFFLE_STATE'): Promise<PlaylistDispatch> {
+        const playlistId = parsePlaylistInput(input);
+        if (this.playlistOperation) throw new PearRequestError('command-busy');
+        if (!this.running || this.snapshot.connection !== 'connected' || !this.snapshot.player.ready) {
+            throw new PearRequestError('not-connected');
+        }
+        const operation = this.playlistOperation = {};
+        const generation = this.generation;
+        let submitted = false;
+        // Capture known Follow state synchronously, before any request/resolution.
+        let shuffle = playlistShuffle(playlistStartupMode({startupMode: mode}), this.snapshot.player.shuffle);
+        try {
+            if (shuffle === null) {
+                try { await this.refreshState('shuffle'); }
+                catch (error) {
+                    if (isUnauthorized(error) || !this.current(generation)) throw error;
+                    throw new PearRequestError('state-unavailable');
+                }
+                if (!this.current(generation)) throw new PearRequestError('aborted');
+                shuffle = this.snapshot.player.shuffle;
+            }
+            if (shuffle === null) throw new PearRequestError('state-unavailable');
+            submitted = true;
+            const value = await this.request('POST', 'play-playlist', {playlistId, shuffle}, 200);
+            if (!isRecord(value) || value.status !== 'dispatched' || value.playlistId !== playlistId || value.shuffle !== shuffle) {
+                throw new PearPlaylistError('unconfirmed');
+            }
+            return Object.freeze({playlistId, shuffle, status: 'dispatched'});
+        } catch (error) {
+            if (submitted && error instanceof PearRequestError && (error.status === 404 || error.status === 501)) {
+                throw new PearPlaylistError('extension-required');
+            }
+            if (submitted && error instanceof PearRequestError && (['timeout', 'network', 'invalid-response', 'aborted'].includes(error.code)
+                || error.status === 502 || error.status === 504)) {
+                throw new PearPlaylistError('unconfirmed');
+            }
+            throw error;
+        } finally {
+            if (this.playlistOperation === operation) this.playlistOperation = undefined;
+        }
     }
 
     /** One bounded gap fill; an intervening WebSocket update wins over a stale REST response. */
@@ -335,6 +388,7 @@ export class PearClient {
     private cancelSession(): void {
         ++this.generation;
         this.commands.cancel();
+        this.playlistOperation = undefined;
         this.controller?.abort();
         this.controller = undefined;
         this.scheduler.clearTimeout(this.retryTimer);

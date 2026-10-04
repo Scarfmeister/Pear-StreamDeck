@@ -4,11 +4,12 @@ import {readFileSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
 import {FakeScheduler, empty, json, PLAYER_INFO, settle} from './helpers';
 
-function browser(entry: 'pear-plugin' | 'pear-pi') {
+function browser(entry: 'pear-plugin' | 'pear-pi', options: {action?: string; settings?: unknown; piUuid?: string} = {}) {
     const clock = new FakeScheduler();
     const sockets: HostSocket[] = [];
     const requests: {url: string; init?: RequestInit}[] = [];
-    const elements = new Map<string, {value: string; textContent: string; disabled: boolean;
+    const elements = new Map<string, {value: string; textContent: string; disabled: boolean; hidden: boolean;
+        input(): void;
         onclick?: () => void; addEventListener(type: string, callback: () => void): void}>();
     let authorized = false;
     class HostSocket {
@@ -30,7 +31,12 @@ function browser(entry: 'pear-plugin' | 'pear-pi') {
     runInNewContext(readFileSync(`dist/browser-tests/${entry}.js`, 'utf8'), {
         window, document: {readyState: 'complete', addEventListener: () => {},
             getElementById: (id: string) => {
-                if (!elements.has(id)) elements.set(id, {value: '', textContent: '', disabled: false, addEventListener: () => {}});
+                if (!elements.has(id)) {
+                    const callbacks: (() => void)[] = [];
+                    elements.set(id, {value: '', textContent: '', disabled: false, hidden: true,
+                        input: () => callbacks.forEach(callback => callback()),
+                        addEventListener: (type, callback) => { if (type === 'input') callbacks.push(callback); }});
+                }
                 return elements.get(id);
             }}, WebSocket: HostSocket, URL, AbortController, console,
         setTimeout: (callback: () => void, delay: number) => clock.setTimeout(callback, delay),
@@ -39,13 +45,14 @@ function browser(entry: 'pear-plugin' | 'pear-pi') {
             requests.push({url: String(url), init});
             if (String(url).includes('/auth/')) { authorized = true; return json({accessToken: 'browser-secret'}); }
             if (!authorized && String(url).endsWith('/song')) return json({}, 401);
+            if (String(url).endsWith('/play-playlist')) return json({}, 404);
             return String(url).endsWith('/like-state') ? json({state: 'LIKE'}) : empty();
         },
     });
     const info = JSON.stringify({application: {language: 'en'}, devices: []});
-    window.connectElgatoStreamDeckSocket!('12345', entry === 'pear-plugin' ? 'plugin' : 'ctx',
+    window.connectElgatoStreamDeckSocket!('12345', entry === 'pear-plugin' ? 'plugin' : options.piUuid ?? 'ctx',
         entry === 'pear-plugin' ? 'registerPlugin' : 'registerPropertyInspector', info,
-        JSON.stringify({action: 'io.github.scarfmeister.pear-streamdeck.next', context: 'ctx', payload: {settings: {}}}));
+        JSON.stringify({action: options.action ?? 'io.github.scarfmeister.pear-streamdeck.next', context: 'ctx', payload: {settings: options.settings ?? {}}}));
     const host = sockets[0];
     host.open();
     return {host, sockets, clock, requests, elements};
@@ -138,4 +145,102 @@ test('browser host events render the manifest playback images and three distinct
     b.host.close();
     assert.equal(pear.closed, true);
     assert.equal(b.clock.tasks.size, 0);
+});
+
+test('PI volume defaults/validation/persistence use the action context, retaining early host settings and unsaved edits', async () => {
+    const action = 'io.github.scarfmeister.pear-streamdeck.volume-down';
+    const b = browser('pear-pi', {action, settings: {steps: 1}, piUuid: 'ui-registration'});
+    const update = (settings: unknown) => b.host.receive({event: 'didReceiveSettings', action, context: 'ctx', payload: {settings}});
+    assert.ok(b.host.sent.some(message => message.event === 'getSettings' && message.action === action && message.context === 'ctx'));
+    update({steps: '10', retained: true}); // Arrives before setupReady.
+    b.host.receive({event: 'didReceiveGlobalSettings', payload: {settings: {}}});
+    await b.clock.advance(1);
+    assert.equal(b.elements.get('volumeSettings')?.hidden, false);
+    assert.equal(b.elements.get('playlistSettings')?.hidden, true);
+    assert.equal(b.elements.get('volumeStep')?.value, '10');
+    const input = b.elements.get('volumeStep')!;
+    input.value = '2.5'; input.input();
+    update({steps: 5, retained: 'new'});
+    assert.equal(input.value, '2.5', 'incoming state/settings do not erase unsaved edits');
+    b.elements.get('actionSave')?.onclick?.();
+    assert.match(b.elements.get('actionMessage')!.textContent, /whole percentage/);
+    assert.equal(b.host.sent.filter(m => m.event === 'setSettings').length, 0);
+    input.value = '2'; input.input(); b.elements.get('actionSave')?.onclick?.();
+    const write = b.host.sent.filter(m => m.event === 'setSettings').at(-1)!;
+    assert.equal(write.action, action); assert.equal(write.context, 'ctx');
+    assert.deepEqual(write.payload, {steps: 2, retained: 'new'});
+    assert.equal(b.host.sent.filter(m => m.event === 'setGlobalSettings').length, 0);
+    assert.equal(b.requests.length, 0); assert.equal(b.sockets.length, 1);
+    update({steps: 'invalid'}); assert.equal(input.value, '5');
+    b.host.close();
+});
+
+test('PI displays every Track Info selection and saves it per context without changing globals', async () => {
+    const action = 'io.github.scarfmeister.pear-streamdeck.song-info';
+    const b = browser('pear-pi', {action});
+    b.host.receive({event: 'didReceiveGlobalSettings', payload: {settings: {}}}); await b.clock.advance(1);
+    assert.equal(b.elements.get('trackInfoSettings')?.hidden, false);
+    const select = b.elements.get('trackInfoFormat')!;
+    assert.equal(select.value, 'TITLE_ARTIST');
+    for (const format of ['TITLE', 'ARTIST', 'TITLE_ARTIST', 'ALBUM', 'TITLE_ARTIST_ALBUM']) {
+        select.value = format; select.input(); b.elements.get('actionSave')?.onclick?.();
+        assert.equal((b.host.sent.filter(m => m.event === 'setSettings').at(-1)?.payload as {displayFormat: string}).displayFormat, format);
+    }
+    assert.equal(b.requests.length, 0); b.host.close();
+});
+
+test('PI playlist URL normalizes to stored ID, validates malformed edits, and defaults Follow while exposing Stage 7', async () => {
+    const action = 'io.github.scarfmeister.pear-streamdeck.play-playlist';
+    const b = browser('pear-pi', {action, settings: {playlistUrl: 'https://music.youtube.com/playlist?list=New', playlistId: 'Old', retained: true}});
+    b.host.receive({event: 'didReceiveGlobalSettings', payload: {settings: {}}}); await b.clock.advance(1);
+    assert.equal(b.elements.get('playlistSettings')?.hidden, false);
+    assert.equal(b.elements.get('playlistStartupMode')?.value, 'FOLLOW_SHUFFLE_STATE');
+    b.elements.get('actionSave')?.onclick?.();
+    assert.deepEqual(b.host.sent.filter(m => m.event === 'setSettings').at(-1)?.payload,
+        {playlistId: 'New', retained: true, startupMode: 'FOLLOW_SHUFFLE_STATE'});
+    assert.equal(b.elements.get('playlistInput')?.value, 'New');
+    const input = b.elements.get('playlistInput')!;
+    input.value = 'https://evil.test/playlist?list=bad'; input.input(); b.elements.get('actionSave')?.onclick?.();
+    assert.equal(b.host.sent.filter(m => m.event === 'setSettings').length, 1);
+    assert.match(b.elements.get('actionMessage')!.textContent, /playlist ID/);
+    assert.ok(readFileSync('property-inspector.html', 'utf8').includes('Stage 7'));
+    assert.equal(b.requests.length, 0); b.host.close();
+});
+
+test('PI connection validation errors preserve user edits until the plugin confirms saving', async () => {
+    const b = browser('pear-pi');
+    b.host.receive({event: 'didReceiveGlobalSettings', payload: {settings: {}}}); await b.clock.advance(1);
+    const status = {type: 'pear-status', connection: 'connected', authentication: 'authorized',
+        settings: {host: '127.0.0.1', port: 26538, protocol: 'http'}};
+    b.host.receive({event: 'sendToPropertyInspector', payload: status});
+    const port = b.elements.get('globalPort')!;
+    port.value = 'bad'; port.input(); b.elements.get('globalSave')?.onclick?.();
+    b.host.receive({event: 'sendToPropertyInspector', payload: {...status, error: 'Port is invalid.'}});
+    assert.equal(port.value, 'bad');
+    assert.equal(b.elements.get('connectionError')?.textContent, 'Port is invalid.');
+    b.host.receive({event: 'sendToPropertyInspector', payload: {type: 'pear-connection-saved'}});
+    b.host.receive({event: 'sendToPropertyInspector', payload: status});
+    assert.equal(port.value, '26538');
+    assert.equal(b.elements.get('globalAuthStatus')?.textContent, 'Authorized');
+    assert.ok(!JSON.stringify(b.host.sent).includes('accessToken'));
+    b.host.close();
+});
+
+test('browser playlist activation calls only the documented route and surfaces missing capability to its PI/key', async () => {
+    const b = browser('pear-plugin');
+    b.host.receive({event: 'didReceiveGlobalSettings', payload: {settings: {}}}); await b.clock.advance(1); await settle();
+    b.sockets[1].receive(PLAYER_INFO); await settle();
+    const action = 'io.github.scarfmeister.pear-streamdeck.play-playlist';
+    const settings = {playlistId: 'PL_Test', startupMode: 'ALWAYS_SHUFFLE'};
+    b.host.receive({event: 'sendToPlugin', action, context: 'ctx', payload: {type: 'pear-get-status'}});
+    b.host.receive({event: 'willAppear', action, context: 'ctx', payload: {settings, controller: 'Keypad'}});
+    b.host.receive({event: 'keyUp', action, context: 'ctx', payload: {settings}}); await settle();
+    const commands = b.requests.filter(r => r.init?.method === 'POST' && !r.url.includes('/auth/'));
+    assert.equal(commands.length, 1); assert.ok(commands[0].url.endsWith('/play-playlist'));
+    assert.deepEqual(JSON.parse(String(commands[0].init?.body)), {playlistId: 'PL_Test', shuffle: true});
+    assert.ok(b.host.sent.some(m => m.event === 'showAlert'));
+    assert.ok(b.host.sent.some(m => m.event === 'setTitle' && (m.payload as {title: string}).title === 'Stage 7\nrequired'));
+    assert.ok(b.host.sent.some(m => m.event === 'sendToPropertyInspector' && (m.payload as {message?: string}).message?.includes('Stage 7')));
+    assert.ok(!JSON.stringify(b.host.sent.filter(m => m.event === 'sendToPropertyInspector')).includes('browser-secret'));
+    b.host.close(); assert.equal(b.clock.tasks.size, 0);
 });

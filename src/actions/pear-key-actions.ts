@@ -1,22 +1,11 @@
 import {ActionTypes} from '../interfaces/enums';
 import {isRecord} from '../pear/config';
 import {PearCommands} from '../pear/commands';
-import {PearSnapshot} from '../pear/pear-client';
+import {PearClient, PearPlaylistError, PearSnapshot} from '../pear/pear-client';
 import {PearSong} from '../pear/state';
-
-export type TrackInfoFormat = 'TITLE' | 'ARTIST' | 'TITLE_ARTIST' | 'ALBUM' | 'TITLE_ARTIST_ALBUM';
-export const TRACK_INFO_FORMATS: readonly TrackInfoFormat[] = ['TITLE', 'ARTIST', 'TITLE_ARTIST', 'ALBUM', 'TITLE_ARTIST_ALBUM'];
-
-export function volumeStep(settings: unknown): number {
-    const raw = isRecord(settings) ? settings.steps : undefined;
-    const step = typeof raw === 'number' ? raw : typeof raw === 'string' && /^\d+$/.test(raw) ? Number(raw) : NaN;
-    return Number.isInteger(step) && step >= 1 && step <= 100 ? step : 5;
-}
-
-export function trackInfoFormat(settings: unknown): TrackInfoFormat {
-    const raw = isRecord(settings) ? settings.displayFormat : undefined;
-    return TRACK_INFO_FORMATS.includes(raw as TrackInfoFormat) ? raw as TrackInfoFormat : 'TITLE_ARTIST';
-}
+import {TrackInfoFormat, trackInfoFormat, volumeStep} from '../streamdeck/action-settings';
+import {parsePlaylistInput, playlistInput, playlistStartupMode} from '../pear/playlist';
+export {TRACK_INFO_FORMATS, TrackInfoFormat, trackInfoFormat, volumeStep} from '../streamdeck/action-settings';
 
 function readableLine(text: string, limit: number): string {
     const characters = Array.from(text.replace(/\s+/g, ' ').trim());
@@ -39,6 +28,7 @@ export interface PearKeyClient {
         'like' | 'dislike' | 'toggleMute' | 'changeVolume' | 'toggleShuffle' | 'cycleRepeat'>;
     getSnapshot(): PearSnapshot;
     subscribe(listener: (snapshot: PearSnapshot) => void): () => void;
+    startPlaylist: PearClient['startPlaylist'];
 }
 
 export interface PearKeyHost {
@@ -47,6 +37,7 @@ export interface PearKeyHost {
     setImage(image: string, context: string): void;
     setFeedback(context: string, payload: Record<string, unknown>): void;
     showAlert(context: string): void;
+    playlistStatus?(context: string, message: string): void;
 }
 
 export interface KeyContextEvent {
@@ -55,7 +46,7 @@ export interface KeyContextEvent {
     payload: {settings?: unknown; controller?: string};
 }
 type Render = {title: string; state?: 0 | 1; image?: string; feedback?: boolean};
-type Context = {action: string; controller?: string; settings: unknown; rendered?: Render};
+type Context = {action: string; controller?: string; settings: unknown; rendered?: Render; playlistError?: string};
 
 /** One shared subscription, with independently cached displays for all visible contexts. */
 export class PearKeyActions {
@@ -82,6 +73,7 @@ export class PearKeyActions {
         const entry = this.contexts.get(event.context);
         if (!entry || entry.action !== event.action) return;
         entry.settings = event.payload.settings;
+        entry.playlistError = undefined;
         this.render(event.context, entry, this.client.getSnapshot());
     }
 
@@ -110,11 +102,29 @@ export class PearKeyActions {
                 case ActionTypes.SONG_INFO: await commands.togglePlay(); break;
                 case ActionTypes.SHUFFLE: await commands.toggleShuffle(); break;
                 case ActionTypes.REPEAT: await commands.cycleRepeat(); break;
-                case ActionTypes.PLAY_PLAYLIST: this.host.showAlert(event.context); break;
+                case ActionTypes.PLAY_PLAYLIST:
+                    await this.client.startPlaylist(playlistInput(settings), playlistStartupMode(settings));
+                    if (visible && this.contexts.get(event.context) === visible && !this.disposed) {
+                        visible.playlistError = undefined;
+                        this.render(event.context, visible, this.client.getSnapshot());
+                    }
+                    if (!this.disposed && (!visible || this.contexts.get(event.context) === visible)) {
+                        this.host.playlistStatus?.(event.context, 'Native playlist command dispatched. Check Pear state for playback.');
+                    }
+                    break;
             }
-        } catch {
+        } catch (error) {
             // The shared client logs safe errors. Never serialize events/settings/credentials here.
-            if (!this.disposed && (!visible || this.contexts.get(event.context) === visible)) this.host.showAlert(event.context);
+            if (!this.disposed && (!visible || this.contexts.get(event.context) === visible)) {
+                if (event.action === ActionTypes.PLAY_PLAYLIST) {
+                    if (visible) {
+                        visible.playlistError = error instanceof PearPlaylistError && error.reason === 'extension-required' ? 'Stage 7\nrequired' : 'Start failed';
+                        this.render(event.context, visible, this.client.getSnapshot());
+                    }
+                    this.host.playlistStatus?.(event.context, error instanceof Error ? error.message : 'Playlist startup failed.');
+                }
+                this.host.showAlert(event.context);
+            }
         }
     }
 
@@ -139,12 +149,15 @@ export class PearKeyActions {
 
     private display(entry: Context, snapshot: PearSnapshot): Render {
         if (entry.controller === 'Encoder') return {title: 'Dials pending', feedback: true};
-        if (entry.action === ActionTypes.PLAY_PLAYLIST) return {title: 'Pear API\nrequired'};
         if (!snapshot.player.ready || snapshot.connection !== 'connected') {
             return {title: snapshot.connection === 'authorizing' ? 'Approve\nin Pear' : 'Pear\noffline'};
         }
         const state = snapshot.player;
         switch (entry.action) {
+            case ActionTypes.PLAY_PLAYLIST:
+                if (entry.playlistError) return {title: entry.playlistError};
+                try { parsePlaylistInput(playlistInput(entry.settings)); return {title: 'Play\nplaylist'}; }
+                catch { return {title: 'Set playlist'}; }
             case ActionTypes.PLAY_PAUSE:
                 return {state: state.isPlaying === true ? 1 : 0, title: state.isPlaying === null ? '?' : ''};
             case ActionTypes.LIKE_TRACK:

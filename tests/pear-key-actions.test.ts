@@ -2,9 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {formatTrackInfo, PearKeyActions, PearKeyClient, PearKeyHost, trackInfoFormat, volumeStep} from '../src/actions/pear-key-actions';
 import {ActionTypes} from '../src/interfaces/enums';
-import {PearSnapshot} from '../src/pear/pear-client';
+import {PearPlaylistError, PearSnapshot} from '../src/pear/pear-client';
+import {parsePlaylistInput, playlistShuffle} from '../src/pear/playlist';
 import {emptyPlayerState, mergePlayerState, PlayerUpdate} from '../src/pear/state';
-import {harness, settle, SONG} from './helpers';
+import {deferred, harness, settle, SONG} from './helpers';
+import {PlaylistDispatch} from '../src/pear/playlist';
 
 class KeyHost implements PearKeyHost {
     readonly events: {type: string; context: string; value?: unknown}[] = [];
@@ -13,6 +15,7 @@ class KeyHost implements PearKeyHost {
     setImage(image: string, context: string) { this.events.push({type: 'image', context, value: image}); }
     setFeedback(context: string, payload: Record<string, unknown>) { this.events.push({type: 'feedback', context, value: payload}); }
     showAlert(context: string) { this.events.push({type: 'alert', context}); }
+    playlistStatus(context: string, message: string) { this.events.push({type: 'playlistStatus', context, value: message}); }
     latest(type: string, context: string) { return this.events.filter(event => event.type === type && event.context === context).at(-1)?.value; }
 }
 
@@ -21,13 +24,18 @@ function event(action: ActionTypes, context = 'key', settings: unknown = {}, con
 }
 
 function fakeClient() {
-    const calls: {name: string; delta?: number}[] = [];
+    const calls: {name: string; delta?: number; playlistId?: string; mode?: string}[] = [];
     let snapshot: PearSnapshot = {connection: 'connected', authentication: 'disabled', retryAttempt: 0,
         retryInMs: null, lastError: null, player: mergePlayerState(emptyPlayerState(), {ready: true, song: SONG,
             isPlaying: true, muted: false, volume: 35, shuffle: false, repeat: 'NONE', likeState: 'INDIFFERENT'})};
     const listeners = new Set<(value: PearSnapshot) => void>();
     const command = (name: string) => async () => { calls.push({name}); };
     const client: PearKeyClient = {getSnapshot: () => snapshot,
+        startPlaylist: async (input, mode = 'FOLLOW_SHUFFLE_STATE') => {
+            const playlistId = parsePlaylistInput(input);
+            calls.push({name: 'startPlaylist', playlistId, mode});
+            return {playlistId, shuffle: playlistShuffle(mode, snapshot.player.shuffle) ?? false, status: 'dispatched'};
+        },
         subscribe: listener => { listeners.add(listener); listener(snapshot); return () => { listeners.delete(listener); }; },
         commands: {play: command('play'), pause: command('pause'), togglePlay: command('togglePlay'), next: command('next'),
             previous: command('previous'), like: command('like'), dislike: command('dislike'), toggleMute: command('toggleMute'),
@@ -191,18 +199,26 @@ test('volume settings validate defaults and steps, and changed settings affect t
     keys.dispose();
 });
 
-test('playlist remains explicitly blocked and encoder events cannot activate key commands', async () => {
+test('playlist configuration calls the shared interface; missing native capability alerts; encoders stay guarded', async () => {
     const f = fakeClient();
     const host = new KeyHost();
     const keys = new PearKeyActions(f.client, host);
     keys.appear(event(ActionTypes.PLAY_PLAYLIST, 'playlist'));
-    assert.equal(host.latest('title', 'playlist'), 'Pear API\nrequired');
+    assert.equal(host.latest('title', 'playlist'), 'Set playlist');
     await keys.press(event(ActionTypes.PLAY_PLAYLIST, 'playlist'));
     assert.equal(host.events.at(-1)?.type, 'alert');
+    keys.settings(event(ActionTypes.PLAY_PLAYLIST, 'playlist', {playlistId: 'PL_example'}));
+    await keys.press({action: ActionTypes.PLAY_PLAYLIST, context: 'playlist', payload: {}});
+    assert.deepEqual(f.calls.at(-1), {name: 'startPlaylist', playlistId: 'PL_example', mode: 'FOLLOW_SHUFFLE_STATE'});
+    assert.equal(host.latest('title', 'playlist'), 'Play\nplaylist');
+    f.client.startPlaylist = async () => { throw new PearPlaylistError('extension-required'); };
+    await keys.press({action: ActionTypes.PLAY_PLAYLIST, context: 'playlist', payload: {}});
+    assert.equal(host.latest('title', 'playlist'), 'Stage 7\nrequired');
+    assert.match(String(host.latest('playlistStatus', 'playlist')), /Stage 7/);
     keys.appear(event(ActionTypes.VOLUME_UP, 'dial', {}, 'Encoder'));
     await keys.press({action: ActionTypes.VOLUME_UP, context: 'dial', payload: {}});
     await keys.press(event(ActionTypes.PLAY_PAUSE, 'other-dial', {}, 'Encoder'));
-    assert.equal(f.calls.length, 0);
+    assert.equal(f.calls.length, 1);
     assert.deepEqual(host.latest('feedback', 'dial'), {title: 'Dials pending'});
     keys.dispose();
 });
@@ -221,4 +237,18 @@ test('failed commands alert without inventing a state transition; errors after d
     keys.dispose();
     await pending;
     assert.equal(host.events.length, count);
+});
+
+test('playlist dispatch completion after a context disappears or the host closes does not update its PI/key', async () => {
+    for (const dispose of [false, true]) {
+        const f = fakeClient(); const host = new KeyHost(); const keys = new PearKeyActions(f.client, host);
+        const result = deferred<PlaylistDispatch>(); f.client.startPlaylist = () => result.promise;
+        keys.appear(event(ActionTypes.PLAY_PLAYLIST, 'playlist', {playlistId: 'PL_Test'}));
+        const pending = keys.press({action: ActionTypes.PLAY_PLAYLIST, context: 'playlist', payload: {}});
+        if (dispose) keys.dispose(); else keys.disappear('playlist');
+        const count = host.events.length;
+        result.resolve({playlistId: 'PL_Test', shuffle: false, status: 'dispatched'}); await pending;
+        assert.equal(host.events.length, count);
+        keys.dispose();
+    }
 });

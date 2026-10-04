@@ -1,15 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Pear Desktop Connector — Connection</title>
+    <title>Pear Desktop Connector — Settings</title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="sdpi.css">
+    <style>[hidden] { display: none !important; }</style>
     <script src="bundle-pi.js"></script>
 </head>
 <body>
 <div class="sdpi-wrapper">
-    <p>Standard key controls are available. Volume keys use 5% steps by default.
-       Per-action settings and dedicated dials are coming in later stages.</p>
+    <section id="actionSettings" hidden>
+        <section id="volumeSettings" hidden>
+            <div class="sdpi-item">
+                <label class="sdpi-item-label" for="volumeStep">Step (%)</label>
+                <input class="sdpi-item-value" type="number" id="volumeStep" min="1" max="100" step="1" value="5">
+            </div>
+            <p>Whole percentages from 1 to 100. Default: 5%. Volume stays within 0–100%.</p>
+        </section>
+        <section id="trackInfoSettings" hidden>
+            <div class="sdpi-item">
+                <label class="sdpi-item-label" for="trackInfoFormat">Display</label>
+                <select class="sdpi-item-value" id="trackInfoFormat">
+                    <option value="TITLE">Title</option>
+                    <option value="ARTIST">Artist</option>
+                    <option value="TITLE_ARTIST" selected>Title + Artist</option>
+                    <option value="ALBUM">Album</option>
+                    <option value="TITLE_ARTIST_ALBUM">Title + Artist + Album</option>
+                </select>
+            </div>
+            <p>Long lines are shortened to fit a key. Enable Show Title and clear a custom Stream Deck title to see metadata.</p>
+        </section>
+        <section id="playlistSettings" hidden>
+            <div class="sdpi-item">
+                <label class="sdpi-item-label" for="playlistInput">Playlist</label>
+                <input class="sdpi-item-value" type="text" id="playlistInput" maxlength="4096" placeholder="Playlist URL or ID" spellcheck="false">
+            </div>
+            <div class="sdpi-item">
+                <label class="sdpi-item-label" for="playlistStartupMode">Start mode</label>
+                <select class="sdpi-item-value" id="playlistStartupMode">
+                    <option value="FOLLOW_SHUFFLE_STATE">Follow Shuffle State</option>
+                    <option value="ALWAYS_NORMAL">Always Normal</option>
+                    <option value="ALWAYS_SHUFFLE">Always Shuffle</option>
+                </select>
+            </div>
+            <p>Save extracts and stores the playlist ID. Follow uses Pear's actual shuffle state when pressed.</p>
+            <p id="playlistRequirement">Playlist execution in all modes requires the Pear API extension planned for Stage 7.
+                Pear 3.12.0 cannot start playlists. A missing or unsupported native operation alerts; no fallback playback is sent.</p>
+        </section>
+        <div class="sdpi-item"><button class="sdpi-item-value" id="actionSave">Save action settings</button></div>
+        <p id="actionMessage" role="status" aria-live="polite"></p>
+    </section>
+    <p>Connection settings apply to all Pear actions. Dedicated dials are planned for a later stage.</p>
     <div class="sdpi-item">
         <div class="sdpi-item-label">Connection</div>
         <strong class="sdpi-item-value" id="globalConnectionStatus">Waiting for plugin</strong>
@@ -19,15 +60,15 @@
         <strong class="sdpi-item-value" id="globalAuthStatus">Checking</strong>
     </div>
     <div class="sdpi-item">
-        <div class="sdpi-item-label">Host</div>
+        <label class="sdpi-item-label" for="globalHost">Host</label>
         <input class="sdpi-item-value" type="text" id="globalHost" value="127.0.0.1">
     </div>
     <div class="sdpi-item">
-        <div class="sdpi-item-label">Port</div>
+        <label class="sdpi-item-label" for="globalPort">Port</label>
         <input class="sdpi-item-value" type="number" id="globalPort" value="26538" min="1" max="65535">
     </div>
     <div class="sdpi-item">
-        <div class="sdpi-item-label">Protocol</div>
+        <label class="sdpi-item-label" for="globalProtocol">Protocol</label>
         <select class="sdpi-item-value" id="globalProtocol">
             <option value="http">HTTP (local default)</option>
             <option value="https">HTTPS</option>

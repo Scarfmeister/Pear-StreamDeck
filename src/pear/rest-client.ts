@@ -25,6 +25,7 @@ export interface RequestOptions {
     accessToken?: string;
     signal?: AbortSignal;
     timeoutMs?: number;
+    successStatus?: number;
 }
 
 export class PearRestClient {
@@ -64,6 +65,9 @@ export class PearRestClient {
                 const retryAfter = response.status === 429 && Number.isFinite(seconds) && seconds > 0
                     ? Math.min(300000, seconds * 1000) : undefined;
                 throw new PearRequestError('http', response.status, retryAfter);
+            }
+            if (options.successStatus !== undefined && response.status !== options.successStatus) {
+                throw new PearRequestError('invalid-response');
             }
             if (response.status === 204) return undefined;
             const body = await response.text();

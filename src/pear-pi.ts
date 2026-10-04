@@ -1,5 +1,8 @@
-import {SDOnPiEvent, SendToPiEvent, StreamDeckPropertyInspectorHandler} from 'streamdeck-typescript';
+import {DidReceiveSettingsEvent, SDOnPiEvent, SendToPiEvent, StreamDeckPropertyInspectorHandler} from 'streamdeck-typescript';
 import {isRecord} from './pear/config';
+import {ActionTypes} from './interfaces/enums';
+import {saveActionSettings, trackInfoFormat, volumeStep} from './streamdeck/action-settings';
+import {playlistInput, playlistStartupMode} from './pear/playlist';
 
 class PearPi extends StreamDeckPropertyInspectorHandler {
     constructor() { super(); }
@@ -13,6 +16,26 @@ class PearPi extends StreamDeckPropertyInspectorHandler {
     private reauthorizeButton: HTMLButtonElement;
     private inputsInitialized = false;
     private dirty = false;
+    private actionDirty = false;
+    private actionSettings: unknown;
+    private volumeInput: HTMLInputElement;
+    private formatInput: HTMLSelectElement;
+    private playlistInputElement: HTMLInputElement;
+    private startupInput: HTMLSelectElement;
+    private actionMessage: HTMLElement;
+
+    // The retained framework omits action and assumes the PI UUID is the action context.
+    override requestSettings(): void {
+        this.send('getSettings', {action: this.actionInfo.action, context: this.actionInfo.context});
+    }
+
+    override setSettings<T>(settings: T): void {
+        this.send('setSettings', {action: this.actionInfo.action, context: this.actionInfo.context, payload: settings});
+    }
+
+    override sendToPlugin(payload: unknown, action?: string): void {
+        this.send('sendToPlugin', {action: action ?? this.actionInfo.action, context: this.actionInfo.context, payload});
+    }
 
     @SDOnPiEvent('setupReady')
     ready() {
@@ -27,18 +50,74 @@ class PearPi extends StreamDeckPropertyInspectorHandler {
             input.addEventListener('input', () => { this.dirty = true; });
         }
         (document.getElementById('globalSave') as HTMLButtonElement).onclick = () => {
-            this.dirty = false;
+            this.dirty = true;
             this.sendToPlugin({type: 'pear-save-connection', configuration: {
                 host: this.hostInput.value, port: this.portInput.value, protocol: this.protocolInput.value}});
         };
         this.reauthorizeButton.onclick = () => this.sendToPlugin({type: 'pear-reauthorize'});
+        this.volumeInput = document.getElementById('volumeStep') as HTMLInputElement;
+        this.formatInput = document.getElementById('trackInfoFormat') as HTMLSelectElement;
+        this.playlistInputElement = document.getElementById('playlistInput') as HTMLInputElement;
+        this.startupInput = document.getElementById('playlistStartupMode') as HTMLSelectElement;
+        this.actionMessage = document.getElementById('actionMessage') as HTMLElement;
+        const action = this.actionInfo.action;
+        const volume = action === ActionTypes.VOLUME_UP || action === ActionTypes.VOLUME_DOWN;
+        const track = action === ActionTypes.SONG_INFO;
+        const playlist = action === ActionTypes.PLAY_PLAYLIST;
+        (document.getElementById('volumeSettings') as HTMLElement).hidden = !volume;
+        (document.getElementById('trackInfoSettings') as HTMLElement).hidden = !track;
+        (document.getElementById('playlistSettings') as HTMLElement).hidden = !playlist;
+        (document.getElementById('actionSettings') as HTMLElement).hidden = !volume && !track && !playlist;
+        for (const input of [this.volumeInput, this.formatInput, this.playlistInputElement, this.startupInput]) {
+            input.addEventListener('input', () => { this.actionDirty = true; this.actionMessage.textContent = ''; });
+        }
+        this.actionSettings ??= this.actionInfo.payload.settings;
+        this.renderActionSettings();
+        (document.getElementById('actionSave') as HTMLButtonElement).onclick = () => {
+            try {
+                const settings = saveActionSettings(action, this.actionSettings, {steps: this.volumeInput.value,
+                    displayFormat: this.formatInput.value, playlistInput: this.playlistInputElement.value,
+                    startupMode: this.startupInput.value});
+                this.setSettings(settings);
+                this.actionSettings = settings;
+                this.actionDirty = false;
+                this.renderActionSettings();
+                this.actionMessage.textContent = 'Settings sent to Stream Deck.';
+                this.requestSettings();
+            } catch (error) {
+                this.actionMessage.textContent = error instanceof Error ? error.message : 'Could not save action settings.';
+            }
+        };
         this.sendToPlugin({type: 'pear-get-status'});
+    }
+
+    @SDOnPiEvent('didReceiveSettings')
+    receiveActionSettings(event: DidReceiveSettingsEvent) {
+        if (event.context !== this.actionInfo.context || event.action !== this.actionInfo.action) return;
+        this.actionSettings = event.payload.settings;
+        if (this.actionMessage && !this.actionDirty) this.renderActionSettings();
+    }
+
+    private renderActionSettings(): void {
+        this.volumeInput.value = String(volumeStep(this.actionSettings));
+        this.formatInput.value = trackInfoFormat(this.actionSettings);
+        const input = playlistInput(this.actionSettings);
+        this.playlistInputElement.value = typeof input === 'string' ? input : '';
+        this.startupInput.value = playlistStartupMode(this.actionSettings);
     }
 
     @SDOnPiEvent('sendToPropertyInspector')
     receive(event: SendToPiEvent) {
         const payload: unknown = event.payload;
-        if (!isRecord(payload) || payload.type !== 'pear-status' || !this.connection) return;
+        if (!isRecord(payload) || !this.connection) return;
+        if (payload.type === 'pear-connection-saved') { this.dirty = false; return; }
+        if (payload.type === 'pear-playlist-status') {
+            if (this.actionInfo.action === ActionTypes.PLAY_PLAYLIST && typeof payload.message === 'string') {
+                this.actionMessage.textContent = payload.message;
+            }
+            return;
+        }
+        if (payload.type !== 'pear-status') return;
         if (isRecord(payload.settings) && (!this.inputsInitialized || !this.dirty)) {
             this.hostInput.value = String(payload.settings.host);
             this.portInput.value = String(payload.settings.port);

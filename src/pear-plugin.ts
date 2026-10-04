@@ -43,6 +43,7 @@ class PearPlugin extends StreamDeckPluginHandler {
             if (event.payload.type === 'pear-save-connection') {
                 this.pear.saveConnection(event.payload.configuration);
                 this.configurationError = undefined;
+                this.sendToPropertyInspector({type: 'pear-connection-saved'}, event.action, event.context);
             }
             if (event.payload.type === 'pear-reauthorize') this.pear.reauthorize();
             this.publishStatus();
@@ -71,6 +72,11 @@ class PearPlugin extends StreamDeckPluginHandler {
 
     @SDOnActionEvent('dialUp')
     pendingDial(event: DialUpEvent) { this.showAlert(event.context); }
+
+    playlistStatus(context: string, message: string): void {
+        const action = this.inspectors.get(context);
+        if (action) this.sendToPropertyInspector({type: 'pear-playlist-status', message}, action, context);
+    }
 
     private publishStatus(error?: string) {
         for (const [context, action] of this.inspectors) {

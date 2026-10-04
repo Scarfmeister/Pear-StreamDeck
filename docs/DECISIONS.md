@@ -6,7 +6,7 @@ Audit date: 2026-10-04 UTC / 2026-10-03 America/Chicago.
 
 `PROJECT_SPEC.md` preserves the supplied specification byte-for-byte. Its SHA-256 is `798be8f52331034021c925dea263c7adba4b46c2b36e20b4309647e2dfd5436b`.
 
-Stages 1–3 completed the audit/bootstrap, shared Pear client, and playlist investigation. Stage 4 authorizes durable agent instructions and the eleven standard key actions. Playlist startup remains blocked on the separate Pear extension recorded in D013. Per-action Property Inspector UI, dedicated dials, the Pear extension, and the final PR/release belong to later explicitly requested stages. Stop after committing, pushing, and verifying Stage 4.
+Stages 1–4 completed the audit/bootstrap, shared Pear client, playlist investigation, and eleven standard key actions. Stage 5 explicitly authorizes Property Inspectors, per-action settings, and the guarded playlist client interface/tests ahead of the Pear extension. Native playlist execution remains blocked on that separate extension in **Stage 7**, under D013. Dedicated dials and the final PR/release remain separately requested stages. Stop after committing, pushing, and verifying Stage 5.
 
 Work in `Scarfmeister/Pear-StreamDeck` on `dev/pear-port`. `origin` is the fork; `upstream` is `XeroxDev/YTMD-StreamDeck`. Preserve the default branch, upstream history, and original MIT license. Never push to upstream.
 
@@ -150,7 +150,7 @@ Playlist shows an explicit Pear API requirement and sends no start request. Inhe
 
 ## D013 — Stage 3 playlist extension contract
 
-**Decision: extend Pear in a later stage.** Pinned Pear 3.12.0 (`3f599b42724be827db51cd4689996dc3e48a9561`) exposes neither playlist-start operation. `POST /queue` accepts one video; `POST /shuffle` operates on the current queue. No REST or WebSocket command accepts a playlist ID for startup. Do not add a client method that implies these operations already exist.
+**Decision: extend Pear in Stage 7.** Pinned Pear 3.12.0 (`3f599b42724be827db51cd4689996dc3e48a9561`) exposes neither playlist-start operation. `POST /queue` accepts one video; `POST /shuffle` operates on the current queue. No REST or WebSocket command accepts a playlist ID for startup. Stage 3 deferred a speculative client method. The user's Stage 5 scope now explicitly authorizes the guarded interface, settings, and fake-contract tests; these must expose missing capability without implying native operations already exist.
 
 ### HTTP contract (proposed, not implemented)
 
@@ -225,4 +225,16 @@ The later shared client will expose `startPlaylist(input, mode)` and send exactl
 
 Parse a trimmed raw ID or an HTTP(S) YouTube Music/YouTube playlist or watch URL with exactly one valid `list` query value. Allow exact hosts `music.youtube.com`, `youtube.com`, `www.youtube.com`, `m.youtube.com`, and `youtu.be` (a shared watch URL with `list`). Reject embedded credentials, other hosts/subdomains, unsupported paths, missing/duplicate `list`, malformed encoding, invalid IDs, and unsafe schemes. Decode once, ignore unrelated query fields, preserve case, and do not take `v`, a short-link video path, or a browse ID as a substitute for `list`.
 
-Tests for parsing, normal startup, both Always modes, Follow off/on/unknown, missing capability, and no replay belong with the client methods after the Pear contract is implemented. Stage 3 adds no speculative client call or false-positive playlist tests. The exact Pear source map and extension test gate are in `PLAYLIST_API_SPIKE.md`; physical checks are in `MANUAL_TESTING.md`.
+Stage 5 adds parsing, both Always modes, Follow off/on/unknown, request construction, missing-capability, and no-replay tests against the proposed contract, as explicitly requested. Their mocked dispatch result is not a claim of current Pear capability. Stage 3 added no client call; native operation and signed-in acceptance still require Stage 7. The exact Pear source map and extension test gate are in `PLAYLIST_API_SPIKE.md`; physical checks are in `MANUAL_TESTING.md`.
+
+## D015 — Stage 5 shared action settings and guarded playlist interface
+
+Retain the active HTML PI and framework. A small local PI adapter includes the documented action UUID/context in settings and plugin messages. Cache settings that arrive before setup, render only the relevant section, preserve unrelated per-action fields, and keep unsaved input through status/settings updates. Common host/port/protocol/authentication/reauthorize controls continue using the plugin-owned `PearSession`; tokens never enter status, input fields, or logs. A plugin save-confirmation message lets invalid connection edits remain visible for correction. Neither PI nor action opens another Pear transport.
+
+`src/streamdeck/action-settings.ts` centralizes volume and Track Info validation for the PI/key layer. Old integer/string `steps` 1–100 stay compatible; invalid/missing values use 5%. Explicit invalid edits do not write. Track Info defaults to TITLE_ARTIST and exposes all five formats. Keep the existing bounded formatter/centered 10-point title/static image; custom host titles and wide glyphs remain manual acceptance. No new action schema version is needed for these additive flat settings; migration occurs on explicit Save rather than rewriting unrelated contexts.
+
+Playlist settings store `playlistId` and `startupMode` (FOLLOW_SHUFFLE_STATE default, ALWAYS_NORMAL, ALWAYS_SHUFFLE). Save parses URL/raw ID, removes legacy `playlistUrl`, and retains unrelated settings. Legacy nonempty URL wins over an old ID; malformed URL does not silently start the old playlist. D013's parsing/mode contract is implemented in one pure module with conservative URL/input limits documented in `research/playlist-settings.md`.
+
+`PearClient.startPlaylist(input, mode)` is the Stage 7 client interface. One active request, captured known Follow state, one bounded nullable-state read, generation cancellation, and exactly one protected POST prevent guessed startup or automatic replay. Always modes work without a known shuffle flag. Require a matching HTTP 200/ID/boolean/`dispatched` response; a 204 or mismatched response is not success. No response changes the player/song/shuffle model. Missing route/native capability reports Stage 7; ambiguous failures remain unconfirmed. No alternate route, normal→shuffle→skip sequence, or fake playback is used. Without the extension, all configuration/validation/persistence and standard keys remain usable; both playlist execution modes remain blocked.
+
+Research is saved in `research/property-inspector-sdk.md`, `track-info-display.md`, and `playlist-settings.md`. The complete automated suite exercises actual browser bundles plus fake client/server boundaries. Live Pear/Elgato/OpenDeck/device operation and host disk persistence remain unverified. Stage 5 makes no Pear source, dependency/lockfile, upstream/default-branch, dedicated-dial, release, or final-PR changes.

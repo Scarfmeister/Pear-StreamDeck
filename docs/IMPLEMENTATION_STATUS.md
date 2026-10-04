@@ -1,8 +1,41 @@
 # Implementation status
 
-Current stage: **Stage 4 — Codex bootstrap and standard Stream Deck actions**.
+Current stage: **Stage 5 — Property Inspectors, settings, and Play Playlist action**.
 
-State: **Stage 4 complete, committed, and pushed.** The final tested implementation is [`69bce200dafb20f09ece55e03750d251a0b56297`](https://github.com/Scarfmeister/Pear-StreamDeck/commit/69bce200dafb20f09ece55e03750d251a0b56297); [GitHub CI passed](https://github.com/Scarfmeister/Pear-StreamDeck/actions/runs/37230247552). Commit references, package evidence, and remote verification are recorded in [the Stage 4 checkpoint](checkpoints/stage-04.md). This documentation-only bookkeeping update follows the tested implementation; the final remote head is also supplied in the stage report.
+State: **Stage 5 implementation and local validation complete.** Commit/push/CI/remote evidence is recorded in [the Stage 5 checkpoint](checkpoints/stage-05.md) by the closing documentation update. Native playlist execution remains blocked on the separate Pear API extension in **Stage 7**; this stage implements the configuration, persistence, validation, and expected client interface only.
+
+## Completed Stage 5 work
+
+- Fetched, checked out, and pulled `dev/pear-port`; confirmed a clean starting tree at `15bb236f17c69e49ee6002c004f992e4d1ae5f8e`. Read AGENTS, specification, status, decisions, manual checks, Stage 3 playlist evidence, Stage 4 research/checkpoint, and recent history before edits.
+- Retained centralized global connection controls for host/port/protocol, authorization/token status, Reauthorize, and connection/retry status. Default remains HTTP `127.0.0.1:26538`. Invalid connection edits now remain visible until corrected/accepted; credentials never enter PI status or logs.
+- Added native per-context PI controls for Volume Up/Down steps (integer 1–100%, default 5%), all five Track Info formats (Title + Artist default), and playlist URL/ID plus three startup modes (Follow default).
+- Centralized action validators/readers. Strict invalid edits submit no write; old/malformed records use safe defaults. Unrelated settings stay intact, settings arriving before setup are retained, and status/settings updates do not erase unsaved edits. Global settings remain separate; opening a PI does not rewrite actions or start playback.
+- Added a documented small framework PI adapter using action UUID/context for settings/plugin messages. Kept the existing browser integration and one Pear session/transport owner.
+- Implemented D013 URL/raw-ID parsing, conservative unsafe-input rejection, decode-once/case preservation, canonical ID storage, and explicit-save migration of legacy playlist URLs. Invalid legacy URLs cannot fall back to stale IDs.
+- Added shared `PearClient.startPlaylist(input, mode)`: captured Follow state, one bounded unknown-state read, one active operation, generation cancellation, exactly one D013 request, strict dispatch response, no optimistic state or command replay. Missing/unsupported native capability displays the Stage 7 requirement and alerts; no fallback or normal→shuffle→skip workaround exists.
+- Added 20 automated tests to the retained 62, including pure settings/parser/mode tests, actual PI/plugin browser bundles, and playlist client/failure/cancellation coverage. Fake successful dispatch is explicitly not proof of current Pear/native operation.
+- Persisted SDK/settings/display/client findings, D015 and scope clarification to D013, README setup, and Stage 5 manual acceptance. No Pear source, dependencies/lockfile, spec/license, default/upstream branch, dial implementation, release, or final PR changes.
+
+## Stage 5 validation
+
+Environment: system Node `22.22.2`; Node `24.21.0` and official CLI `1.10.1` under `/tmp`; locked TypeScript/esbuild/framework unchanged.
+
+| Check | Result |
+| --- | --- |
+| Clean `npm ci` | Pass; 248 locked packages. |
+| Full source/test type checks | Pass; zero errors. |
+| Complete `npm test` / Node 24 runner | Pass; all eight files; Node 24 individual run reports **82 tests**, zero failures/cancellations/skips. |
+| Build / manifest preparation | Pass; both browser bundles, normalized version `2.3.0.0`. |
+| Official CLI validate / pack | Pass; zero errors, retained category/name warning, 48 files, approximately 217.8 kB unpacked. |
+| Production dependency audit | Pass; zero findings. Clean install retains seven known development-only findings (2 moderate, 5 high); no dependency changes. |
+| Package/preservation/docs/whitespace checks | Recorded in the Stage 5 checkpoint. Original spec, MIT, dependencies, upstream ancestry, and default branch are preserved. |
+| Real Pear / Elgato / OpenDeck / hardware | Not run; forms, host persistence, readability, and native playback require manual acceptance. |
+
+Artifact: `build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`. Stage 5 development package: eleven standard keys plus per-action settings and a guarded playlist client interface. Both native playlist modes require Stage 7. Dedicated dials, Linux override, artwork hardening, final assets/development dependency cleanup, and release remain later work. Existing cold-cache/rating/shuffle/half-open/persistence limits from Stage 4 remain unchanged.
+
+## Stage 4 checkpoint history
+
+Stage 4 complete, committed, and pushed. Its final tested implementation is [`69bce200dafb20f09ece55e03750d251a0b56297`](https://github.com/Scarfmeister/Pear-StreamDeck/commit/69bce200dafb20f09ece55e03750d251a0b56297); [GitHub CI passed](https://github.com/Scarfmeister/Pear-StreamDeck/actions/runs/37230247552). See [the Stage 4 checkpoint](checkpoints/stage-04.md); its final bookkeeping head is Stage 5's starting commit above. The sections below retain prior-stage history.
 
 ## Completed Stage 4 work
 
@@ -143,6 +176,6 @@ Stage 1 verified the fork/history/MIT license, saved the exact specification, ch
 
 ## Next stage and stop point
 
-**Stage 5 — Property Inspector and per-action settings.** Complete the per-action settings UI, including volume step and Track Info display-format choices, using the existing plugin-owned connection and settings messages. Playlist settings must preserve the explicit D013 capability requirement; its Pear extension and native acceptance remain separately authorized work.
+**Stage 6 — Stream Deck Plus encoder actions.** Implement dedicated Volume and Transport dials plus the playlist selector/its settings using the existing shared state, action validators, and guarded playlist client. Keep native playlist execution blocked on the separately authorized Stage 7 Pear extension and acceptance gate. Begin Stage 6 only after the user explicitly requests it.
 
-Stage 4 stops after its commits are pushed and the remote `dev/pear-port` head is verified. Do not start Stage 5, a Pear patch, dedicated dials, final PR, or release automatically. Read `AGENTS.md` and the current specification/status/decisions/research/checkpoint before the next stage.
+Stage 5 stops after its commits are pushed and the remote `dev/pear-port` head is verified. Do not start Stage 6/7, a Pear patch, final PR, or release automatically. Read `AGENTS.md` and the current specification/status/decisions/research/checkpoint before the next stage.
