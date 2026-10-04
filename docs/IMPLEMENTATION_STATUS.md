@@ -2,7 +2,7 @@
 
 Current stage: **Stage 5 — Property Inspectors, settings, and Play Playlist action**.
 
-State: **Stage 5 implementation and local validation complete.** Commit/push/CI/remote evidence is recorded in [the Stage 5 checkpoint](checkpoints/stage-05.md) by the closing documentation update. Native playlist execution remains blocked on the separate Pear API extension in **Stage 7**; this stage implements the configuration, persistence, validation, and expected client interface only.
+State: **Stage 5 complete, committed, and pushed.** Final tested implementation: [`633d8bfbbedb73c2cc5e3dcd98f11924052050cc`](https://github.com/Scarfmeister/Pear-StreamDeck/commit/633d8bfbbedb73c2cc5e3dcd98f11924052050cc); [GitHub CI passed](https://github.com/Scarfmeister/Pear-StreamDeck/actions/runs/37234585004). See [the Stage 5 checkpoint](checkpoints/stage-05.md) for package/remote evidence. This closing documentation commit follows the tested implementation; its final remote head is independently verified and supplied in the stage report. Native playlist execution remains blocked on the separate Pear API extension in **Stage 7**; this stage implements the configuration, persistence, validation, and expected client interface only.
 
 ## Completed Stage 5 work
 
@@ -28,7 +28,9 @@ Environment: system Node `22.22.2`; Node `24.21.0` and official CLI `1.10.1` und
 | Build / manifest preparation | Pass; both browser bundles, normalized version `2.3.0.0`. |
 | Official CLI validate / pack | Pass; zero errors, retained category/name warning, 48 files, approximately 217.8 kB unpacked. |
 | Production dependency audit | Pass; zero findings. Clean install retains seven known development-only findings (2 moderate, 5 high); no dependency changes. |
-| Package/preservation/docs/whitespace checks | Recorded in the Stage 5 checkpoint. Original spec, MIT, dependencies, upstream ancestry, and default branch are preserved. |
+| Package/preservation/docs/whitespace checks | Pass; 48 expected ZIP files, original MIT/spec/dependencies/AGENTS byte equality, upstream ancestry, local Markdown paths, `git diff --check`, commitlint. |
+| GitHub implementation CI | Pass; [run 37234585004](https://github.com/Scarfmeister/Pear-StreamDeck/actions/runs/37234585004), all install/type/test/build/validate/pack/upload steps successful. |
+| Remote implementation verification | Fresh fetch: local and `origin/dev/pear-port` both `633d8bfbbedb73c2cc5e3dcd98f11924052050cc`; `origin/master` remains `8b0c3320ce59b741b3165a1c8ac3a54b66c2c97a`. Final documentation head is verified after push. |
 | Real Pear / Elgato / OpenDeck / hardware | Not run; forms, host persistence, readability, and native playback require manual acceptance. |
 
 Artifact: `build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`. Stage 5 development package: eleven standard keys plus per-action settings and a guarded playlist client interface. Both native playlist modes require Stage 7. Dedicated dials, Linux override, artwork hardening, final assets/development dependency cleanup, and release remain later work. Existing cold-cache/rating/shuffle/half-open/persistence limits from Stage 4 remain unchanged.

@@ -38,8 +38,9 @@ Environment: system Node `22.22.2`; Node `24.21.0` and official CLI `1.10.1` ins
 | `npm run build` / `npm run prepare:streamdeck-cli` | Pass; both active browser bundles, normalized version `2.3.0.0`. |
 | CLI `validate` / `pack` | Pass; zero errors, retained intentional category/name warning, 48 files, approximately 217.8 kB unpacked. |
 | Production audit / clean-install audit | Zero production findings; seven retained development-only findings (2 moderate, 5 high). No package/lockfile changes. |
-| Package/preservation/docs/whitespace | Pass; ZIP has 48 expected files, UUID/version/entries/state assets/original MIT, no test or companion runtime; spec/license/dependencies/AGENTS byte equality, upstream ancestry, 31 local Markdown paths, `git diff --check`. No separate source-lint script is configured. |
-| GitHub CI / remote verification | Exact tested commit/run/remote record added after implementation commit and push. |
+| Package/preservation/docs/whitespace | Pass; ZIP has 48 expected files, UUID/version/entries/state assets/original MIT, no test or companion runtime; spec/license/dependencies/AGENTS byte equality, upstream ancestry, 31 local Markdown paths, `git diff --check`, existing Husky/commitlint hook. No separate source-lint script is configured. |
+| GitHub implementation CI | Pass; [run 37234585004](https://github.com/Scarfmeister/Pear-StreamDeck/actions/runs/37234585004), all install/type/test/build/validate/pack/upload steps successful. |
+| Remote implementation verification | Pass; fresh fetch confirms local/origin development head equality at the exact SHA below; default branch unchanged. |
 | Pear/Elgato/OpenDeck/device/manual acceptance | Not performed. Fake dispatch fixtures are not current Pear capability or native-playback proof. |
 
 Coverage includes integer-step bounds/defaults; all Track Info choices; valid raw IDs/five URL hosts/decode-once input; malformed URLs/encoding/credentials/paths/duplicate lists; explicit-save legacy migration; default/unknown/Always/Follow modes; one POST; captured shuffle; bounded read/push race; strict 200 dispatch vs 204/mismatched results; 404/501/other errors/auth/timeouts; busy/cancellation/no replay; context disappearance/host closure; actual browser PI initialization/save/routing/dirty-input behavior; and token-free status/PI transport isolation. All retained client/state/standard-key tests pass.
@@ -62,7 +63,9 @@ Artifact: `build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin` (devel
 
 ## Commit and remote record
 
-The final tested implementation SHA, CI result, package hash, and remote verification are recorded in the following documentation-only bookkeeping update. A tracked checkpoint cannot contain the hash of the commit containing its own final bytes; it records the tested implementation SHA, while the final bookkeeping head is independently pushed/verified and supplied in the stage report. Its exact head is also discoverable from this file's Git history.
+**Final tested implementation commit SHA:** [`633d8bfbbedb73c2cc5e3dcd98f11924052050cc`](https://github.com/Scarfmeister/Pear-StreamDeck/commit/633d8bfbbedb73c2cc5e3dcd98f11924052050cc), `feat: add action settings and guarded playlist startup`. Committed with the passing commitlint hook and pushed to origin. A fresh `git fetch origin` confirmed local HEAD and `origin/dev/pear-port` equal this full SHA. `origin/master` remains `8b0c3320ce59b741b3165a1c8ac3a54b66c2c97a`; upstream ancestry and the clean pinned Pear audit checkout are preserved. Implementation CI and package evidence are above.
+
+The closing documentation-only bookkeeping commit records these results. A tracked checkpoint cannot contain the hash of the commit containing its own final bytes; it records the tested implementation SHA, while the final bookkeeping head is independently pushed/verified and supplied in the stage report. Its exact head is also discoverable from this file's Git history. No required Stage 5 implementation or automated validation remains; manual/native work is explicitly listed above.
 
 ## Exact recommended next stage
 
