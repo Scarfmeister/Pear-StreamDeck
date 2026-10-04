@@ -2,7 +2,7 @@
 
 A development fork of [XeroxDev/YTMD-StreamDeck](https://github.com/XeroxDev/YTMD-StreamDeck) for [Pear Desktop](https://github.com/pear-devs/pear-desktop).
 
-**Status: Stage 2 — Pear client foundation.** The plugin owns one native Pear REST/WebSocket client with authorization, global settings, player state, and reconnect. Playback actions and playlist startup are not ported yet. The package is a connection preview, not a working control release.
+**Status: Stage 3 — Playlist capability investigation.** The shared Pear REST/WebSocket foundation is in place. Pear 3.12.0 cannot start playlists through its public API. This checkpoint defines the required native-start extension; playback actions and playlist startup are not ported yet. The package remains a connection preview.
 
 ## Project documents
 
@@ -10,6 +10,7 @@ A development fork of [XeroxDev/YTMD-StreamDeck](https://github.com/XeroxDev/YTM
 - [Implementation status and checkpoint](docs/IMPLEMENTATION_STATUS.md).
 - [Source audit, API contracts, and action map](docs/ARCHITECTURE_AUDIT.md).
 - [Architecture and behavior decisions](docs/DECISIONS.md).
+- [Playlist capability evidence and Pear extension map](docs/PLAYLIST_API_SPIKE.md).
 - [Manual test plan](docs/MANUAL_TESTING.md).
 
 ## Connection preview
@@ -26,7 +27,7 @@ The target is Pear Desktop 3.12.0, with compatible later versions. The plugin wi
 
 The required key actions are Play/Pause, Next, Previous, Like, Dislike, Mute, Volume Down, Volume Up, Track Info, Shuffle, Repeat, and Play Playlist. Stream Deck Plus will have dedicated Volume, Transport, and Playlist Selector dial actions. Shared Pear state will drive their displays.
 
-Native playlist Shuffle Play requires a separate Pear-side extension. See the [audit](docs/ARCHITECTURE_AUDIT.md#playlist-start-and-native-shuffle-play). OBS metadata export is outside this project's scope; use Pear's Tuna integration separately.
+Normal playlist startup and native Shuffle Play require the separate Pear extension specified in [D013](docs/DECISIONS.md#d013--stage-3-playlist-extension-contract). The [investigation](docs/PLAYLIST_API_SPIKE.md) names the source files, native command path, and test gate. No normal-start/shuffle/skip workaround is used. OBS metadata export is outside this project's scope; use Pear's Tuna integration separately.
 
 ## Development baseline
 

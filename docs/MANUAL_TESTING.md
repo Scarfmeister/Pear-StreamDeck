@@ -2,6 +2,8 @@
 
 Stage 2 physical test status: **not run**. The 39 automated client/host tests pass. They use mocked networking and browser VM contexts. They do not establish real Pear, Elgato/OpenDeck, WebView, or device operation. The remaining action/dial/playlist sections are future acceptance tests.
 
+Stage 3 native playlist test status: **not run**. Public playlist data and native website source were read without starting playback. Pear 3.12.0 lacks the needed route. See `PLAYLIST_API_SPIKE.md` and D013 in `DECISIONS.md` for the separate extension plan; do not install this checkpoint expecting playlist control.
+
 ## Stage 2 connection preview
 
 Use the Stage 2 development package only to test the shared connection foundation. Actions show “Actions pending” and do not control playback. The connection panel is currently English only.
@@ -71,15 +73,16 @@ Planned host matrix:
 
 ## Native playlist startup
 
-Run against the separately recorded Pear extension build. Unmodified Pear 3.12.0 must show the documented unsupported-feature result, not a fake successful start.
+Run these future acceptance tests against the separately recorded D013 Pear extension build and the later playlist client. Unmodified Pear 3.12.0 must show the documented unsupported-feature result for the missing route. Stage 3 contains neither component.
 
-1. Test raw playlist IDs and YouTube Music URLs, including extra query fields. Test invalid URLs/hosts, missing list IDs, private/unavailable playlists, albums where applicable, and empty playlists.
-2. Verify each startup mode: Follow with shuffle off/on, Always Normal, and Always Shuffle. Repeat from another currently playing playlist.
-3. Capture the resolved native endpoint and dispatch path in safe debug evidence. Confirm the operation matches YouTube Music's native control and is resolved before playback.
-4. Observe the first audible track and player/queue events. Confirm there is no normal-start command, preliminary wrong track, post-start shuffle workaround, or forced skip.
+1. Test raw playlist IDs and accepted YouTube Music/YouTube URLs, including extra query fields. Test invalid URLs/hosts, embedded credentials, malformed encoding, missing/duplicate list IDs, private/unavailable playlists, albums where applicable, and empty playlists.
+2. Verify each startup mode: Follow with shuffle off/on, Always Normal, and Always Shuffle. Test Follow with unavailable state: one bounded refresh or a state error, with no guessed start. Repeat from another currently playing playlist and from the same playlist/first track, with current shuffle both off and on. Always Normal must replace an old shuffled order; a pause/resume or queue-selection shortcut is insufficient.
+3. Capture the resolved native command kind and dispatch path in safe debug evidence. Redact account/tracking data. Confirm the operation matches YouTube Music's native control, preserves opaque fields, and resolves before playback. Confirm header selection cannot pick related, radio/mix, or queue-add commands. Check supported modern command entities and non-English UI.
+4. Observe the first audible track and player/queue events. For Shuffle Play, confirm there is no normal-start command, preliminary wrong track, post-start shuffle workaround, or forced skip.
 5. A native shuffle may select the original first track by chance. That alone is not a failure or proof of success. Validate the command and queue semantics directly.
-6. Force native endpoint resolution to fail. Confirm an error with no fallback playback. Check command timeout/retry behavior does not repeat non-idempotent starts.
+6. Force native endpoint/handler resolution to fail. Confirm a clear 501 with no fallback playback. Test 400/401/409/422/502/503/504 and the success dispatch-only result against D013. A 200 is not proof of audible playback.
 7. Compare native menu Shuffle Play with connector startup. Record any uncertainty about listening metrics; do not infer them from track order alone.
+8. Delay browse beyond the deadline, abort before/after the permit, overlap two presses, reload the renderer, rebind/disable/re-enable the API, and restart Pear. Confirm stale/expired work cannot obtain a permit, one active request, released listeners, and no retry/replay. After a granted permit, record an unknown result as unknown; do not claim cancellation prevented native playback.
 
 ## Connection recovery and cleanup
 

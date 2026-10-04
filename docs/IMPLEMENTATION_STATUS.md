@@ -1,20 +1,47 @@
 # Implementation status
 
-Current stage: **Stage 2 — Pear client foundation**.
+Current stage: **Stage 3 — Playlist capability investigation and API spike**.
 
-State: **Stage 2 complete, committed, and pushed.**
+State: **Stage 3 complete and locally validated; GitHub checkpoint pending.**
 
 ## Repository and checkpoint
 
 - Repository: [Scarfmeister/Pear-StreamDeck](https://github.com/Scarfmeister/Pear-StreamDeck).
 - Branch: `dev/pear-port`; default branch: `master`.
 - Upstream: [XeroxDev/YTMD-StreamDeck](https://github.com/XeroxDev/YTMD-StreamDeck).
-- Stage 2 starting commit: `3846894e10ee50bde729887395a1e0afd0a1b2c1`.
-- Stage 2 tested implementation/docs checkpoint SHA: [`722ea0ba066c69384025fc591c4e4027fd10f90b`](https://github.com/Scarfmeister/Pear-StreamDeck/commit/722ea0ba066c69384025fc591c4e4027fd10f90b).
-- Client/runtime/tests commit: `060a2e376f23d65427fd045dc1106ab00ea399f7`.
+- Stage 3 starting commit: [`c2517df638486d359f1de4469d42f7d1dbd5c897`](https://github.com/Scarfmeister/Pear-StreamDeck/commit/c2517df638486d359f1de4469d42f7d1dbd5c897).
+- Stage 3 tested documentation checkpoint SHA: pending validation/commit.
+- Stage 3 changes are documentation only. Client/runtime/tests remain at `060a2e376f23d65427fd045dc1106ab00ea399f7`.
 - The follow-up status-record commit records that tested SHA and CI result. A file cannot contain the hash of the commit containing its own final bytes; the final report also identifies the final branch head.
 
 The real fork/history and original MIT license remain intact. The default branch is unchanged from `8b0c3320ce59b741b3165a1c8ac3a54b66c2c97a`. The full original specification is unchanged, SHA-256 `798be8f52331034021c925dea263c7adba4b46c2b36e20b4309647e2dfd5436b`.
+
+## Completed Stage 3 work
+
+- Re-audited the full public control/queue/WebSocket paths at pinned Pear 3.12.0, commit `3f599b42724be827db51cd4689996dc3e48a9561`. Neither normal playlist start nor native Shuffle Play is exposed. Current queue insertion/shuffle do not satisfy the requirement.
+- Read native public YouTube Music playlist data and its application script. Identified separate normal `watchEndpoint` and shuffle `watchPlaylistEndpoint` commands, their opaque parameters, the app's native action dispatcher, command-entity overrides, and fresh-queue shuffle reset. Recorded source revision/hash and the static/live evidence boundary in `PLAYLIST_API_SPIKE.md`.
+- Reviewed open, unmerged Pear PRs #4615 and #4505 at pinned heads. Neither supplies the required native-shuffle contract; URL/first-track fallback is unsuitable.
+- Selected the smallest contained Pear extension: one protected `POST /api/v1/play-playlist` route, strict `{playlistId, shuffle}`, API Server renderer adapter, and one bounded correlated IPC broker. D013 specifies success/error responses, native dispatch, cancellation/deadline rules, and no command replay.
+- Named every planned Pear source change and the later extension test gate. The Pear audit clone remains clean; no Pear modification or PR was started.
+- Specified later client URL/ID parsing and Always Normal / Always Shuffle / Follow state behavior, including unknown state and unsupported capability. No speculative playlist client method, parser, action, transport, or fallback was added because the public API is missing.
+- Updated the manual native-start acceptance plan, project links, and architecture audit. Stage 2 runtime/build behavior remains the connection preview.
+
+## Stage 3 validation
+
+The baseline remains buildable. Stage 3 changed six Markdown files only. No new playlist implementation was made. The native command findings are source evidence, not a passed authenticated Pear playback test.
+
+| Check | Stage 3 result |
+| --- | --- |
+| `npm ci` / `npm run typecheck` | Pass; 248 packages; full source/test checks, zero type errors. |
+| `npm test` | Pass; all 39 existing client/host tests, zero failures/skips. |
+| Build and manifest preparation | Pass; unchanged active Pear browser bundles and manifest version `2.3.0.0`. |
+| Official CLI 1.10.1 validate/pack | Pass; zero errors, one existing intentional category/name warning; 43 files, 193.4 kB unpacked. |
+| ZIP inspection | Pass; UUID/version/entry/icon paths, original MIT, no test files, companion transport, or new playlist runtime. |
+| Dependency audit | Production: zero findings. Full tree: the same 7 development-only findings (2 moderate, 5 high); no dependency changes. |
+| Documentation/preservation | Pass; 15 local Markdown links/anchors, authored whitespace, original spec byte equality/hash, original license hash, upstream ancestry. Default branch and Pear audit clone unchanged. |
+| Native source/data consistency | Pass; one matching playlist header, distinct normal/shuffle command kinds and params, native router fields, recorded script hash. Static/read-only checks only; no playback. |
+| Pear/host/device playlist tests | Not run; the extension and later client do not exist yet. Required tests are planned explicitly. |
+| GitHub checkpoint CI | Pending push; record the run after it completes. |
 
 ## Completed Stage 2 work
 
@@ -33,7 +60,7 @@ The real fork/history and original MIT license remain intact. The default branch
 - Fixed all 14 inherited TypeScript errors with runtime narrowing. Updated Node types to 24 and removed unused test tooling. Companion is now a development-only type-check dependency, absent from active bundles and production dependencies.
 - Updated README, architecture implementation map, D009–D012 decisions, and Stage 2 manual smoke checks.
 
-## Validation
+## Stage 2 validation history
 
 Environment: Node.js `24.19.0`, npm `11.9.0`, TypeScript `5.9.3`, esbuild `0.25.12`, Node types `24.19.1`, official Stream Deck CLI `1.10.1`.
 
@@ -65,11 +92,17 @@ The full dependency audit reports `engine.io-client` (moderate), `socket.io-pars
 
 ## Behavior limits and remaining work
 
-No Stage 2 implementation blocker remains. Physical approval/token-persistence and WebView networking on Elgato/OpenDeck are unverified. Stream Deck global-settings writes have no acknowledgment in this framework; restart tests must confirm real persistence. The preview connection UI is English only. HTTPS relies on the host's normal certificate trust.
+No Stage 3 investigation blocker remains. Playlist implementation is blocked on the separate Pear extension and its signed-in native acceptance gate. This environment has no running signed-in Pear session or Stream Deck hardware; native dispatch, private playlists, the first audible track, same-playlist normal startup, and listening metrics remain unverified. Static/public-site source evidence is documented explicitly.
+
+Physical approval/token-persistence and WebView networking on Elgato/OpenDeck remain unverified. Stream Deck global-settings writes have no acknowledgment in this framework; restart tests must confirm real persistence. The preview connection UI is English only. HTTPS relies on the host's normal certificate trust.
 
 An accepted API snapshot is not proof the renderer has populated Pear's startup caches. No unsupported heartbeat or constant REST polling is added, so silent established TCP half-open detection remains limited. Same-track external rating changes can stay stale on unmodified Pear 3.12.0, which does not push a rating event.
 
-The full action set, per-action settings, dedicated dials, Linux manifest override, final icons, and complete installation instructions remain later work. Native playlist startup is not implemented. Pear 3.12.0 still needs the separately planned native playlist/Shuffle Play extension; shuffle-off and repeat-cycle semantics need live verification. OBS export remains excluded.
+The full action set, per-action settings, dedicated dials, Linux manifest override, final icons, and complete installation instructions remain later work. Native playlist startup is not implemented. Pear 3.12.0 needs the D013 extension; shuffle-off and repeat-cycle semantics also need live verification. OBS export remains excluded.
+
+## Stage 2 history
+
+Stage 2 implemented the shared client and connection preview, fixed inherited type errors, and added 39 deterministic tests. Its tested checkpoint is [`722ea0ba066c69384025fc591c4e4027fd10f90b`](https://github.com/Scarfmeister/Pear-StreamDeck/commit/722ea0ba066c69384025fc591c4e4027fd10f90b); its final status-record commit `c2517df638486d359f1de4469d42f7d1dbd5c897` is this stage's starting point. Both CI runs passed. The details above are retained as history, not new Stage 3 implementation.
 
 ## Stage 1 history
 
@@ -77,6 +110,6 @@ Stage 1 verified the fork/history/MIT license, saved the exact specification, ch
 
 ## Next stage and stop point
 
-Next proposed stage: port the normal key actions and their settings to the one shared client, with confirmed-state rendering and action-specific tests. Dedicated dials and native playlist startup must follow their authorized stage prompts.
+Next dependency: the separately authorized Pear API extension stage, following D013 and `PLAYLIST_API_SPIKE.md`, then its real native-start acceptance and later shared-client/parser/mode tests. The user supplies the next stage prompt; other key/dial/action work remains outside this stage.
 
-Stage 2 stops at the pushed foundation checkpoint. Do not begin action/playlist implementation, change Pear, or create/merge a final PR. Resume only after the user supplies the next stage prompt. Before changes, read `PROJECT_SPEC.md`, this file, and `DECISIONS.md`.
+Stage 3 stops at the pushed investigation checkpoint. Do not begin the Pear patch, action/playlist implementation, or create/merge a final PR. Resume only after the user supplies the next stage prompt. Before changes, read `PROJECT_SPEC.md`, this file, and `DECISIONS.md`.

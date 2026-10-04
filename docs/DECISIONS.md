@@ -6,7 +6,7 @@ Audit date: 2026-10-04 UTC / 2026-10-03 America/Chicago.
 
 `PROJECT_SPEC.md` preserves the supplied specification byte-for-byte. Its SHA-256 is `798be8f52331034021c925dea263c7adba4b46c2b36e20b4309647e2dfd5436b`.
 
-Stage 1 authorized the audit and bootstrap. The current Stage 2 instruction authorizes the shared Pear client, host settings integration, and client tests. It excludes the full action port and playlist startup. The original instruction to finish the port and prepare a final PR applies to later work. Do not change Pear or open a PR at this checkpoint.
+Stage 1 authorized the audit and bootstrap. Stage 2 authorized the shared Pear client, host settings integration, and client tests. The current Stage 3 instruction authorizes the playlist capability investigation. Pear 3.12.0 cannot perform the required starts through its public API, so this stage records the extension contract and source change map. Do not implement that Pear extension, the full action port, or a final PR at this checkpoint. The original instruction to finish the port and prepare a final PR applies to later work.
 
 Work in `Scarfmeister/Pear-StreamDeck` on `dev/pear-port`. `origin` is the fork; `upstream` is `XeroxDev/YTMD-StreamDeck`. Preserve the default branch, upstream history, and original MIT license. Never push to upstream.
 
@@ -70,11 +70,11 @@ The intended repeat cycle is `NONE → ALL → ONE → NONE`. Pear accepts `{ "i
 
 The plugin resolves URL/ID and `Follow Shuffle State`/`Always Normal`/`Always Shuffle` into one request. The default is `Follow Shuffle State`, based on confirmed Pear state.
 
-Proposed additive route: `POST /api/v1/play-playlist` with `{ "playlistId": "...", "shuffle": true|false }`. This route is planned; it does not exist in 3.12.0. Align its name with reviewed upstream work if appropriate.
+Proposed additive route: `POST /api/v1/play-playlist` with `{ "playlistId": "...", "shuffle": true|false }`. This route does not exist in 3.12.0. Stage 3 fixes the proposed contract in D013. The open upstream `playPlaylist` proposals have no native-shuffle selector and do not satisfy this contract.
 
 Pear must resolve and invoke the exact operation behind YouTube Music's native Normal Play or Shuffle Play control before playback begins. Preserve its endpoint parameters. Do not guess an undocumented shuffle parameter, start normally then shuffle/skip, or fall back to normal playback when Shuffle Play fails. Return a clear unsupported/error result.
 
-Keep the extension, tests, and patch/PR plan in a separate Pear fork branch such as `feat/api-playlist-start`. Do not copy Pear source into this repository. Pear PR #4615 is open and unmerged at the audit date; review it later without assuming its broader controls meet native Shuffle Play.
+Keep the extension and its tests in a separate Pear fork branch such as `feat/api-playlist-start`. Do not copy Pear or YouTube Music source into this repository. Stage 3 reviewed Pear PRs #4615 and #4505; both are open and unmerged at the audit date. See `PLAYLIST_API_SPIKE.md` for pinned evidence, native dispatch details, and the exact source change map.
 
 ## D007 — Playlist Selector uses one encoder
 
@@ -131,3 +131,82 @@ Use Node.js 24's built-in `node:test` with the existing esbuild to bundle TypeSc
 Use injected fetch/socket/settings/timer implementations to exercise approval, cancellation, state, and backoff without real sleeps. Execute the actual browser entry bundles in isolated VM contexts to check host registration, token persistence messages, PI routing, dormant-action behavior, and cleanup. These tests do not establish real Pear, Elgato, OpenDeck, WebView, certificate, or hardware behavior.
 
 Stage 2 has no client implementation blocker. Full dependency audit still has development-only findings in old companion and commit-hook tooling. Production audit is clear; this does not mean the whole dependency tree is clear. Keep the remaining development cleanup and physical acceptance in the release gate. No release, final PR, or next-stage action work is authorized here.
+
+## D013 — Stage 3 playlist extension contract
+
+**Decision: extend Pear in a later stage.** Pinned Pear 3.12.0 (`3f599b42724be827db51cd4689996dc3e48a9561`) exposes neither playlist-start operation. `POST /queue` accepts one video; `POST /shuffle` operates on the current queue. No REST or WebSocket command accepts a playlist ID for startup. Do not add a client method that implies these operations already exist.
+
+### HTTP contract (proposed, not implemented)
+
+Add one route, `POST /api/v1/play-playlist`, to the existing authenticated Hono API. Keep its existing JWT/authorized-client guards and `NONE` behavior. The request is strict JSON:
+
+```json
+{ "playlistId": "PL_example", "shuffle": true }
+```
+
+Both fields are required. `shuffle` must be a boolean. `playlistId` must match `^[A-Za-z0-9_-]{1,256}$`; do not require a guessed playlist prefix. Reject extra fields, URLs, whitespace, empty IDs, and non-JSON bodies with 400. IDs are case-sensitive. A syntactically valid ID can still be unavailable. The API accepts an ID only; URL parsing and startup-mode selection stay in the shared Stream Deck client.
+
+On success return **200**, `application/json`:
+
+```json
+{ "playlistId": "PL_example", "shuffle": true, "status": "dispatched" }
+```
+
+This means the requested native command resolved and a native handler accepted dispatch. It does not mean sound started, a player state changed, or listening metrics were recorded. Do not return 204 immediately after sending IPC. Keep the existing player/queue/shuffle WebSocket events unchanged. Confirm playback through those events and manual evidence; do not add a new playlist-success event at this stage.
+
+Extension errors use `{ "error": { "code": "...", "dispatch": "not_dispatched" } }`. `dispatch` can be `unknown` only after a dispatch permit was granted. Keep messages/logs free of tokens, account data, raw browse responses, and tracking payloads.
+
+| HTTP | Code / meaning | Dispatch result |
+| --- | --- | --- |
+| 400 | `INVALID_PLAYLIST_REQUEST` | `not_dispatched` |
+| 401 | Existing Pear authorization guard; retain its existing response format | No playlist work begins. |
+| 409 | `PLAYLIST_START_BUSY`; one request is already active | `not_dispatched` |
+| 422 | `PLAYLIST_UNAVAILABLE`; explicit inaccessible/empty/unplayable result from YouTube Music | `not_dispatched` |
+| 501 | `NATIVE_PLAYLIST_CONTROL_UNAVAILABLE` or `NATIVE_PLAYLIST_DISPATCH_UNAVAILABLE`; missing, ambiguous, or unsupported native structure/handler | `not_dispatched` |
+| 502 | `PLAYLIST_RESOLUTION_FAILED`; browse request failed | `not_dispatched` |
+| 502 | `PLAYLIST_DISPATCH_FAILED`; failure after permitting native dispatch | `unknown` |
+| 503 | `PLAYER_NOT_READY`; renderer/player/API adapter is not ready | `not_dispatched` |
+| 504 | `PLAYLIST_START_TIMEOUT`; five-second server deadline expired | `not_dispatched` before a permit, otherwise `unknown` |
+
+Register request/success/error schemas in Pear's existing OpenAPI `/doc`; no extra capability endpoint is needed. Unmodified 3.12.0 returns 404 for this path. The later client must report that the Pear extension is required and send no alternative command. An unrelated camel-case `playPlaylist` route is not this capability. Document the required Pear extension commit/build before enabling playlist actions.
+
+### Native resolution and dispatch
+
+Use an **API Server plugin renderer adapter** and one correlated IPC broker. Pear already supports plugin renderer `start`, `onPlayerApiReady`, and `stop` hooks. This keeps the new behavior inside `src/plugins/api-server` and avoids new handlers in the global renderer or unrelated song controls.
+
+1. In the signed-in Pear renderer, require the loaded player and `ytmusic-app.networkManager`. Resolve the requested playlist through that manager's `/browse` request with `{browseId: 'VL' + playlistId}`. Do not use a plugin-side YouTube request, a second login, or full-page navigation. The `VL` prefix belongs to the internal browse ID, not the public input.
+2. Select only the requested playlist's header: responsive, detail, or editable-detail layouts. Normal start uses its native play control. Shuffle start uses its native shuffle button or the header menu's `MUSIC_SHUFFLE` item. Support the observed responsive `buttons[].musicPlayButtonRenderer.playNavigationEndpoint` and `buttons[].menuRenderer.items[].menuNavigationItemRenderer.navigationEndpoint` structures. Read supported legacy header equivalents explicitly. Do not recursively score all endpoints: track rows, related shelves, mix/radio, queue insertion, and download controls are not startup controls.
+3. Modern controls can refer to command entities. Resolve the control's actual command from its entity data as YouTube Music does, including `musicShuffleButtonRenderer.button` and play-command overrides. If that relation cannot be resolved safely, return 501. Select by renderer kind and icon fields, never translated text. Require one unambiguous startup command for the requested ID; reject a command for a different playlist.
+4. Preserve the complete command object, including `watchEndpoint` / `watchPlaylistEndpoint`, opaque `params`, `clickTrackingParams`, `loggingContext`, music configs, and native command wrappers. Do not replace it with a watch URL, first-video ID, guessed shuffle constant, or a handmade queue. The public-site investigation observed distinct Normal Play and Shuffle Play commands for the same playlist.
+5. Dispatch once through the native app action router. The inspected website routes `yt-watch-endpoint` and `yt-watch-playlist-endpoint` to `handleNavigationEndpoint`, then `navigator.navigate`. Its `yt-action` event detail has `actionName`, `optionalAction`, `args`, and mutable `returnValue`. For the supported leaf commands, emit that event from `ytmusic-app` with the complete endpoint as the first argument, the app as the source argument, `optionalAction: false`, and an empty `returnValue`. Use `bubbles: true` and `composed: true`. A nonempty handler return list is dispatch acknowledgment even if its entry is `undefined`; zero handlers is 501. A native `commandExecutorCommand` must go through `yt-command-executor-command` intact after validating its startup leaves, rather than being unpacked into guessed operations. Do not call the minified constructors or string-only `app.navigate(page)` with an endpoint object.
+6. Resolve and validate everything before granting dispatch. Never perform normal start, post-start shuffle, skip, or fallback playback for a shuffle request. Never interpret a random first-track match as failed shuffle. The website is loaded dynamically; the dispatch envelope and both mode semantics must pass the live Pear acceptance gate below before shipping this extension.
+
+The website's fresh-queue path resets the previous shuffle state before loading the native queue. This supports normal-start feasibility from an old shuffled queue, but is static-source evidence only. A same-playlist normal control can reuse an existing queue. Test both cases. If a captured native normal command cannot enforce normal startup, resolve the native playlist-start/clear-state command before playback; fail unsupported rather than adding a post-start workaround or claiming Always Normal passed.
+
+### IPC lifetime and cancellation contract
+
+Use plugin-owned channels. Main-to-renderer `peard:api-playlist-start` carries `{requestId, generation, deadlineUnixMs, playlistId, shuffle}`. The main process creates the correlation ID and a five-second absolute deadline, below the client REST timeout of eight seconds. The renderer resolves but does not yet dispatch.
+
+Renderer-to-main `peard:api-playlist-permit` is an invoke request `{requestId, generation}` returning `{allowed: boolean}`. Grant only the active, unexpired request, from this window's main frame, with the API enabled and the client still authorized. Record that native dispatch may now occur. Before emitting the native event, the renderer rechecks its generation, cancellation flag, readiness, and absolute deadline. There must be no further asynchronous work between that check and dispatch.
+
+Renderer-to-main `peard:api-playlist-result` carries `{requestId, generation, status: 'dispatched'}` or `{requestId, generation, status: 'failed', code}`. Main validates the sender, correlation, generation, and payload. A successful native handler acknowledgment resolves the HTTP success; it is not a playback confirmation. Main-to-renderer `peard:api-playlist-cancel` carries `{requestId, generation}` on abort, timeout, API stop/rebind, or window reload/destruction. A late browse promise must never obtain a permit or start playback.
+
+Keep one active operation and reject overlapping requests with 409; do not queue playlist starts. Ignore duplicate/stale results. Own and remove the exact Electron IPC listeners/permit handler on plugin stop. Use a new generation on API/window restarts. Cancel pending work on HTTP abort and server/config/window changes. Re-enabling the plugin after the player is already loaded must restore readiness through the existing lifecycle hook and runtime guards.
+
+There is an unavoidable interval after the permit when native dispatch can occur before an abort/result is observed. In that case the outcome is `unknown`, not a promise that playback did not start. No automatic HTTP, reconnect, or IPC replay is allowed. Already accepted YouTube Music playback/network work cannot be undone by canceling the REST request.
+
+### Later client interface and required mode tests
+
+The later shared client will expose `startPlaylist(input, mode)` and send exactly one request after parsing input and resolving the mode. No action or PI opens its own transport. Its successful result means dispatched only. Capture Follow's confirmed shuffle value at activation; do not change it during endpoint resolution.
+
+| Startup mode | Confirmed shuffle at activation | Request `shuffle` |
+| --- | --- | --- |
+| Always Shuffle | Either value or unknown | `true` |
+| Always Normal | Either value or unknown | `false` |
+| Follow Shuffle State (default) | `true` | `true` |
+| Follow Shuffle State (default) | `false` | `false` |
+| Follow Shuffle State | Unknown/unready | No start. Allow one bounded state refresh; otherwise report state unavailable. |
+
+Parse a trimmed raw ID or an HTTP(S) YouTube Music/YouTube playlist or watch URL with exactly one valid `list` query value. Allow exact hosts `music.youtube.com`, `youtube.com`, `www.youtube.com`, `m.youtube.com`, and `youtu.be` (a shared watch URL with `list`). Reject embedded credentials, other hosts/subdomains, unsupported paths, missing/duplicate `list`, malformed encoding, invalid IDs, and unsafe schemes. Decode once, ignore unrelated query fields, preserve case, and do not take `v`, a short-link video path, or a browse ID as a substitute for `list`.
+
+Tests for parsing, normal startup, both Always modes, Follow off/on/unknown, missing capability, and no replay belong with the client methods after the Pear contract is implemented. Stage 3 adds no speculative client call or false-positive playlist tests. The exact Pear source map and extension test gate are in `PLAYLIST_API_SPIKE.md`; physical checks are in `MANUAL_TESTING.md`.
