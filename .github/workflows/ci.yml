@@ -25,6 +25,12 @@ jobs:
       - name: Install Stream Deck CLI
         run: npm install -g @elgato/cli@1.10.1
 
+      - name: Type-check plugin and tests
+        run: npm run typecheck
+
+      - name: Test Pear client
+        run: npm test
+
       - name: Build plugin package
         run: npm run build
 

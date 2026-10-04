@@ -23,8 +23,8 @@ async function watchBundle(entryPoint, outFile, label) {
 }
 
 Promise.all([
-  watchBundle('src/ytmd-pi.ts', 'bundle-pi.js', 'property-inspector'),
-  watchBundle('src/ytmd.ts', 'bundle.js', 'plugin')
+  watchBundle('src/pear-pi.ts', 'bundle-pi.js', 'property-inspector'),
+  watchBundle('src/pear-plugin.ts', 'bundle.js', 'plugin')
 ])
   .then(() => {
     console.log('Watching for changes...');

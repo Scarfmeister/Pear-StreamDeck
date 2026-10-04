@@ -1,3 +1,4 @@
+import {isLegacyError, isLegacySettings} from "../../shared/legacy-guards";
 import {DidReceiveSettingsEvent} from 'streamdeck-typescript';
 import {YTMDPi} from '../../ytmd-pi';
 import {PisAbstract} from '../pis.abstract';
@@ -84,7 +85,7 @@ export class PlayPlaylistPi extends PisAbstract {
             this.pi.removeError('playlist-fetch-error');
         }
         const settings = this.settingsManager.getGlobalSettings<GlobalSettingsInterface>();
-        if (!settings?.token) {
+        if (!isLegacySettings(settings) || !settings.token) {
             if (showErrors) {
                 this.pi.showError(
                     'playlist-fetch-error',
@@ -119,7 +120,7 @@ export class PlayPlaylistPi extends PisAbstract {
             this.updatePlaylistSelect();
             if (showErrors) {
                 let msg = "";
-                if (e satisfies ErrorOutput) {
+                if (isLegacyError(e)) {
                     if (e.statusCode === 429) {
                         const seconds = this.getRetrySeconds(e.message);
                         msg = this.pi.getLangString("PLAYLIST_ERROR_RATE_LIMIT", {seconds});

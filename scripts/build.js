@@ -30,8 +30,8 @@ async function bundle(entryPoint, outFile) {
 
 async function main() {
     await Promise.all([
-        bundle('src/ytmd-pi.ts', `${outputDir}/bundle-pi.js`),
-        bundle('src/ytmd.ts', `${outputDir}/bundle.js`)
+        bundle('src/pear-pi.ts', `${outputDir}/bundle-pi.js`),
+        bundle('src/pear-plugin.ts', `${outputDir}/bundle.js`)
     ]);
 
     // Copy files
@@ -42,6 +42,7 @@ async function main() {
         'package.json',
         'package-lock.json',
         'tsconfig.json',
+        'tsconfig.tests.json',
         'release-please-config.json',
         '.release-please-manifest.json'
     ]);

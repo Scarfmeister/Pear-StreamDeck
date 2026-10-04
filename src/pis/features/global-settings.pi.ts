@@ -1,3 +1,4 @@
+import {isLegacySettings} from "../../shared/legacy-guards";
 import {ErrorOutput, SocketState} from "ytmdesktop-ts-companion";
 import {YTMDPi} from "../../ytmd-pi";
 import {PluginData} from "../../shared/plugin-data";
@@ -41,7 +42,7 @@ export class GlobalSettingsPi {
 
     private async refreshConnectionStatus() {
         const settings = this.pi.settingsManager.getGlobalSettings<GlobalSettingsInterface>();
-        if (!settings?.token) {
+        if (!isLegacySettings(settings) || !settings.token) {
             this.setConnectionStatus(
                 this.pi.getLangString("CONNECTION_STATUS_AUTH_REQUIRED"),
                 'red'

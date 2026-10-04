@@ -1,3 +1,4 @@
+import {isLegacyError} from "../shared/legacy-guards";
 import {KeyUpEvent, SDOnActionEvent, WillAppearEvent, WillDisappearEvent} from 'streamdeck-typescript';
 import {YTMD} from '../ytmd';
 import {DefaultAction} from './default.action';
@@ -59,7 +60,7 @@ export class PlayPlaylistAction extends DefaultAction<PlayPlaylistAction> {
         } catch (reason) {
             console.error(reason);
             let message = JSON.stringify(reason);
-            if (reason satisfies ErrorOutput) {
+            if (isLegacyError(reason)) {
                 message = reason.message;
             }
             this.plugin.logMessage(`Error while starting playlist. context: ${JSON.stringify(context)}, error: ${message}`);
