@@ -1,5 +1,7 @@
 const esbuild = require('esbuild');
 const fs = require('fs');
+const manifest = JSON.parse(fs.readFileSync('manifest.json', 'utf-8'));
+const outputDir = `build/${manifest.UUID}.sdPlugin`;
 // Create release folder
 console.log('Creating release folder');
 if (fs.existsSync('build')) {
@@ -9,10 +11,7 @@ fs.mkdirSync('build');
 
 // Create plugin folder
 console.log('Creating plugin folder');
-if (fs.existsSync('build/fun.shiro.ytmd.sdPlugin')) {
-    fs.rmSync('build/fun.shiro.ytmd.sdPlugin', {recursive: true, force: true});
-}
-fs.mkdirSync('build/fun.shiro.ytmd.sdPlugin');
+fs.mkdirSync(outputDir);
 
 // Build plugin
 console.log('Building plugin');
@@ -31,13 +30,12 @@ async function bundle(entryPoint, outFile) {
 
 async function main() {
     await Promise.all([
-        bundle('src/ytmd-pi.ts', 'build/fun.shiro.ytmd.sdPlugin/bundle-pi.js'),
-        bundle('src/ytmd.ts', 'build/fun.shiro.ytmd.sdPlugin/bundle.js')
+        bundle('src/ytmd-pi.ts', `${outputDir}/bundle-pi.js`),
+        bundle('src/ytmd.ts', `${outputDir}/bundle.js`)
     ]);
 
     // Copy files
     console.log('Copying files');
-    const outputDir = 'build/fun.shiro.ytmd.sdPlugin';
     const rootEntries = fs.readdirSync('.');
 
     const excludedJson = new Set([
@@ -60,7 +58,8 @@ async function main() {
         .filter((name) => name.endsWith('.css'))
         .forEach((name) => fs.copyFileSync(name, `${outputDir}/${name}`));
 
-    fs.cpSync('icons', 'build/fun.shiro.ytmd.sdPlugin/icons', {recursive: true});
+    fs.cpSync('icons', `${outputDir}/icons`, {recursive: true});
+    fs.copyFileSync('LICENSE', `${outputDir}/LICENSE`);
 
     // Done building plugin folder, check the build directory
     console.log('Done building plugin folder, check the build directory');

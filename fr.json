@@ -1,48 +1,48 @@
 {
-  "Name": "YTMD Connector",
-  "Category": "YTMD Connector",
-  "Description": "Ce plugin Stream Deck permet de contrôler l'application YouTube Music Desktop (https://github.com/ytmdesktop/ytmdesktop)",
-  "fun.shiro.ytmdc.play-pause": {
+  "Name": "Pear Desktop Connector",
+  "Category": "Pear Desktop",
+  "Description": "Pear Desktop Connector development fork. See the repository for implementation status.",
+  "io.github.scarfmeister.pear-streamdeck.play-pause": {
     "Name": "Lecture/Pause",
     "Tooltip": "Jouer ou mettre en pause la musique"
   },
-  "fun.shiro.ytmdc.next": {
+  "io.github.scarfmeister.pear-streamdeck.next": {
     "Name": "Piste suivante",
     "Tooltip": "Jouer la piste suivante"
   },
-  "fun.shiro.ytmdc.prev": {
+  "io.github.scarfmeister.pear-streamdeck.prev": {
     "Name": "Piste précédente",
     "Tooltip": "Jouer la piste précédente"
   },
-  "fun.shiro.ytmdc.like": {
+  "io.github.scarfmeister.pear-streamdeck.like": {
     "Name": "J'aime",
     "Tooltip": "Mettre un \"J'aime\" à la piste actuelle"
   },
-  "fun.shiro.ytmdc.dislike": {
+  "io.github.scarfmeister.pear-streamdeck.dislike": {
     "Name": "Je n'aime pas",
     "Tooltip": "Mettre un \"Je n'aime pas\" à la piste actuelle"
   },
-  "fun.shiro.ytmdc.mute": {
+  "io.github.scarfmeister.pear-streamdeck.mute": {
     "Name": "Couper le son",
     "Tooltip": "Couper ou rétablir le son"
   },
-  "fun.shiro.ytmdc.volume-down": {
+  "io.github.scarfmeister.pear-streamdeck.volume-down": {
     "Name": "Réduire le volume",
     "Tooltip": "Réduire le volume"
   },
-  "fun.shiro.ytmdc.volume-up": {
+  "io.github.scarfmeister.pear-streamdeck.volume-up": {
     "Name": "Augmenter le volume",
     "Tooltip": "Augmenter le volume"
   },
-  "fun.shiro.ytmdc.song-info": {
+  "io.github.scarfmeister.pear-streamdeck.song-info": {
     "Name": "Infos sur la piste",
     "Tooltip": "Afficher les informations sur la piste actuelle (titre et image)"
   },
-  "fun.shiro.ytmdc.shuffle": {
+  "io.github.scarfmeister.pear-streamdeck.shuffle": {
     "Name": "Lecture aléatoire",
     "Tooltip": "Activer ou désactiver la lecture aléatoire"
   },
-  "fun.shiro.ytmdc.repeat": {
+  "io.github.scarfmeister.pear-streamdeck.repeat": {
     "Name": "Lecture en boucle",
     "Tooltip": "Activer ou désactiver la lecture en boucle"
   },
@@ -66,10 +66,10 @@
       "SUPPORT_FEEDBACK_TITLE": "Support & Retours",
       "SUPPORT_FEEDBACK_TEXT": "Vous avez trouvé un bug ? Vous avez une idée de fonctionnalité ?<br>Vous pouvez les envoyer sur <a href=\"https://github.com/XeroxDev/YTMD-StreamDeck/issues/new/choose\" rel=\"noopener\" target=\"_blank\">GitHub</a> ou sur <a href=\"https://x.xeroxdev.de/s/discord\" rel=\"noopener\" target=\"_blank\">Discord</a> !",
       "VAR_USAGE": "<p><strong>Variables disponibles :</strong> {current}, {remaining}, {duration}</p><p><strong>Valeurs spéciales :</strong> :S = en secondes, :H = format naturel (par défaut)</p><p><strong>Utilisation :</strong> {remaining:S} pour afficher le temps restant en secondes</p>",
-    "TOGGLE": "Basculer",
-    "PAUSE": "Pause",
-    "PLAY": "Lecture",
-    "ACTION": "Action",
+      "TOGGLE": "Basculer",
+      "PAUSE": "Pause",
+      "PLAY": "Lecture",
+      "ACTION": "Action",
       "PLAYLIST": "Playlist",
       "PLAYLIST_URL": "URL de la playlist",
       "PLAYLIST_URL_STATUS": "Statut de l’URL de la playlist",

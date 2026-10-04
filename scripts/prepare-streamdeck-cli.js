@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const manifestPath = path.join('build', 'fun.shiro.ytmd.sdPlugin', 'manifest.json');
+const sourceManifest = JSON.parse(fs.readFileSync('manifest.json', 'utf-8'));
+const manifestPath = path.join('build', `${sourceManifest.UUID}.sdPlugin`, 'manifest.json');
 
 if (!fs.existsSync(manifestPath)) {
   console.error(`Manifest not found at ${manifestPath}`);

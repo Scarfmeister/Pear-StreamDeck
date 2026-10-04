@@ -7,4 +7,6 @@ coverage/
 build/
 bundle.js
 bundle-pi.js
+bundle.js.map
+bundle-pi.js.map
 DistributionTool.exe
