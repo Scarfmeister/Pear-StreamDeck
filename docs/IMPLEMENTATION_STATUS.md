@@ -2,7 +2,7 @@
 
 Current stage: **Stage 4 — Codex bootstrap and standard Stream Deck actions**.
 
-State: **Stage 4 implemented and validated.** Commit references and remote verification are recorded in [the Stage 4 checkpoint](checkpoints/stage-04.md).
+State: **Stage 4 complete, committed, and pushed.** The final tested implementation is [`69bce200dafb20f09ece55e03750d251a0b56297`](https://github.com/Scarfmeister/Pear-StreamDeck/commit/69bce200dafb20f09ece55e03750d251a0b56297); [GitHub CI passed](https://github.com/Scarfmeister/Pear-StreamDeck/actions/runs/37230247552). Commit references, package evidence, and remote verification are recorded in [the Stage 4 checkpoint](checkpoints/stage-04.md). This documentation-only bookkeeping update follows the tested implementation; the final remote head is also supplied in the stage report.
 
 ## Completed Stage 4 work
 
@@ -28,9 +28,11 @@ Environment: system Node `22.22.2`; required Node `24.21.0` and official CLI `1.
 | Complete `npm test` / Node 24 individual-test run | Pass; 62 tests, zero failures/cancellations/skips. |
 | Build and manifest preparation | Pass; active Pear bundles, normalized `2.3.0.0` manifest. |
 | Official CLI validate/pack | Pass; zero errors; existing intentional category/name warning; 48 packaged files. |
-| Package inspection | UUID/version/entries, all new state SVGs, unchanged MIT license, no companion/Socket.IO/test runtime; see checkpoint for final inspection. |
+| Package inspection | Pass; 48 files, UUID/version/entries, all state SVGs, unchanged MIT license, no companion/Socket.IO/test runtime. |
 | Production/full dependency audit | Production zero findings; full tree retains the same seven development-only findings (2 moderate, 5 high). No dependency changes. |
-| Spec/license/history/whitespace | Original spec/license and upstream history preserved; see checkpoint for final validation. |
+| Spec/license/history/whitespace | Pass; original spec/license byte equality and hashes, unchanged dependencies, upstream ancestry, authored whitespace, and 22 local Markdown link paths. |
+| GitHub implementation CI | Pass; [run 37230247552](https://github.com/Scarfmeister/Pear-StreamDeck/actions/runs/37230247552), including artifact upload. |
+| Remote implementation verification | Fresh fetch: local and `origin/dev/pear-port` both `69bce200dafb20f09ece55e03750d251a0b56297`; `origin/master` remains `8b0c3320ce59b741b3165a1c8ac3a54b66c2c97a`. Final documentation head is verified after its push. |
 | Real Pear/Elgato/OpenDeck/hardware | Not run. Source findings and mocked tests do not establish live native/device acceptance. |
 
 Artifact: `build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`. It is a Stage 4 development package with eleven keys, not a complete port/release. Enable Pear 3.12.0's API Server at `127.0.0.1:26538` and approve the connector's first authorization request. The global connection PI remains English only. Per-action PI UI, dedicated dials, Linux override, final asset cleanup, and native playlist startup remain later work.
@@ -38,7 +40,6 @@ Artifact: `build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`. It is
 Current limitations: Pear's cold renderer caches can publish defaults; same-track external rating changes are not pushed and a slow native cache update can outlast the delayed read; legacy shuffle may not support off; silent half-open detection and real host token persistence remain unverified. No running Pear or physical device was available. Stage 4's source findings and remaining acceptance are in `research/like-dislike-behavior.md`, `research/repeat-behavior.md`, `research/standard-key-actions.md`, and `MANUAL_TESTING.md`.
 
 ## Stage 3 repository and checkpoint history
-
 
 - Repository: [Scarfmeister/Pear-StreamDeck](https://github.com/Scarfmeister/Pear-StreamDeck).
 - Branch: `dev/pear-port`; default branch: `master`.

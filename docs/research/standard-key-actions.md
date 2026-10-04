@@ -22,3 +22,7 @@ Stage 4 investigation, 2026-10-04. Scope: playback, shuffle, volume/mute, key st
 ## Assumptions and unresolved questions
 
 Static native source does not prove actual queue/account behavior, device display quality, or host persistence. The dynamic website may change; legacy shuffle, disabled controls, cold renderer cache defaults, and artwork need the documented manual acceptance. No running signed-in Pear session or physical Stream Deck was available. No Pear changes, playlist method, dedicated dial implementation, or per-action PI UI were added in Stage 4.
+
+## Tooling verification
+
+Node 24.21.0 and official Stream Deck CLI 1.10.1 were installed in `/tmp` for local verification; the repository's dependency files are unchanged. CLI validation/packing passes with the existing intentional category/name warning. `npm audit --omit=dev --json` reports zero production findings. The full audit retains seven development-only findings (2 moderate, 5 high), matching the Stage 2 graph: ajv, engine.io-client, fast-uri, js-yaml, lodash, socket.io-parser, and ws. Sources are the locked `package-lock.json`, npm's audit response, and linked [ajv](https://github.com/advisories/GHSA-2g4f-4pwh-qvx6), [Socket.IO parser](https://github.com/advisories/GHSA-2m8v-j782-fhvr), and [ws](https://github.com/advisories/GHSA-96hv-2xvq-fx4p) advisories. Cleanup remains a later release gate; no forced upgrades are part of this stage.

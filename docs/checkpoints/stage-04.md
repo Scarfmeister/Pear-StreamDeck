@@ -42,7 +42,10 @@ Environment: Node `22.22.2` system runtime and Node `24.21.0` installed under `/
 | Production dependency audit | Pass; zero findings. |
 | Full dependency audit | Seven unchanged development-only findings (2 moderate, 5 high), in legacy companion/hook tooling. No forced upgrades or dependency changes. |
 | Original spec/license/dependencies/history | Pass; byte equality to the starting commit, recorded SHA-256 checks, unchanged package/lockfile, preserved upstream ancestor. |
+| Package ZIP inspection | Pass; 48 files, correct UUID/version and entry points, all state SVGs, unchanged packaged MIT license, no companion/Socket.IO/test runtime. |
+| Local documentation links | Pass; 22 local Markdown link paths. |
 | Whitespace/commit message checks | `git diff --check` and the existing Husky/commitlint hook pass. No separate source-lint script is configured. |
+| GitHub implementation CI | Pass; [run 37230247552](https://github.com/Scarfmeister/Pear-StreamDeck/actions/runs/37230247552), all install/type/test/build/validate/pack/upload steps successful. |
 | Live Pear/Elgato/OpenDeck/device acceptance | Not performed. Mocked tests and pinned source tracing do not establish native/hardware operation. |
 
 The sandbox's isolated test reporter summarizes whole files. To obtain the individual count without changing the runner, verification used Node 24 `--test --experimental-test-isolation=none dist/tests/*.cjs`. All 62 tests passed.
@@ -50,6 +53,8 @@ The sandbox's isolated test reporter summarizes whole files. To obtain the indiv
 Automated coverage includes explicit stopped/playing transport choice, every standard action-to-client binding, all native rating transitions, zero-volume mute, volume clamping/serialization/failure/cancellation, both shuffle directions and unsupported off confirmation, all repeat modes, REST-vs-WebSocket races, no polling/replay, display-format preparation, duplicate/new/removed contexts, unknown/offline recovery, manifest image mapping, PI transport isolation, and host cleanup.
 
 Artifact: `build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`. It is a development package with eleven keys; it is not a complete port/release.
+
+Artifact SHA-256: `3a5814d11e0a74b58d4905fb3d04a7832d0cdb62fd661da4a53781453a7a4103`. Original specification SHA-256: `798be8f52331034021c925dea263c7adba4b46c2b36e20b4309647e2dfd5436b`. Original MIT license SHA-256: `c823e8c0ab3d6e53682d42507552e9e959acd06d6f6cda5f04f4ec605c3313db`.
 
 ## Unresolved problems and manual testing still required
 
@@ -67,7 +72,11 @@ Artifact: `build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`. It is
 
 ## Commit and remote record
 
-Bootstrap commit: `d81e564` (`chore: add durable coding agent instructions`). The final tested implementation commit SHA, package inspection, CI result, and remote verification are recorded in the final bookkeeping update after the implementation commit is created and pushed. The checkpoint/status bookkeeping commit follows that tested commit; a tracked file cannot embed the hash of the commit containing its own final bytes. The stage report also supplies the final remote branch-head SHA.
+Bootstrap commit: [`d81e5646d10f764db45c78ccf63dfaa79329d97b`](https://github.com/Scarfmeister/Pear-StreamDeck/commit/d81e5646d10f764db45c78ccf63dfaa79329d97b), `chore: add durable coding agent instructions`.
+
+**Final tested implementation commit SHA:** [`69bce200dafb20f09ece55e03750d251a0b56297`](https://github.com/Scarfmeister/Pear-StreamDeck/commit/69bce200dafb20f09ece55e03750d251a0b56297), `feat: implement state-aware Pear standard key actions`. Both logical commits are pushed. A fresh `git fetch origin` confirmed local HEAD and `origin/dev/pear-port` equal that full SHA. `origin/master` remains `8b0c3320ce59b741b3165a1c8ac3a54b66c2c97a`. The Pear audit checkout remains clean at its pinned 3.12.0 commit. Implementation CI and package evidence are recorded above.
+
+The checkpoint/status bookkeeping commit follows that tested commit and changes documentation only. A tracked file cannot embed the hash of the commit containing its own final bytes; its commit is discoverable from this file's Git history. The final bookkeeping head is pushed and independently verified before stopping, and the stage report supplies that final remote branch-head SHA.
 
 ## Exact recommended next stage
 
