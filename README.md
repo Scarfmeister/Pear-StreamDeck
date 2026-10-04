@@ -1,83 +1,45 @@
-![Thumbnail](assets/thumbnail/ytmdc-thumbnail.png)
+# Pear Desktop Connector
 
-# 1. Table of content
-- [1. Table of content](#1-table-of-content)
-- [2. Badges](#2-badges)
-- [3. What is this Plugin?](#3-what-is-this-plugin)
-- [4. Support / Feedback](#4-support--feedback)
-- [5. Actions](#5-actions)
-- [6. How to use it?](#6-how-to-use-it)
-- [7. How to contribute?](#7-how-to-contribute)
+A development fork of [XeroxDev/YTMD-StreamDeck](https://github.com/XeroxDev/YTMD-StreamDeck) for [Pear Desktop](https://github.com/pear-devs/pear-desktop).
 
-# 2. Badges
-[![Forks](https://img.shields.io/github/forks/XeroxDev/YTMD-StreamDeck?color=blue&style=for-the-badge)](https://github.com/XeroxDev/YTMD-StreamDeck/network/members)
-[![Stars](https://img.shields.io/github/stars/XeroxDev/YTMD-StreamDeck?color=yellow&style=for-the-badge)](https://github.com/XeroxDev/YTMD-StreamDeck/stargazers)
-[![Watchers](https://img.shields.io/github/watchers/XeroxDev/YTMD-StreamDeck?color=lightgray&style=for-the-badge)](https://github.com/XeroxDev/YTMD-StreamDeck/watchers)
-[![Contributors](https://img.shields.io/github/contributors/XeroxDev/YTMD-StreamDeck?color=green&style=for-the-badge)](https://github.com/XeroxDev/YTMD-StreamDeck/graphs/contributors)
+**Status: Stage 1 — repository bootstrap and architecture audit.** The runtime still uses the inherited YTMD companion client. Pear control is planned for later stages. The package built here is a development baseline, not a working Pear release.
 
-[![Issues](https://img.shields.io/github/issues/XeroxDev/YTMD-StreamDeck?color=yellow&style=for-the-badge)](https://github.com/XeroxDev/YTMD-StreamDeck/issues)
-[![Issues closed](https://img.shields.io/github/issues-closed/XeroxDev/YTMD-StreamDeck?color=yellow&style=for-the-badge)](https://github.com/XeroxDev/YTMD-StreamDeck/issues?q=is%3Aissue+is%3Aclosed)
+## Project documents
 
-[![Issues-pr](https://img.shields.io/github/issues-pr/XeroxDev/YTMD-StreamDeck?color=yellow&style=for-the-badge)](https://github.com/XeroxDev/YTMD-StreamDeck/pulls)
-[![Issues-pr closed](https://img.shields.io/github/issues-pr-closed/XeroxDev/YTMD-StreamDeck?color=yellow&style=for-the-badge)](https://github.com/XeroxDev/YTMD-StreamDeck/pulls?q=is%3Apr+is%3Aclosed)
-[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](https://github.com/XeroxDev/YTMD-StreamDeck/compare)
+- [Original requirements](docs/PROJECT_SPEC.md), preserved exactly from the supplied specification.
+- [Implementation status and checkpoint](docs/IMPLEMENTATION_STATUS.md).
+- [Source audit, API contracts, and action map](docs/ARCHITECTURE_AUDIT.md).
+- [Architecture and behavior decisions](docs/DECISIONS.md).
+- [Manual test plan](docs/MANUAL_TESTING.md).
 
-[![Release](https://img.shields.io/github/release/XeroxDev/YTMD-StreamDeck?color=black&style=for-the-badge)](https://github.com/XeroxDev/YTMD-StreamDeck/releases)
+## Planned controls
 
-[![Awesome Badges](https://img.shields.io/badge/badges-awesome-green?style=for-the-badge)](https://shields.io)
+The target is Pear Desktop 3.12.0, with compatible later versions. The plugin will use Pear's native REST API and WebSocket state updates. The default connection will be `127.0.0.1:26538`, with first-run authorization and stored-token reuse. Enable Pear's API Server plugin. Set its bind address to `127.0.0.1` for local use; Pear 3.12.0 itself defaults to `0.0.0.0`.
 
-# 3. What is this Plugin?
-This Stream Deck Plugin allows you to control the [YouTube Music Desktop App](https://github.com/ytmdesktop/ytmdesktop)
+The required key actions are Play/Pause, Next, Previous, Like, Dislike, Mute, Volume Down, Volume Up, Track Info, Shuffle, Repeat, and Play Playlist. Stream Deck Plus will have dedicated Volume, Transport, and Playlist Selector dial actions. Shared Pear state will drive their displays.
 
-> [!NOTE]
-> we only support version 2.x.x and above, if you are using an older version, please update to the latest version.
+Native playlist Shuffle Play requires a separate Pear-side extension. See the [audit](docs/ARCHITECTURE_AUDIT.md#playlist-start-and-native-shuffle-play). OBS metadata export is outside this project's scope; use Pear's Tuna integration separately.
 
-# 4. Support / Feedback
-You found a bug? You have a feature request? I would love to hear about it [here](https://github.com/XeroxDev/YTMD-StreamDeck/issues/new/choose) or click on the "Issues" tab here on the GitHub repositorie!
+## Development baseline
 
-You can also join my discord [here](https://x.xeroxdev.de/s/discord)
+Use branch `dev/pear-port`. Node.js 24 was used for this checkpoint and is configured in CI.
 
-# 5. Actions
+```sh
+npm ci
+npm run build
+npm run prepare:streamdeck-cli
+npx --yes @elgato/cli@1.10.1 validate --no-update-check build/io.github.scarfmeister.pear-streamdeck.sdPlugin
+npx --yes @elgato/cli@1.10.1 pack --no-update-check build/io.github.scarfmeister.pear-streamdeck.sdPlugin --output build --force --no-file-list
+```
 
-- Play / Pause Track
-- Next Track
-- Previous Track
-- Like Track
-- Dislike Track
-- Volume Mute
-- Volume Down
-- Volume Up
-- Track Info
-  - Shows a scrolling text for album, title and author
-  - Shows the thumbnail of the track
-- Shuffle
-- Repeat
-  - NONE
-  - ALL
-  - ONE
+`npm ci` installs locked dependencies. `build` creates the plugin directory. `prepare:streamdeck-cli` normalizes its manifest. `validate` checks the package. `pack` creates a development `.streamDeckPlugin` file in `build`; `--force` permits replacement of that local output. The CLI version is pinned for repeatable checks.
 
-# 6. How to use it?
-> [!NOTE]
-> This is just a simplified version, please visit the [official documentation](https://help.xeroxdev.de/en/stream-deck/ytmd/home#h-5-how-to-use-it) for a more detailed guide.
+`npm run watch` rebuilds the browser bundles when a source file changes. `npm run typecheck` runs the full TypeScript check. It currently reports 14 inherited errors; see the status document for their locations. There is no inherited unit-test suite. These checks do not establish working Pear control or physical-device compatibility.
 
-1. Install the [YouTube Music Desktop App](https://github.com/ytmdesktop/ytmdesktop).
-2. Install the Plugin from [Releases](https://github.com/XeroxDev/YTMD-StreamDeck/releases) or from the official Stream Deck Store.
-3. Add Play/Pause action
-4. Insert, if not already correct, the settings to YTMDesktop (eg. Host and Port)
-5. Make sure the YTMDesktop App and the Companion Server is running
-   - To start the companion server, click at the top right of YTMDesktop on the settings gear
-   - Go on the left side on the "Integrations" tab
-   - Enable the "Companion Server"
-6. Turn on "enable companion authorization" under the Companion Server
-7. Press the Authorize button in the Play/Pause action settings
-8. Compare the authorization code displaying by the plugin with the one displaying in the YTMDesktop App
-9. If they match, confirm the authorization in the YTMDesktop App
-10. You are ready to go! (Steps 6-9 are only needed once/when the plugin isn't authorized)
+The plugin UUID is `io.github.scarfmeister.pear-streamdeck`. Its name is **Pear Desktop Connector**, and its category is **Pear Desktop**. The selected approach retains `streamdeck-typescript` with limited modernization. A Linux manifest override and the dedicated dial actions remain future work.
 
-# 7. How to contribute?
+## Attribution and license
 
-Just fork the repository and create PR's.
+This project derives from YTMD-StreamDeck by Dominic “XeroxDev” Ris. Its upstream Git history is retained. The original [MIT license](LICENSE), including the 2021 copyright notice, is unchanged and is copied into the built plugin directory.
 
-> [!NOTE]
-> We're using [release-please](https://github.com/googleapis/release-please) to optimal release the plugin.
-> release-please is following the [conventionalcommits](https://www.conventionalcommits.org) specification.
+The inherited version number `2.3.0` identifies the baseline. It is not a Pear release announcement. User installation and authorization instructions will be completed with the working port.
