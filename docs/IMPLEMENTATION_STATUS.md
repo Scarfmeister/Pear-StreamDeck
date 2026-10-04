@@ -2,7 +2,7 @@
 
 Current stage: **Stage 6 — Stream Deck Plus encoder and dial support**.
 
-State: **Stage 6 implementation and automated validation complete; commit/remote evidence being recorded.** Dedicated Volume, Transport, and Playlist Selector encoders share the existing Pear client. Native playlist execution remains blocked on the separate **Stage 7** Pear extension. Physical Pear/Elgato/OpenDeck/device acceptance and Linux packaging are unverified. See [the Stage 6 checkpoint](checkpoints/stage-06.md) and [SDK/runtime research](research/stream-deck-plus-sdk.md).
+State: **Stage 6 complete, committed, and pushed.** Final tested implementation: [`0c6b011bb6469613f89584b4b11496f619919feb`](https://github.com/Scarfmeister/Pear-StreamDeck/commit/0c6b011bb6469613f89584b4b11496f619919feb); [GitHub CI passed](https://github.com/Scarfmeister/Pear-StreamDeck/actions/runs/37237529138). Dedicated Volume, Transport, and Playlist Selector encoders share the existing Pear client. This closing documentation commit records the tested implementation; its final remote head is independently verified and supplied in the stage report. Native playlist execution remains blocked on the separate **Stage 7** Pear extension. Physical Pear/Elgato/OpenDeck/device acceptance and Linux packaging are unverified. See [the Stage 6 checkpoint](checkpoints/stage-06.md) and [SDK/runtime research](research/stream-deck-plus-sdk.md).
 
 ## Completed Stage 6 work
 
@@ -29,7 +29,8 @@ Environment: system Node `22.22.2`, verification Node `24.21.0`, official CLI `1
 | Build / manifest preparation / official CLI validate and pack | Pass; both browser bundles, custom layout, version `2.3.0.0`; zero errors and retained category/name warning; 49 files, 235,308 unpacked bytes. |
 | Production dependency audit | Zero findings. Clean install retains seven known development-only findings (2 moderate, 5 high); no dependency changes. |
 | Package/preservation/source/docs checks | Package resources, MIT/spec/dependencies/AGENTS byte preservation, upstream ancestry, 43 local Markdown paths/anchors, and whitespace pass; pinned OpenDeck/renderer checkouts remain clean. Artifact/commit evidence is in the checkpoint. |
-| GitHub CI / remote head | Recorded after implementation commit and push. |
+| GitHub implementation CI | Pass; [run 37237529138](https://github.com/Scarfmeister/Pear-StreamDeck/actions/runs/37237529138), all install/type/test/build/validate/pack/upload steps successful. |
+| Remote implementation verification | Fresh fetch: local and `origin/dev/pear-port` both `0c6b011bb6469613f89584b4b11496f619919feb`; default `origin/master` remains `8b0c3320ce59b741b3165a1c8ac3a54b66c2c97a`. Closing documentation head is verified after push. |
 | Real Pear / Elgato / OpenDeck / hardware | Not performed; automated logic/wire/schema and source expectations are distinct from physical acceptance. |
 
 The Stage 6 development package includes three dedicated dials, eleven standard keys, and the guarded playlist key/client interface. Stock Pear still cannot execute playlists. Linux override, artwork hardening, final asset/dormant-source/development-dependency cleanup, hardware/native acceptance, and release remain later work. Existing cold-cache/rating/shuffle/half-open/host-persistence limits remain.

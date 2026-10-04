@@ -37,9 +37,10 @@ Environment: system Node `22.22.2`; Node `24.21.0` and official CLI `1.10.1` und
 | Complete `npm test` / Node 24 individual runner | Pass; ten test files, **101 tests**, zero failures/cancellations/skips. Node 24 individual command: `node --test --experimental-test-isolation=none dist/tests/*.test.cjs`. |
 | Build / manifest preparation / official CLI validation and pack | Pass; active browser bundles and bundled custom layout, normalized `2.3.0.0`, zero errors, retained intentional category/name warning; 49 files, 235,308 unpacked bytes. |
 | Production / clean-install audit | Zero production findings; seven retained development-only findings (2 moderate, 5 high). No dependency/lockfile changes. |
-| Package/preservation/docs/whitespace | Pass; 49 expected ZIP files, feedback image/layout/PI resources, original MIT/spec/dependencies/AGENTS byte equality, upstream ancestry, 43 local Markdown paths/anchors, and authored whitespace. Existing commitlint runs at commit time. |
+| Package/preservation/docs/whitespace | Pass; 49 expected ZIP files, feedback image/layout/PI resources, original MIT/spec/dependencies/AGENTS byte equality, upstream ancestry, 43 local Markdown paths/anchors, authored whitespace, and existing Husky/commitlint hook. |
 | SDK/OpenDeck source audit | Pass; exact framework/event/layout APIs and pinned OpenDeck/renderer inspected before reliance. Audit checkouts remain clean; source evidence only. |
-| GitHub implementation CI / remote verification | Recorded in the closing bookkeeping commit after push. |
+| GitHub implementation CI | Pass; [run 37237529138](https://github.com/Scarfmeister/Pear-StreamDeck/actions/runs/37237529138), all install/type/test/build/validate/pack/upload steps successful. |
+| Remote implementation verification | Pass; fresh fetch confirms local/origin development-head equality at the full implementation SHA below, and the default branch is unchanged. |
 | Real Pear / Elgato / OpenDeck / physical hardware | Not performed. Mocked dispatch/wire/schema/source checks do not establish native playback, installed host operation, or disk persistence. |
 
 Coverage includes signed/invalid/controller-guarded rotation; default/configured volume steps; true mute and external confirmed state; both volume bounds and actual shared-client interactions; transport batching/bounds/cancellation/no replay; release/short-touch/hold separation; playback/metadata/unknown/offline feedback; rendering suppression/cleanup; selector wrap/empty/one/invalid lists/index restoration/list edits; canonical parsing/modes/images; PI early settings/drafts/latest-selection persistence; actual plugin/PI bundle routing; one shared Pear connection; selected press/missing extension/no fallback; stale operation/context protection; custom layout geometry/feedback keys and real image resources. The resource check found incorrect new `.svg` image paths; they were fixed to existing `.png` resources and the full suite passed again.
@@ -61,7 +62,9 @@ Artifact: `build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`, local
 
 ## Commit and remote record
 
-The final tested implementation commit SHA, package evidence, CI result, and remote verification are recorded by the closing documentation commit after the implementation commit is pushed. A checkpoint cannot contain the SHA of the commit containing its own final bytes. As in Stages 4–5, the closing head is independently pushed/verified and supplied in the stage report; its exact SHA is also available from this checkpoint's Git history.
+**Final tested implementation commit SHA:** [`0c6b011bb6469613f89584b4b11496f619919feb`](https://github.com/Scarfmeister/Pear-StreamDeck/commit/0c6b011bb6469613f89584b4b11496f619919feb), `feat: add Stream Deck Plus encoder actions`. The existing commitlint hook passed, and the commit was pushed to origin. A fresh `git fetch origin` confirmed both local HEAD and `origin/dev/pear-port` equal this SHA. `origin/master` remains `8b0c3320ce59b741b3165a1c8ac3a54b66c2c97a`; upstream ancestry and the clean pinned OpenDeck/renderer audit checkouts are preserved. Package and implementation CI evidence are above.
+
+The closing documentation-only bookkeeping commit records these results. A tracked checkpoint cannot contain the SHA of the commit containing its own final bytes. As in Stages 4–5, the final bookkeeping head is independently pushed/verified and supplied in the stage report; retrieve its exact SHA from `git log -1 --format=%H -- docs/checkpoints/stage-06.md`. No required Stage 6 implementation or automated validation remains; manual/native work is explicitly listed above. No next stage was started.
 
 ## Exact recommended next stage
 
