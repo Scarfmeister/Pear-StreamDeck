@@ -73,8 +73,9 @@ test('browser plugin registers, loads global settings, persists the token, and e
     assert.ok(!JSON.stringify(status).includes('secret'));
     b.host.receive({event: 'willAppear', action, context: 'ctx', payload: {controller: 'Keypad', settings: {}}});
     b.host.receive({event: 'keyUp', action, context: 'ctx', payload: {settings: {}}});
-    assert.ok(b.host.sent.some(message => message.event === 'showAlert'));
-    assert.equal(b.requests.filter(request => request.url.endsWith('/next')).length, 0, 'actions are not ported here');
+    await settle();
+    assert.equal(b.requests.filter(request => request.url.endsWith('/next') && request.init?.method === 'POST').length, 1);
+    assert.equal(b.host.sent.filter(message => message.event === 'showAlert').length, 0);
     b.host.close();
     await settle();
     assert.equal(b.sockets[1].closed, true);
@@ -100,4 +101,41 @@ test('browser PI sends connection messages through the host and opens no Pear tr
     assert.ok(messageTypes.includes('pear-save-connection') && messageTypes.includes('pear-reauthorize'));
     assert.equal(b.requests.length, 0);
     b.host.close();
+});
+
+test('browser host events render the manifest playback images and three distinct repeat images', async () => {
+    const b = browser('pear-plugin');
+    b.host.receive({event: 'didReceiveGlobalSettings', payload: {settings: {}}});
+    await b.clock.advance(1);
+    await settle();
+    const pear = b.sockets[1];
+    pear.receive(PLAYER_INFO);
+    await settle();
+    const action = 'io.github.scarfmeister.pear-streamdeck.play-pause';
+    const manifest = JSON.parse(readFileSync('manifest.json', 'utf8')) as {
+        Actions: {UUID: string; DisableAutomaticStates?: boolean; States: {Image: string}[]}[]};
+    const playPause = manifest.Actions.find(entry => entry.UUID === action)!;
+    const latestState = () => (b.host.sent.filter(message => message.event === 'setState' && message.context === 'play').at(-1)?.payload as {state: number}).state;
+    b.host.receive({event: 'willAppear', action, context: 'play', payload: {controller: 'Keypad', settings: {}}});
+    assert.equal(playPause.States[latestState()].Image, 'icons/music-pause');
+    assert.equal(playPause.DisableAutomaticStates, true);
+    pear.receive({type: 'PLAYER_STATE_CHANGED', isPlaying: false, position: 0});
+    assert.equal(playPause.States[latestState()].Image, 'icons/music-play');
+    b.host.receive({event: 'willAppear', action: 'io.github.scarfmeister.pear-streamdeck.repeat', context: 'repeat',
+        payload: {controller: 'Keypad', settings: {}}});
+    const images = new Set<string>();
+    for (const repeat of ['NONE', 'ALL', 'ONE']) {
+        pear.receive({type: 'REPEAT_CHANGED', repeat});
+        const image = (b.host.sent.filter(message => message.event === 'setImage' && message.context === 'repeat').at(-1)?.payload as {image: string}).image;
+        images.add(image);
+        assert.ok(readFileSync(image, 'utf8').startsWith('<svg'));
+    }
+    assert.equal(images.size, 3);
+    const count = b.host.sent.length;
+    b.host.receive({event: 'willDisappear', action, context: 'play', payload: {controller: 'Keypad', settings: {}}});
+    pear.receive({type: 'PLAYER_STATE_CHANGED', isPlaying: true, position: 0});
+    assert.equal(b.host.sent.slice(count).filter(message => message.context === 'play').length, 0);
+    b.host.close();
+    assert.equal(pear.closed, true);
+    assert.equal(b.clock.tasks.size, 0);
 });

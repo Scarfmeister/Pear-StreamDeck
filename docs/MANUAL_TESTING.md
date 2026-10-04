@@ -1,6 +1,23 @@
 # Manual testing
 
-Stage 2 physical test status: **not run**. The 39 automated client/host tests pass. They use mocked networking and browser VM contexts. They do not establish real Pear, Elgato/OpenDeck, WebView, or device operation. The remaining action/dial/playlist sections are future acceptance tests.
+Stage 4 key acceptance status: **not run on real Pear or hardware**. The 62 automated tests cover client/host/key logic with mocked networking and browser VM contexts. Stage 4 enables eleven standard keys; Playlist, dedicated dials, and per-action PI controls remain later work. Use the Stage 4 package for the key checks below.
+
+## Stage 4 standard-key acceptance
+
+1. Record the versions/device/auth strategy using the test record below. Enable Pear's API Server and authorize the connector. Confirm all eleven keys work on a supported host; a socket open alone must not mark them ready.
+2. Play/Pause: start, pause, stop, and resume from Pear. Verify Play/Pause images on two duplicate keys and after switching profiles. Activate once per press; a fast overlapping press while awaiting confirmation should alert as busy. No host automatic image toggling is allowed.
+3. Next/Previous: verify one normal transport command per release. Track Info displays title + artist with bounded lines, preserves both while paused, and toggles playback when pressed. Check long Unicode text, no track, absent artist/album, and legibility at the default font size. Stage 4 uses a static image; artwork is deferred.
+4. Like/Dislike: start from INDIFFERENT, LIKE, and DISLIKE. Verify native same-state clearing to INDIFFERENT, opposite-state switching, and refreshed real icons. On unmodified Pear, same-track external changes can remain stale until a bounded rating refresh. Test slow cache updates, signed-out/unavailable controls, and a track change during the read.
+5. Mute: verify true mute with both nonzero volume and volume zero, external mute changes, and duplicate contexts. Neither key press nor a 204 should assume success.
+6. Volume: default 5%; stored `steps` 1/2/5/10 are honored, but there is no Stage 4 PI editor. Verify clamping at 0/1/99/100, alternating rapid presses from two keys, external volume changes between inputs, and no extra commands at a bound. Unconfirmed/failed commands must alert, preserve actual volume, and discard waiting input. Reconnect must not replay it.
+7. Shuffle: verify off/on gray/white images and real off→on→off transitions. The inspected native server-queue path toggles both ways; a legacy path may only reorder. If an off press stays on, the key must remain On and alert after bounded confirmation. Record that upstream behavior for the separate Pear extension; do not mark the off requirement passed.
+8. Repeat: verify NONE→ALL→ONE→NONE from every starting mode. Images and Off/All/One labels must be distinct. Test disabled repeat, external changes, duplicates, slow/no events, and reconnect without command replay.
+9. Disconnect/disable/restart Pear; keys show offline until a fresh snapshot. Switch profiles repeatedly and close the host during an active command. Confirm no obsolete-context display updates, extra sockets, retained command timers, or error/request floods. Pear-pushed fields must not be polled continuously.
+10. Play Playlist displays “Pear API required” and alerts without sending a start request. Inherited encoder slots display “Dials pending” and must not activate key commands. The connection PI should accurately state the current key/settings stage.
+
+No running signed-in Pear instance, Elgato/OpenDeck host, or physical Stream Deck was available in the Codex workspace. These are unverified acceptance checks, not observed failures or passes.
+
+Stage 2 physical test status: **not run**. Its 39 automated client/host tests pass and remain in the complete Stage 4 suite. They do not establish real Pear, Elgato/OpenDeck, WebView, or device operation. Dedicated dial/playlist and full settings acceptance remain future checks.
 
 Stage 3 native playlist test status: **not run**. Public playlist data and native website source were read without starting playback. Pear 3.12.0 lacks the needed route. See `PLAYLIST_API_SPIKE.md` and D013 in `DECISIONS.md` for the separate extension plan; do not install this checkpoint expecting playlist control.
 

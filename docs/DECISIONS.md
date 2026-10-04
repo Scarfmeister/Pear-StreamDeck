@@ -6,13 +6,13 @@ Audit date: 2026-10-04 UTC / 2026-10-03 America/Chicago.
 
 `PROJECT_SPEC.md` preserves the supplied specification byte-for-byte. Its SHA-256 is `798be8f52331034021c925dea263c7adba4b46c2b36e20b4309647e2dfd5436b`.
 
-Stage 1 authorized the audit and bootstrap. Stage 2 authorized the shared Pear client, host settings integration, and client tests. The current Stage 3 instruction authorizes the playlist capability investigation. Pear 3.12.0 cannot perform the required starts through its public API, so this stage records the extension contract and source change map. Do not implement that Pear extension, the full action port, or a final PR at this checkpoint. The original instruction to finish the port and prepare a final PR applies to later work.
+Stages 1–3 completed the audit/bootstrap, shared Pear client, and playlist investigation. Stage 4 authorizes durable agent instructions and the eleven standard key actions. Playlist startup remains blocked on the separate Pear extension recorded in D013. Per-action Property Inspector UI, dedicated dials, the Pear extension, and the final PR/release belong to later explicitly requested stages. Stop after committing, pushing, and verifying Stage 4.
 
 Work in `Scarfmeister/Pear-StreamDeck` on `dev/pear-port`. `origin` is the fork; `upstream` is `XeroxDev/YTMD-StreamDeck`. Preserve the default branch, upstream history, and original MIT license. Never push to upstream.
 
 ## D002 — Retain the framework with limited modernization
 
-Keep `streamdeck-typescript` 3.3.4, TypeScript, the HTML plugin entry point, esbuild browser bundles, and manifest `SDKVersion: 2`. Add a small local Stream Deck adapter for touch-event typing, numeric repeat states, and common rendering behavior when needed.
+Keep `streamdeck-typescript` 3.3.4, TypeScript, the HTML plugin entry point, esbuild browser bundles, and manifest `SDKVersion: 2`. Add a small local Stream Deck adapter for touch-event typing and common rendering behavior when needed. Stage 4 uses explicit images for the three repeat modes because the documented host protocol only promises numeric states 0 and 1; see D014.
 
 The existing framework handles dial rotation/press events, `setFeedback`, and `setFeedbackLayout`. OpenDeck 2.14.0 handles those messages and `touchTap`, renders the layouts, launches HTML plugins in a webview, and injects `connectElgatoStreamDeckSocket`. These features cover the required dials.
 
@@ -58,13 +58,13 @@ Use WebSocket for playback, song, position, volume/mute, shuffle, and repeat. Us
 
 Pear 3.12.0 does not send like state through the API WebSocket. Read `/like-state` on connection, video change, and rating commands. External rating changes on the same track can remain stale on unmodified Pear; document this limit. A later optional Pear `LIKE_CHANGED` event can close the gap. Do not claim this event exists in 3.12.0.
 
-Pear calls the internal `updateLikeStatus('LIKE'|'DISLIKE')` method. Same-state toggle behavior is not proven here. Until a clear operation is verified, pressing an active rating will be a client no-op after a fresh state read. Do not invent an unlike endpoint.
+Pear calls the native `updateLikeStatus('LIKE'|'DISLIKE')` method. Stage 4's pinned native-source tracing establishes same-state clearing to INDIFFERENT. Send the same like/dislike endpoint once, including when active; let the native renderer select the transition. Do not invent an unlike endpoint. See `research/like-dislike-behavior.md` for evidence and the live acceptance boundary.
 
 Default all volume steps to 5%. Apply the configured step and signed dial ticks to confirmed/current volume, clamp to 0–100, and serialize/coalesce rapid commands. Do not display command targets as confirmed state. Mute uses `/toggle-mute` and Pear's `muted` flag, including when volume is zero.
 
-The intended repeat cycle is `NONE → ALL → ONE → NONE`. Pear accepts `{ "iteration": 1 }` and clicks the native repeat control. Verify the live cycle order, serialize commands, and confirm with `REPEAT_CHANGED`. It has no public target-mode setter.
+The source-verified repeat cycle is `NONE → ALL → ONE → NONE`. Pear accepts `{ "iteration": 1 }` and clicks the native repeat control. Serialize commands and confirm with `REPEAT_CHANGED`; the live cycle remains a hardware/Pear acceptance check. It has no public target-mode setter. See `research/repeat-behavior.md`.
 
-`POST /shuffle` calls `queue.shuffle()`. Source alone does not establish an off transition. Verify both directions. If it only shuffles, a small explicit state/toggle operation belongs in the separate Pear extension. Never show a false off state.
+`POST /shuffle` calls `queue.shuffle()`. Stage 4 traced the inspected native server-queue path: it toggles real shuffle state in both directions. The legacy queue path may only reorder items. Confirm actual updates and alert on an unsupported/unconfirmed transition. If a live supported installation cannot turn shuffle off, a small explicit operation belongs in the separate Pear extension. Never show a false off state. See `research/standard-key-actions.md`.
 
 ## D006 — Native playlist start stays in Pear
 
@@ -96,7 +96,7 @@ OBS export stays excluded. The inherited `2.3.0` version remains a baseline iden
 
 Build/watch now use `src/pear-plugin.ts` and `src/pear-pi.ts`. One plugin-owned `PearSession` creates one `PearClient`. It waits for Stream Deck global settings, merges credential writes into that record, and routes PI connection/status/reauthorize messages. The PI creates no Pear client, HTTP request, or socket. Status payloads contain no credentials. The host socket is distinct from the one Pear socket.
 
-The twelve inherited action classes and old PI classes remain dormant source for the action-port stage. Neither active bundle imports them. Keys show “Actions pending” and presses give an alert; there are no playback handlers or playlist startup. The preview connection panel is English only. Action settings and translated Pear UI belong to the later action/UI work.
+At Stage 2, the twelve inherited action classes and old PI classes remained dormant; keys showed “Actions pending”. Stage 4 replaces that active preview handler with `PearKeyActions` and shared `PearCommands` for the eleven standard keys. The inherited classes remain dormant reference source, including unported playlist/PI/dial code, and neither active bundle imports them. The connection panel is English only. Per-action UI and translated Pear UI belong to Stage 5/later work.
 
 Keep the companion package temporarily as a **development-only** dependency to type-check that dormant source. This is not its complete removal from the lockfile. Remove it and `legacy-guards.ts` when the source port no longer needs those types. The guards use real runtime narrowing and fix all 14 inherited TypeScript errors without lowering compiler strictness. Production bundles and the production dependency graph exclude the companion and Socket.IO.
 
@@ -128,9 +128,25 @@ Read like state once after a snapshot and on video changes, with an explicit ref
 
 Use Node.js 24's built-in `node:test` with the existing esbuild to bundle TypeScript tests. No new runtime transport or test framework is needed. Update Node type declarations to 24 and remove unused Mocha/Chai/nyc/jsdom/ts-node/esm tooling. CI now checks all source and test types and runs the suite before packaging.
 
-Use injected fetch/socket/settings/timer implementations to exercise approval, cancellation, state, and backoff without real sleeps. Execute the actual browser entry bundles in isolated VM contexts to check host registration, token persistence messages, PI routing, dormant-action behavior, and cleanup. These tests do not establish real Pear, Elgato, OpenDeck, WebView, certificate, or hardware behavior.
+Use injected fetch/socket/settings/timer implementations to exercise approval, cancellation, state, commands, and backoff without real sleeps. Execute the actual browser entry bundles in isolated VM contexts to check host registration, token persistence messages, PI routing, key behavior, manifest image mapping, and cleanup. These tests do not establish real Pear, Elgato, OpenDeck, WebView, certificate, or hardware behavior.
 
 Stage 2 has no client implementation blocker. Full dependency audit still has development-only findings in old companion and commit-hook tooling. Production audit is clear; this does not mean the whole dependency tree is clear. Keep the remaining development cleanup and physical acceptance in the release gate. No release, final PR, or next-stage action work is authorized here.
+
+## D014 — Stage 4 standard key commands and confirmed displays
+
+`PearClient.commands` owns one `PearCommands` instance for all eleven standard key actions. `PearKeyActions` keeps one shared snapshot subscription and separate render/settings caches for visible contexts. Appearance renders immediately; disappearance drops that context; host closure disposes the subscription, command waits, and pending input. Position-only events do not resend unchanged key displays. The existing framework, settings owner, UUIDs, and browser build remain intact.
+
+Play/Pause chooses `/play` or `/pause` from confirmed `isPlaying`, so stopped state uses Play despite Pear's narrow `/toggle-play` implementation. Next/Previous send one ordinary transport request. Track Info retains the inherited press-to-play/pause behavior. Stateful host toggling is disabled in the manifest; index 0 means inactive/Play/unmuted and index 1 means active/Pause/muted.
+
+Mute, shuffle, repeat, and playback accept one command per lane while confirmation is outstanding; overlapping activation alerts as busy. Volume has one shared lane with at most sixteen waiting inputs. Each input computes its clamped target from the latest confirmed volume, awaits a real update before advancing, and does not send a redundant bound command. Failures/cancellation discard waiting volume input. No playback command is automatically retried or replayed.
+
+Commands wait up to two seconds for expected pushed state. Volume/mute/shuffle/repeat can then perform one bounded REST confirmation read. Malformed or stale reads cannot overwrite newer pushed fields. An unconfirmed command alerts and retains actual state. Like/Dislike always invoke the native supported toggle once, then do one delayed fresh rating read; unknown/stale rating limits remain explicit. REST dispatch acknowledgment alone never updates a displayed target.
+
+Repeat uses mode-specific generic SVGs and labels through `setImage`/`setTitle`; it does not rely on undocumented state index 2. Shuffle has gray off and white on manifest images. These five SVGs are original MIT-licensed geometric assets; the final inherited asset audit remains later work.
+
+Track Info defaults to title + artist, with up to twelve Unicode code points per line and ellipsis. A pure formatter supports the five requested formats for Stage 5, preserving full song/album/image metadata in the model. The existing artwork helper lacks timeout, race protection, and proven WebView CORS behavior, so Stage 4 uses its static icon. Per-action settings UI and artwork hardening are deferred. `steps` accepts integer percentages 1–100, default 5; stored settings are already honored and settings updates affect the next activation.
+
+Playlist shows an explicit Pear API requirement and sends no start request. Inherited encoder declarations remain guarded/pending until the dedicated dial stage. No Pear code, package dependency, release, or final PR changes are part of Stage 4. The native-source findings and assumptions are persisted in the three Stage 4 research documents; real Pear/host/device acceptance remains required.
 
 ## D013 — Stage 3 playlist extension contract
 

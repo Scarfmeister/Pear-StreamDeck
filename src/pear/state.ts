@@ -82,3 +82,16 @@ export function clampVolume(value: number): number {
     if (!Number.isFinite(value)) throw new Error('Volume must be a finite number.');
     return Math.min(100, Math.max(0, value));
 }
+
+export type StateField = 'volume' | 'shuffle' | 'repeat';
+
+/** REST responses use different names from Pear's WebSocket messages. */
+export function parseStateResponse(field: StateField, value: unknown): PlayerUpdate | null {
+    if (!isRecord(value)) return null;
+    if (field === 'volume' && finiteNonnegative(value.state) && value.state <= 100 && typeof value.isMuted === 'boolean') {
+        return {volume: value.state, muted: value.isMuted};
+    }
+    if (field === 'shuffle' && typeof value.state === 'boolean') return {shuffle: value.state};
+    if (field === 'repeat' && (value.mode === null || isRepeatMode(value.mode))) return {repeat: value.mode};
+    return null;
+}

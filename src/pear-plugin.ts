@@ -1,20 +1,23 @@
 import {DidReceiveGlobalSettingsEvent, SDOnActionEvent, SendToPluginEvent,
-    StreamDeckPluginHandler, WillAppearEvent, WillDisappearEvent, KeyUpEvent} from 'streamdeck-typescript';
+    StreamDeckPluginHandler, WillAppearEvent, WillDisappearEvent, KeyUpEvent, DidReceiveSettingsEvent,
+    DialUpEvent} from 'streamdeck-typescript';
 import {isRecord} from './pear/config';
 import {PearSession} from './streamdeck/pear-session';
+import {PearKeyActions} from './actions/pear-key-actions';
 
 class PearPlugin extends StreamDeckPluginHandler {
     readonly pear = new PearSession({saveGlobalSettings: settings => {
         this.settingsManager.cacheGlobalSettings(settings);
         this.setGlobalSettings(settings);
     }}, {log: (level, message) => this.logMessage(`[Pear/${level}] ${message}`)});
+    private readonly keys = new PearKeyActions(this.pear.client, this);
     private readonly inspectors = new Map<string, string>();
     private configurationError?: string;
 
     constructor() {
         super();
         this.pear.client.subscribe(() => this.publishStatus());
-        window.addEventListener('beforeunload', () => this.pear.client.stop());
+        window.addEventListener('beforeunload', () => { this.keys.dispose(); this.pear.client.stop(); });
     }
 
     @SDOnActionEvent('didReceiveGlobalSettings')
@@ -52,17 +55,22 @@ class PearPlugin extends StreamDeckPluginHandler {
     inspectorClosed(event: WillDisappearEvent) { this.inspectors.delete(event.context); }
 
     @SDOnActionEvent('connectionClosed')
-    hostClosed() { this.inspectors.clear(); this.pear.client.stop(); }
+    hostClosed() { this.inspectors.clear(); this.keys.dispose(); this.pear.client.stop(); }
 
-    // Stage 2 intentionally has no playback handlers. Old YTMD actions stay dormant in source.
     @SDOnActionEvent('willAppear')
-    pendingAction(event: WillAppearEvent) {
-        if (event.payload.controller === 'Encoder') this.setFeedback(event.context, {title: 'Actions pending'});
-        else this.setTitle('Actions\npending', event.context);
-    }
+    actionAppeared(event: WillAppearEvent) { this.keys.appear(event); }
+
+    @SDOnActionEvent('willDisappear')
+    actionDisappeared(event: WillDisappearEvent) { this.keys.disappear(event.context); }
+
+    @SDOnActionEvent('didReceiveSettings')
+    actionSettingsChanged(event: DidReceiveSettingsEvent) { this.keys.settings(event); }
 
     @SDOnActionEvent('keyUp')
-    pendingPress(event: KeyUpEvent) { this.showAlert(event.context); }
+    actionPressed(event: KeyUpEvent) { void this.keys.press(event); }
+
+    @SDOnActionEvent('dialUp')
+    pendingDial(event: DialUpEvent) { this.showAlert(event.context); }
 
     private publishStatus(error?: string) {
         for (const [context, action] of this.inspectors) {

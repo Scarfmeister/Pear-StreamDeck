@@ -1,7 +1,8 @@
 import {apiUrl, authUrl, PearConfiguration} from './config';
 import {Scheduler, systemScheduler} from './runtime';
 
-export type FailureCode = 'http' | 'network' | 'timeout' | 'aborted' | 'invalid-response' | 'not-connected';
+export type FailureCode = 'http' | 'network' | 'timeout' | 'aborted' | 'invalid-response' | 'not-connected' |
+    'state-unavailable' | 'command-busy' | 'command-unconfirmed';
 
 export class PearRequestError extends Error {
     readonly code: FailureCode;

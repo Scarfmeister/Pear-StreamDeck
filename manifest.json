@@ -28,12 +28,12 @@
       "Name": "Play-Pause",
       "States": [
         {
-          "Image": "icons/music-pause",
+          "Image": "icons/music-play",
           "TitleAlignment": "middle",
           "FontSize": 16
         },
         {
-          "Image": "icons/music-play",
+          "Image": "icons/music-pause",
           "TitleAlignment": "middle",
           "FontSize": 16
         }
@@ -42,7 +42,7 @@
         "Keypad",
         "Encoder"
       ],
-      "DisableAutomaticStates": false,
+      "DisableAutomaticStates": true,
       "Encoder": {
         "layout": "$B1",
         "StackColor": "#AABBCC",
@@ -88,38 +88,40 @@
       "Name": "Like",
       "States": [
         {
-          "Image": "icons/like-on",
+          "Image": "icons/like-off",
           "TitleAlignment": "middle",
           "FontSize": 16
         },
         {
-          "Image": "icons/like-off",
+          "Image": "icons/like-on",
           "TitleAlignment": "middle",
           "FontSize": 16
         }
       ],
       "SupportedInMultiActions": true,
       "Tooltip": "Likes current song",
-      "UUID": "io.github.scarfmeister.pear-streamdeck.like"
+      "UUID": "io.github.scarfmeister.pear-streamdeck.like",
+      "DisableAutomaticStates": true
     },
     {
       "Icon": "icons/dislike-on",
       "Name": "Dislike",
       "States": [
         {
-          "Image": "icons/dislike-on",
+          "Image": "icons/dislike-off",
           "TitleAlignment": "middle",
           "FontSize": 16
         },
         {
-          "Image": "icons/dislike-off",
+          "Image": "icons/dislike-on",
           "TitleAlignment": "middle",
           "FontSize": 16
         }
       ],
       "SupportedInMultiActions": true,
       "Tooltip": "Dislikes current song",
-      "UUID": "io.github.scarfmeister.pear-streamdeck.dislike"
+      "UUID": "io.github.scarfmeister.pear-streamdeck.dislike",
+      "DisableAutomaticStates": true
     },
     {
       "Icon": "icons/volume-on",
@@ -138,7 +140,8 @@
       ],
       "SupportedInMultiActions": true,
       "Tooltip": "Mutes / unmutes volume",
-      "UUID": "io.github.scarfmeister.pear-streamdeck.mute"
+      "UUID": "io.github.scarfmeister.pear-streamdeck.mute",
+      "DisableAutomaticStates": true
     },
     {
       "Icon": "icons/volume-down",
@@ -188,13 +191,13 @@
         {
           "Image": "icons/action-image",
           "TitleAlignment": "middle",
-          "FontSize": 12,
-          "FontFamily": "Courier New",
-          "FontStyle": "Bold"
+          "FontSize": 10,
+          "FontFamily": "Arial",
+          "FontStyle": "Regular"
         }
       ],
       "SupportedInMultiActions": true,
-      "Tooltip": "Track Title and Thumbnail",
+      "Tooltip": "Track title and artist; press to play or pause",
       "UUID": "io.github.scarfmeister.pear-streamdeck.song-info"
     },
     {
@@ -202,24 +205,35 @@
       "Name": "Shuffle",
       "States": [
         {
-          "Image": "icons/shuffle"
+          "Image": "icons/shuffle-off",
+          "TitleAlignment": "bottom",
+          "FontSize": 12
+        },
+        {
+          "Image": "icons/shuffle-on",
+          "TitleAlignment": "bottom",
+          "FontSize": 12
         }
       ],
       "SupportedInMultiActions": true,
       "Tooltip": "Shuffle",
-      "UUID": "io.github.scarfmeister.pear-streamdeck.shuffle"
+      "UUID": "io.github.scarfmeister.pear-streamdeck.shuffle",
+      "DisableAutomaticStates": true
     },
     {
       "Icon": "icons/repeat",
       "Name": "Repeat",
       "States": [
         {
-          "Image": "icons/repeat"
+          "Image": "icons/repeat-none",
+          "TitleAlignment": "bottom",
+          "FontSize": 12
         }
       ],
       "SupportedInMultiActions": true,
       "Tooltip": "Repeat",
-      "UUID": "io.github.scarfmeister.pear-streamdeck.repeat"
+      "UUID": "io.github.scarfmeister.pear-streamdeck.repeat",
+      "DisableAutomaticStates": true
     },
     {
       "Icon": "icons/music-play",

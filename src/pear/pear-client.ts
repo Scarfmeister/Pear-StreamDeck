@@ -3,8 +3,10 @@ import {endpointKey, normalizeSettings, PEAR_CLIENT_ID, PearSettings, websocketU
 import {reconnectDelay} from './reconnect';
 import {FailureCode, PearRequestError, PearRestClient} from './rest-client';
 import {browserSocket, PearSocket, Scheduler, SocketFactory, systemScheduler} from './runtime';
-import {clampVolume, emptyPlayerState, LikeState, mergePlayerState, parseLikeState, PearPlayerState} from './state';
+import {clampVolume, emptyPlayerState, LikeState, mergePlayerState, parseLikeState, parseStateResponse,
+    PearPlayerState, StateField} from './state';
 import {parsePearMessage} from './websocket';
+import {PearCommands} from './commands';
 
 export type ConnectionState = 'stopped' | 'connecting' | 'authorizing' | 'awaiting-snapshot' |
     'connected' | 'retrying' | 'authorization-required' | 'error';
@@ -31,6 +33,7 @@ export interface PearClientOptions {
 
 /** One owner for REST, approval, the socket, and confirmed state. No action or PI transport. */
 export class PearClient {
+    readonly commands: PearCommands;
     private settings: PearSettings;
     private readonly rest: PearRestClient;
     private readonly scheduler: Scheduler;
@@ -53,6 +56,7 @@ export class PearClient {
     private trackRevision = 0;
     private likeRead?: {generation: number; promise: Promise<LikeState | null>};
     private likeReadAgain = false;
+    private readonly fieldRevisions = {volume: 0, shuffle: 0, repeat: 0};
 
     constructor(settings: unknown = {}, options: PearClientOptions = {}) {
         this.settings = normalizeSettings(settings);
@@ -60,6 +64,7 @@ export class PearClient {
         this.scheduler = options.scheduler ?? systemScheduler;
         this.sockets = options.socketFactory ?? browserSocket;
         this.rest = new PearRestClient(options.fetch, this.scheduler);
+        this.commands = new PearCommands(this, this.scheduler);
     }
 
     getSnapshot(): PearSnapshot { return this.snapshot; }
@@ -136,10 +141,26 @@ export class PearClient {
         return this.request('POST', 'volume', {volume: clampVolume(volume)});
     }
 
-    /** Bounded gap fill: Pear 3.12.0 does not push ratings. Also usable after a future rating command. */
-    refreshLikeState(): Promise<LikeState | null> {
+    /** One bounded gap fill; an intervening WebSocket update wins over a stale REST response. */
+    async refreshState(field: StateField): Promise<void> {
+        const generation = this.generation;
+        const revision = this.fieldRevisions[field];
+        const value = await this.request('GET', field === 'repeat' ? 'repeat-mode' : field);
+        const update = parseStateResponse(field, value);
+        if (!update) throw new PearRequestError('invalid-response');
+        if (this.current(generation) && revision === this.fieldRevisions[field]) {
+            this.publish({player: mergePlayerState(this.snapshot.player, update)});
+        }
+    }
+
+    /** Bounded gap fill: Pear 3.12.0 does not push ratings. Commands can require a fresh read. */
+    refreshLikeState(afterPending = false): Promise<LikeState | null> {
         if (this.snapshot.connection !== 'connected' || !this.controller) return Promise.resolve(null);
         if (this.likeRead?.generation === this.generation) {
+            if (afterPending) {
+                const generation = this.generation;
+                return this.likeRead.promise.then(() => this.current(generation) ? this.refreshLikeState() : null);
+            }
             this.likeReadAgain = true;
             return this.likeRead.promise;
         }
@@ -249,6 +270,9 @@ export class PearClient {
             return;
         }
         if (this.snapshot.connection !== 'connected' && event.type !== 'PLAYER_INFO') return;
+        for (const field of ['volume', 'shuffle', 'repeat'] as const) {
+            if (event.update[field] !== undefined) ++this.fieldRevisions[field];
+        }
         if (event.type === 'PLAYER_INFO') {
             this.scheduler.clearTimeout(this.snapshotTimer);
             this.snapshotTimer = undefined;
@@ -310,6 +334,7 @@ export class PearClient {
 
     private cancelSession(): void {
         ++this.generation;
+        this.commands.cancel();
         this.controller?.abort();
         this.controller = undefined;
         this.scheduler.clearTimeout(this.retryTimer);
