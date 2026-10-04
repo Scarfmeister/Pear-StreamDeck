@@ -2,7 +2,7 @@
 
 Current stage: **Stage 1 — repository bootstrap and architecture audit**.
 
-State: **Stage 1 complete locally; Git checkpoint push pending.** Stage 2 has not started.
+State: **Stage 1 complete, committed, and pushed.** Stage 2 has not started.
 
 ## Repository and checkpoint
 
@@ -11,7 +11,8 @@ State: **Stage 1 complete locally; Git checkpoint push pending.** Stage 2 has no
 - Upstream: [XeroxDev/YTMD-StreamDeck](https://github.com/XeroxDev/YTMD-StreamDeck).
 - Starting commit: `8b0c3320ce59b741b3165a1c8ac3a54b66c2c97a`.
 - Starting history: 192 commits, identical to upstream master; original MIT license intact.
-- Final implementation checkpoint SHA: pending commit.
+- Final implementation checkpoint SHA: [`12e820e1c0221ad0ed6b1220f134b59e41f180a4`](https://github.com/Scarfmeister/Pear-StreamDeck/commit/12e820e1c0221ad0ed6b1220f134b59e41f180a4).
+- Bootstrap commit: `47da5688680415be2a3847717cfe06083e1f35c5`.
 - Status-record commit: the follow-up records the checkpoint SHA. A file cannot include the hash of the commit that contains its own final bytes; the recorded checkpoint identifies all tested implementation/docs changes before that bookkeeping update.
 
 ## Completed Stage 1 work
@@ -38,12 +39,16 @@ Environment: Node.js `24.19.0`, npm `11.9.0`, TypeScript `5.9.3`, esbuild `0.25.
 | Generated manifest preparation | Pass | Pass; version `2.3.0.0` |
 | Official CLI validation | Pass with 13 warnings: category plus old UUID-prefix warnings | Pass, zero errors; one intentional category/name warning |
 | `.streamDeckPlugin` packing | Not tested before bootstrap | Pass; 43 files, reported unpacked size 418.0 kB |
-| Watch mode | Failed: obsolete esbuild `watch` option | Pass; initial builds and rebuild after touching a source file; stopped cleanly |
+| Watch mode | Failed: obsolete esbuild `watch` option | Pass; initial builds and rebuild after touching a source file; stopped with Ctrl+C |
 | Full TypeScript check | Fails with 14 inherited errors | Same 14 errors; locations/codes below |
 | Production dependency audit | 3 findings: 1 moderate, 2 high | Same 3 findings; old dependency path retained for later replacement |
 | Spec/license/namespace/package checks | Baseline license/history checked | Pass: exact source spec, original/packaged license, 12 unique matching action UUIDs, localization keys, icon/entry paths, package-lock identity, README links, branch and upstream ancestry |
 | Unit tests | No test script or test files in upstream | No Pear code implemented; client tests belong to the client stage |
 | Physical Pear / Elgato / OpenDeck tests | Unavailable | Not run; manual plan recorded |
+
+GitHub CI also passed on the recorded implementation checkpoint: [run 37175065562](https://github.com/Scarfmeister/Pear-StreamDeck/actions/runs/37175065562). This workflow installs dependencies, builds, prepares/validates the manifest, packs, and uploads the development package. It does not run the failing full TypeScript check or physical-device tests.
+
+The terminal had no GitHub push credentials. The connected GitHub integration uploaded the two logical commits. The resulting bootstrap and audit trees exactly match the locally validated trees (`f70bd8d5bdb6ab7f89964fdb256dcd524ab665ab` and `5e40e141ef03f08514a3ccacb1ea7081753546c5`). The local development branch was synchronized to these GitHub commits after a clean-worktree/tree-equality check. No upstream/default branch was changed and no PR was created.
 
 CLI's remaining warning says Category should match Name. The user requested `Pear Desktop` and `Pear Desktop Connector`, so the two values are retained. The development package is `build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`; it is not a working Pear release.
 
