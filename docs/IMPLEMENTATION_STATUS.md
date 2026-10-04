@@ -2,7 +2,7 @@
 
 Current stage: **Stage 2 — Pear client foundation**.
 
-State: **Implemented and validated locally; preparing the pushed checkpoint.**
+State: **Stage 2 complete, committed, and pushed.**
 
 ## Repository and checkpoint
 
@@ -10,8 +10,9 @@ State: **Implemented and validated locally; preparing the pushed checkpoint.**
 - Branch: `dev/pear-port`; default branch: `master`.
 - Upstream: [XeroxDev/YTMD-StreamDeck](https://github.com/XeroxDev/YTMD-StreamDeck).
 - Stage 2 starting commit: `3846894e10ee50bde729887395a1e0afd0a1b2c1`.
-- Stage 2 tested implementation/docs checkpoint SHA: to be recorded after upload and CI verification.
-- The follow-up status-record commit will record that tested SHA. A file cannot contain the hash of the commit containing its own final bytes; the report will also identify the final branch head.
+- Stage 2 tested implementation/docs checkpoint SHA: [`722ea0ba066c69384025fc591c4e4027fd10f90b`](https://github.com/Scarfmeister/Pear-StreamDeck/commit/722ea0ba066c69384025fc591c4e4027fd10f90b).
+- Client/runtime/tests commit: `060a2e376f23d65427fd045dc1106ab00ea399f7`.
+- The follow-up status-record commit records that tested SHA and CI result. A file cannot contain the hash of the commit containing its own final bytes; the final report also identifies the final branch head.
 
 The real fork/history and original MIT license remain intact. The default branch is unchanged from `8b0c3320ce59b741b3165a1c8ac3a54b66c2c97a`. The full original specification is unchanged, SHA-256 `798be8f52331034021c925dea263c7adba4b46c2b36e20b4309647e2dfd5436b`.
 
@@ -54,7 +55,9 @@ Environment: Node.js `24.19.0`, npm `11.9.0`, TypeScript `5.9.3`, esbuild `0.25.
 | Full dependency audit | 7 development-only findings: 2 moderate, 5 high; details below. |
 | Spec/license/history/whitespace | Pass; source spec byte equality and SHA-256, unchanged original license, upstream ancestry, authored whitespace. Original spec EOF blank-line exception remains as recorded in Stage 1. |
 | Physical Pear/Elgato/OpenDeck tests | Not run; acceptance steps remain in `MANUAL_TESTING.md`. |
-| GitHub CI | To be recorded after push. |
+| GitHub CI | Pass on the tested checkpoint; install, full type checking, all tests, build, manifest preparation/validation, pack, and artifact upload. |
+
+GitHub CI passed: [run 37179146101](https://github.com/Scarfmeister/Pear-StreamDeck/actions/runs/37179146101). The connected GitHub integration uploaded the logical client and documentation commits. Their trees exactly matched the local tested trees (`644d8611b67e1b14936fbdc573a883e57458f46c` and `80c2026cf878caf6a47c555603721ff29a46eba9`). The local branch was synchronized only after clean-worktree/tree-equality checks. The final bookkeeping commit records this result. No upstream/default branch was changed and no PR was created.
 
 CLI's warning says Category should match Name. The requested `Pear Desktop` category and `Pear Desktop Connector` name are retained. Package path: `build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`. It is a connection foundation preview; it does not provide working playback actions.
 
