@@ -10,9 +10,11 @@ import {PearCommands} from './commands';
 import {parsePlaylistInput, PlaylistDispatch, playlistShuffle, playlistStartupMode, PlaylistStartupMode} from './playlist';
 
 export class PearPlaylistError extends Error {
-    constructor(readonly reason: 'extension-required' | 'unconfirmed') {
+    constructor(readonly reason: 'extension-required' | 'native-unavailable' | 'unconfirmed') {
         super(reason === 'extension-required'
-            ? 'Native playlist startup requires the compatible Pear API extension from Stage 7 (including native controls).'
+            ? 'Native playlist startup requires a Pear build with the playlist API extension.'
+            : reason === 'native-unavailable'
+                ? 'Pear cannot safely use this playlist\'s native control in the current player state. No startup was dispatched.'
             : 'Playlist startup could not be confirmed. Playback may have started; no automatic retry was sent.');
     }
 }
@@ -151,7 +153,7 @@ export class PearClient {
         return this.request('POST', 'volume', {volume: clampVolume(volume)});
     }
 
-    /** Stage 7 contract only. One native startup request; dispatch is not playback confirmation. */
+    /** One native startup request through the playlist API extension; dispatch is not playback confirmation. */
     async startPlaylist(input: unknown, mode: PlaylistStartupMode = 'FOLLOW_SHUFFLE_STATE'): Promise<PlaylistDispatch> {
         const playlistId = parsePlaylistInput(input);
         if (this.playlistOperation) throw new PearRequestError('command-busy');
@@ -182,10 +184,12 @@ export class PearClient {
             return Object.freeze({playlistId, shuffle, status: 'dispatched'});
         } catch (error) {
             if (submitted && error instanceof PearRequestError && (error.status === 404 || error.status === 501)) {
-                throw new PearPlaylistError('extension-required');
+                throw new PearPlaylistError(error.status === 501 && error.playlistFailure
+                    ? 'native-unavailable' : 'extension-required');
             }
-            if (submitted && error instanceof PearRequestError && (['timeout', 'network', 'invalid-response', 'aborted'].includes(error.code)
-                || error.status === 502 || error.status === 504)) {
+            if (submitted && error instanceof PearRequestError && (error.playlistFailure?.dispatch === 'unknown'
+                || ['timeout', 'network', 'invalid-response', 'aborted'].includes(error.code)
+                || !error.playlistFailure && (error.status === 502 || error.status === 504))) {
                 throw new PearPlaylistError('unconfirmed');
             }
             throw error;

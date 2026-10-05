@@ -1,6 +1,42 @@
 # Implementation status
 
-Current stage: **Stage 6 — Stream Deck Plus encoder and dial support**.
+Localization status:
+- Existing locale JSON files were preserved structurally, but translated content was replaced with English during the Pear rewrite.
+- This is a known pre-release regression.
+- Stage 8 must restore/translate all supported locale files from the final English source strings.
+- Release is blocked until localization parity validation passes.
+
+Current stage: **Stage 7 — Conditional Pear Desktop API extension and integration**.
+
+State: **Stage 7 implemented and validated.** The extension was still required by the committed Stage 3 contract and Stage 5–6 checkpoints. The separate Pear fork's `feature/streamdeck-playlist-api` now contains [`b5f13f65c71ca8890c08f52c7d7becde5d855be9`](https://github.com/Scarfmeister/pear-desktop/commit/b5f13f65c71ca8890c08f52c7d7becde5d855be9), pushed and independently verified. The plugin remains on `dev/pear-port`; its integration commit and CI evidence are recorded in the closing documentation update. See [the Stage 7 checkpoint](checkpoints/stage-07.md), [extension research](research/pear-playlist-api-extension.md), and D017. Signed-in native playback, physical Elgato/OpenDeck/device acceptance, and Linux packaging remain unverified.
+
+## Completed Stage 7 work
+
+- Fetched, checked out, and pulled `dev/pear-port`; started clean at `dafde761b9190fffd81b4f02557cb7acb02a7654`. Reviewed authoritative documents, Stage 3 research/contract, Stage 5–6 checkpoints, and recent history before implementation.
+- Cloned and pulled the separate `Scarfmeister/pear-desktop` fork; verified its upstream relationship and equal fork/upstream master base `a8830222afffb4af98aaa9b19287ebc24952605b`. Worked only on `feature/streamdeck-playlist-api`. Current master still lacked both normal playlist startup and native Shuffle Play.
+- Implemented D013's general-purpose protected `POST /api/v1/play-playlist`, strict ID/boolean JSON, OpenAPI schemas, dispatch-only response, and safe structured errors inside Pear's existing API Server plugin. Existing JWT/authorized-client and `NONE` authentication behavior is preserved.
+- Added a contained renderer adapter and correlated broker: signed-in `/browse`, bounded requested-header/native-command/entity resolution, complete opaque command preservation, native `yt-action` acknowledgment, one active operation, five-second deadline, sender/main-frame checks, and authorization/generation/permit gating. Abort, API/config/rebind/stop, and renderer reload/destruction cancel pending work without replay.
+- Guarded legacy normal commands that could reuse a shuffled same-playlist queue. Unsupported or ambiguous native commands/handlers return 501 before startup. No guessed shuffle parameters, watch-URL fallback, fabricated success/state, or normal→shuffle→skip workaround exists.
+- Retained the already matching shared plugin client and added bounded closed-contract error decoding. Missing extension shows Update Pear; a recognized native 501 shows Unavailable. Post-permit unknown outcomes, including HTTP 503, remain unconfirmed. Keys and selector still use one connection/state model.
+- Added 33 Pear tests and four plugin tests, plus an optional real-HTTP cross-repository integration script. Updated setup, decisions, native/manual acceptance, architecture, and reproducible research. Pear package/dependencies/lockfile/license and plugin package/dependencies/lockfile/spec/license/AGENTS remain unchanged; no upstream PR, release, or default-branch changes.
+
+## Stage 7 validation
+
+| Check | Result |
+| --- | --- |
+| Pear frozen install / source and test type checks / main-preload-renderer build | Pass, using Node 24.21.0 and pnpm 11.28.4; unchanged lockfile. |
+| Pear complete Playwright suite | **39 passed**, zero failures/skips: 33 new tests, five existing pure tests, and the existing Electron launch smoke test. GUI launch used isolated test config/cache; it is not signed-in native playback acceptance. |
+| Pear new API lint / changed-file formatting | Pass; zero new lint errors/warnings and clean Stage 7 files. |
+| Pear aggregate `pnpm check` | Still fails the same **17 untouched upstream formatting files** seen before edits; full lint has zero errors and the same 17 inherited warnings. Source/test type checks pass separately. See research for exact files. |
+| Plugin full type checks / tests / browser builds | Pass; **105 tests** across ten files, zero failures/cancellations/skips. |
+| Real-HTTP cross-repository integration | Pass: actual Pear route/broker/adapter and plugin client, JWT, all six mode/state combinations, guarded 501, post-permit unknown outcome, HTTP abort/late browse, revocation, and no replay. Optional fresh anonymous browse data resolves both native commands. Native player/audio is simulated. |
+| Official Stream Deck CLI 1.10.1 validate / pack | Pass; zero errors, retained category/name warning; version 2.3.0.0, 49 files, 236,763 unpacked bytes. Package MIT is byte-identical. |
+| Preservation / whitespace / remote Pear | Pass; original histories/defaults/dependencies/spec/licenses retained. Fresh fork fetch confirms Pear local/remote feature heads both `b5f13f65c71ca8890c08f52c7d7becde5d855be9`. Plugin CI/remote evidence is recorded in closing documentation. |
+| Signed-in native playback / Elgato / OpenDeck / hardware | Not performed. Automated contracts/source shapes and an Electron launch are distinct from native audio/queue or physical acceptance. |
+
+Development artifact: `build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`, SHA-256 `41b4e63bf0acc7d9c78841ccbed27d1335c2d2e12920bf8244b5deb426a277d1`. Stock Pear 3.12.0 still lacks the route; use the recorded fork build, not version number alone. Normal legacy watch commands in a shuffled same-playlist queue fail safely with 501; native fresh-queue semantics, signed-in/private/modern layouts, first audible track, and listening metrics remain manual gates. Retained connection/rating/shuffle/host-persistence limits, Linux override, artwork/assets, dormant-source/development-tool cleanup, and release acceptance remain later work.
+
+## Stage 6 checkpoint history
 
 State: **Stage 6 complete, committed, and pushed.** Final tested implementation: [`0c6b011bb6469613f89584b4b11496f619919feb`](https://github.com/Scarfmeister/Pear-StreamDeck/commit/0c6b011bb6469613f89584b4b11496f619919feb); [GitHub CI passed](https://github.com/Scarfmeister/Pear-StreamDeck/actions/runs/37237529138). Dedicated Volume, Transport, and Playlist Selector encoders share the existing Pear client. This closing documentation commit records the tested implementation; its final remote head is independently verified and supplied in the stage report. Native playlist execution remains blocked on the separate **Stage 7** Pear extension. Physical Pear/Elgato/OpenDeck/device acceptance and Linux packaging are unverified. See [the Stage 6 checkpoint](checkpoints/stage-06.md) and [SDK/runtime research](research/stream-deck-plus-sdk.md).
 
@@ -213,6 +249,6 @@ Stage 1 verified the fork/history/MIT license, saved the exact specification, ch
 
 ## Next stage and stop point
 
-**Stage 7 — Pear native playlist API extension.** In the separate Pear repository, implement D013's protected native Normal/Shuffle Play operation and its tests/acceptance, then validate the already implemented key/selector client contract against that recorded build. Begin only after the user's explicit Stage 7 request; fetch/read that repository's authoritative state and select its specified development branch before changes.
+**Stage 8, only after an explicit Stage 8 request.** Read the Stage 7 checkpoint and follow that request's scope. The outstanding native/host acceptance, Linux override, artwork/assets, and development-tool cleanup gates are recorded; none is automatically started by Stage 7.
 
-Stage 6 stops after its commits are pushed and the remote `dev/pear-port` head is verified. Do not start Stage 7, a Pear patch, final PR, or release automatically. Read `AGENTS.md` and the current specification/status/decisions/research/checkpoint before the next stage.
+Stage 7 stops after both development branches are pushed and their remote heads verified. Do not start Stage 8, open/merge an upstream Pear PR, create a final plugin PR, or publish a release automatically. Read `AGENTS.md` and the current specification/status/decisions/research/checkpoint before the next stage.

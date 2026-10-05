@@ -2,7 +2,7 @@
 
 A development fork of [XeroxDev/YTMD-StreamDeck](https://github.com/XeroxDev/YTMD-StreamDeck) for [Pear Desktop](https://github.com/pear-devs/pear-desktop).
 
-**Status: Stage 6 — Stream Deck Plus Volume, Transport, and Playlist Selector dials implemented and automatically tested.** Eleven standard keys and their settings remain available through the same Pear client. Playlist execution in all modes requires the separate Pear extension planned for Stage 7. Real Pear/Elgato/OpenDeck/device acceptance and Linux packaging remain unverified.
+**Status: Stage 7 — native playlist API extension and Stream Deck integration implemented and automatically tested.** Keys and dials share the existing Pear client. Playlist playback requires the separate [Pear development build](https://github.com/Scarfmeister/pear-desktop/commit/b5f13f65c71ca8890c08f52c7d7becde5d855be9). Signed-in playback, Elgato/OpenDeck/device acceptance, and Linux packaging remain unverified. Unsupported native controls fail visibly without fallback.
 
 ## Project documents
 
@@ -15,10 +15,13 @@ A development fork of [XeroxDev/YTMD-StreamDeck](https://github.com/XeroxDev/YTM
 - [Stage 4 checkpoint](docs/checkpoints/stage-04.md) and [agent instructions](AGENTS.md).
 - [Stage 5 checkpoint](docs/checkpoints/stage-05.md).
 - [Stage 6 checkpoint](docs/checkpoints/stage-06.md) and [Stream Deck Plus SDK verification](docs/research/stream-deck-plus-sdk.md).
+- [Stage 7 checkpoint](docs/checkpoints/stage-07.md) and [Pear extension contract/integration evidence](docs/research/pear-playlist-api-extension.md).
 
-## Setup for the Stage 6 development package
+## Setup for the Stage 7 development package
 
 Enable Pear Desktop 3.12.0's API Server plugin. For local use, set its bind address to `127.0.0.1` and port `26538`; Pear's own default bind address is `0.0.0.0`. Open a connector action's Property Inspector to see connection/authorization status and save host, port, or protocol. The connector defaults to HTTP at `127.0.0.1:26538`.
+
+For playlists, use `Scarfmeister/pear-desktop`, branch `feature/streamdeck-playlist-api`, commit `b5f13f65c71ca8890c08f52c7d7becde5d855be9`. In that separate checkout, Node 24 and pnpm 11 can run `pnpm install --frozen-lockfile`, `pnpm build`, and `pnpm start` for a development build. Sign in to YouTube Music and wait for the player to load, then enable/configure API Server. The branch still reports version 3.12.0; the commit identifies the extension. Stock Pear 3.12.0 supports the standard controls but has no playlist-start route. This branch has not been released or accepted upstream.
 
 With `AUTH_AT_FIRST`, approve the first request from `io.github.scarfmeister.pear-streamdeck` in Pear. The plugin stores the endpoint-bound token in Stream Deck global settings and reuses it. Authentication-disabled (`NONE`) configurations connect without a token or approval request. Denied, revoked, malformed, or interrupted approval needs the panel's **Reauthorize** button. Save endpoint changes before reauthorizing. HTTPS uses the host's normal certificate trust; no certificate bypass is provided.
 
@@ -36,11 +39,13 @@ Track Info's PI offers **Title**, **Artist**, **Title + Artist** (default), **Al
 
 State-changing commands wait for actual confirmation; a failed or unconfirmed command alerts without displaying its target. Overlapping toggles are rejected as busy. Volume serializes up to sixteen waiting inputs and discards them on failure/disconnection. No playback commands are automatically replayed.
 
-Play Playlist's PI accepts a playlist URL or ID and stores the extracted ID on Save. Choose **Follow Shuffle State** (default), **Always Normal**, or **Always Shuffle**. Follow captures Pear's actual shuffle state at activation; unavailable state fails without a guessed start. Supported URLs use the exact YouTube Music/YouTube hosts and a single `list` value; malformed/unsupported input is rejected. Legacy URL settings normalize on explicit Save. Configuration is usable now; **normal and shuffled execution both require the Stage 7 Pear extension**.
+Play Playlist's PI accepts a playlist URL or ID and stores the extracted ID on Save. Choose **Follow Shuffle State** (default), **Always Normal**, or **Always Shuffle**. Follow captures Pear's actual shuffle state at activation; unavailable state fails without a guessed start. Supported URLs use the exact YouTube Music/YouTube hosts and a single `list` value; malformed/unsupported input is rejected. Legacy URL settings normalize on explicit Save. Both playback modes require the compatible Pear development build above.
 
-Pressing a configured playlist sends only the documented `POST /api/v1/play-playlist` request. Missing/unsupported capability alerts and displays “Stage 7 required”, with details in an open PI. A valid extension response means the native command was dispatched; Pear state and later live tests establish playback. Ambiguous failures are reported without automatic retries.
+Pressing a configured playlist sends only `POST /api/v1/play-playlist`. A missing extension shows “Update Pear”; a recognized unsupported native control shows “Unavailable”, with details in an open PI. A valid response acknowledges native dispatch; Pear state establishes playback. Ambiguous failures are reported without automatic retries.
 
-Normal playlist startup and native Shuffle Play require the separate Pear extension specified in [D013](docs/DECISIONS.md#d013--stage-3-playlist-extension-contract). The [investigation](docs/PLAYLIST_API_SPIKE.md) names the source files, native command path, and test gate. No normal-start/shuffle/skip workaround is used. OBS metadata export is outside this project's scope; use Pear's Tuna integration separately.
+The native website can reuse a shuffled queue for a normal start in the same playlist. Where its supplied command cannot guarantee normal order, Pear rejects startup with 501 before dispatch. Unsupported/missing/ambiguous website controls also fail safely. See [the native acceptance plan](docs/MANUAL_TESTING.md#native-playlist-startup); automated fixtures and a dispatch acknowledgment do not establish first audible track or account-specific queue semantics.
+
+The separate Pear extension follows [D013](docs/DECISIONS.md#d013--stage-3-playlist-extension-contract); [Stage 7 research](docs/research/pear-playlist-api-extension.md) records its implementation, authentication, examples, tests, and remaining limits. No normal-start/shuffle/skip workaround is used. OBS metadata export is outside this project's scope; use Pear's Tuna integration separately.
 
 ## Stream Deck Plus dials
 
@@ -54,7 +59,7 @@ Volume Dial reuses the step editor: whole percentages 1–100, default 5%, volum
 
 Open Playlist Selector's PI, select **Add playlist**, enter a name (1–64 characters) and URL/ID, then **Save action settings**. Configure up to sixteen entries and choose Follow Shuffle State (default), Always Normal, or Always Shuffle for each. Optional PNG/JPEG images up to 24 KiB are embedded in action settings. Rotate without starting playback; selection is saved per dial and restored on appearance. List edits retain the selection's position and clamp it to the edited bounds. Invalid entries stay visible for repair and cannot start playback. Incoming selection writes preserve unsaved PI drafts.
 
-The selector is one encoder action with a local list, the supported equivalent to a dynamic host Dial Stack; it does not create a host stack action per playlist. See [the source verification and limitation](docs/research/stream-deck-plus-sdk.md). Follow reads actual Pear shuffle at press time. **All playlist execution still requires Stage 7**; configuring/selecting entries works without it.
+The selector is one encoder action with a local list, the supported equivalent to a dynamic host Dial Stack; it does not create a host stack action per playlist. See [the source verification and limitation](docs/research/stream-deck-plus-sdk.md). Follow reads actual Pear shuffle at press time. Playlist execution uses the same extension as the key; configuring/selecting entries works on stock Pear.
 
 A short touch refreshes the display; hold does nothing. Neither touch nor dial-down duplicates the release command. Clear custom host titles/icons to see the plugin's display. Text is bounded for a 200×100 segment; hardware glyph widths and image decoding remain acceptance checks. Automated messages/schema pass, and pinned OpenDeck source supports expected compatibility; no physical host/device pass or native Linux installation is claimed.
 
@@ -74,7 +79,9 @@ npx --yes @elgato/cli@1.10.1 pack --no-update-check build/io.github.scarfmeister
 
 `npm ci` installs locked dependencies. `build` creates the plugin directory. `prepare:streamdeck-cli` normalizes its manifest. `validate` checks the package. `pack` creates a development `.streamDeckPlugin` file in `build`; `--force` permits replacement of that local output. The CLI version is pinned for repeatable checks.
 
-`npm run watch` rebuilds the active Pear browser bundles. `npm run typecheck` checks all source and test types; the inherited errors have been fixed. `npm test` runs 101 deterministic client/host/key/dial/settings tests with fake networking/timers and actual browser-entry bundles in VM contexts. Playlist success fixtures test the proposed contract; they do not prove Pear 3.12.0 supports it. CI runs these checks before building and packaging.
+`npm run watch` rebuilds the active Pear browser bundles. `npm run typecheck` checks all source and test types. `npm test` runs 105 deterministic client/host/key/dial/settings tests with fake networking/timers and actual browser-entry bundles in VM contexts. CI runs these checks before building and packaging.
+
+With the separate Pear checkout and its locked dependencies installed, run `node scripts/test-pear-extension.js /path/to/pear-desktop` on Node 24. This optional integration check bundles each repository's actual code into a temporary test harness, serves the real Pear route over loopback, and exercises the shared client, authentication, mode selection, native fixture dispatch, HTTP abort, and safe errors. It uses synthetic renderer/player state and does not prove signed-in audio. Pear's complete 39-test suite, source/test type checks, and build pass; its aggregate `pnpm check` retains 17 formatting failures already present at the upstream base, with no new lint/format failures. See the checkpoint for details.
 
 The client is in `src/pear`; the global-settings adapter is `src/streamdeck/pear-session.ts`. The keys use `src/actions/pear-key-actions.ts`, client-owned `src/pear/commands.ts`, and `PearClient.startPlaylist`. Shared action validation lives in `src/streamdeck/action-settings.ts`; playlist parsing/modes live in `src/pear/playlist.ts`. Future actions must use the same plugin-owned client and confirmed snapshots. A standard command's 204 confirms dispatch only; playlist startup specifically requires D013's matching 200 JSON result. No constant polling or automatic playback-command retry is used.
 

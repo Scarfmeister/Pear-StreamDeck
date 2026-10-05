@@ -118,7 +118,8 @@ export class PearKeyActions {
             if (!this.disposed && (!visible || this.contexts.get(event.context) === visible)) {
                 if (event.action === ActionTypes.PLAY_PLAYLIST) {
                     if (visible) {
-                        visible.playlistError = error instanceof PearPlaylistError && error.reason === 'extension-required' ? 'Stage 7\nrequired' : 'Start failed';
+                        visible.playlistError = error instanceof PearPlaylistError && error.reason === 'extension-required' ? 'Update\nPear'
+                            : error instanceof PearPlaylistError && error.reason === 'native-unavailable' ? 'Unavailable' : 'Start failed';
                         this.render(event.context, visible, this.client.getSnapshot());
                     }
                     this.host.playlistStatus?.(event.context, error instanceof Error ? error.message : 'Playlist startup failed.');

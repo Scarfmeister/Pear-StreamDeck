@@ -154,7 +154,9 @@ Playlist shows an explicit Pear API requirement and sends no start request. Inhe
 
 **Decision: extend Pear in Stage 7.** Pinned Pear 3.12.0 (`3f599b42724be827db51cd4689996dc3e48a9561`) exposes neither playlist-start operation. `POST /queue` accepts one video; `POST /shuffle` operates on the current queue. No REST or WebSocket command accepts a playlist ID for startup. Stage 3 deferred a speculative client method. The user's Stage 5 scope now explicitly authorizes the guarded interface, settings, and fake-contract tests; these must expose missing capability without implying native operations already exist.
 
-### HTTP contract (proposed, not implemented)
+Stage 7 implements this contract in the separate Pear branch at `b5f13f65c71ca8890c08f52c7d7becde5d855be9`. Stock Pear remains unsupported. [D017](#d017--stage-7-contained-native-playlist-extension) and [extension research](research/pear-playlist-api-extension.md) record the implementation, conservative native-normal limitation, tests, and outstanding signed-in acceptance. The original Stage 3 investigation remains historical evidence.
+
+### HTTP contract
 
 Add one route, `POST /api/v1/play-playlist`, to the existing authenticated Hono API. Keep its existing JWT/authorized-client guards and `NONE` behavior. The request is strict JSON:
 
@@ -183,7 +185,7 @@ Extension errors use `{ "error": { "code": "...", "dispatch": "not_dispatched" }
 | 501 | `NATIVE_PLAYLIST_CONTROL_UNAVAILABLE` or `NATIVE_PLAYLIST_DISPATCH_UNAVAILABLE`; missing, ambiguous, or unsupported native structure/handler | `not_dispatched` |
 | 502 | `PLAYLIST_RESOLUTION_FAILED`; browse request failed | `not_dispatched` |
 | 502 | `PLAYLIST_DISPATCH_FAILED`; failure after permitting native dispatch | `unknown` |
-| 503 | `PLAYER_NOT_READY`; renderer/player/API adapter is not ready | `not_dispatched` |
+| 503 | `PLAYER_NOT_READY`; renderer/player/API adapter is not ready, or its generation was canceled | `not_dispatched` before a permit, otherwise `unknown` |
 | 504 | `PLAYLIST_START_TIMEOUT`; five-second server deadline expired | `not_dispatched` before a permit, otherwise `unknown` |
 
 Register request/success/error schemas in Pear's existing OpenAPI `/doc`; no extra capability endpoint is needed. Unmodified 3.12.0 returns 404 for this path. The later client must report that the Pear extension is required and send no alternative command. An unrelated camel-case `playPlaylist` route is not this capability. Document the required Pear extension commit/build before enabling playlist actions.
@@ -254,3 +256,15 @@ D007's selector equivalent supports at most sixteen ordered entries. Each explic
 Selected press calls the same `PearClient.startPlaylist` as the key. Follow uses actual shuffle at activation; stock Pear still requires Stage 7 in all modes. No independent queue/playback state, host-stack API, alternative route, or normal→shuffle→skip is introduced.
 
 Pinned OpenDeck 2.14.0 and its locked renderer accept these events, layouts, object indicators, and embedded rasters. Automated browser/wire/layout tests and official CLI validation verify plugin behavior and schema. Source tracing supports expected OpenDeck compatibility; it is not a running-host/device pass. Linux manifest/installation work remains later under D008. Elgato/OpenDeck hardware, host write persistence, WebView networking, rendering, and native playback remain explicit checks in `MANUAL_TESTING.md`. Evidence: [Stage 6 SDK research](research/stream-deck-plus-sdk.md).
+
+## D017 — Stage 7 contained native playlist extension
+
+Committed project evidence still required a Pear change. Use the separate fork `Scarfmeister/pear-desktop`, branch `feature/streamdeck-playlist-api`, based on the reviewed fork/upstream master `a8830222afffb4af98aaa9b19287ebc24952605b`. The implementation commit is `b5f13f65c71ca8890c08f52c7d7becde5d855be9`. No dependency or lockfile changes, copied Pear source, global renderer/song-controls patch, upstream PR, or default-branch work is needed.
+
+Retain D013's one protected `POST /api/v1/play-playlist` and existing authentication. A plugin-owned broker/renderer adapter resolves the requested header control through the signed-in network manager, validates bounded command/entity relations, preserves its complete opaque command, and emits one acknowledged native event. Keep one active operation, the five-second deadline, main-window/main-frame checks, correlation/generation/permit gating, exact owned main-listener disposal, and cancellation on abort/configuration/rebind/stop/reload/destruction. SPA navigation does not invalidate the request. API re-enable uses the existing player-ready hook and a local runtime identity/readiness guard. No native success event or optimistic player state is added.
+
+Native normal watch commands can reuse queue items. Reject a normal video command when current native shuffle is true and the requested playlist can be reused, or when its queue context is unverified. Do not manufacture a clear-state wrapper or claim an existing clear-state feature flag restores normal order. A supplied native watch-playlist startup uses the fresh-queue path. Unknown website variants, ambiguous controls, partial/missing entity relations, and missing handlers fail safely. This is an explicit limitation: Always Normal in a shuffled same-playlist queue is not established for legacy watch commands. Signed-in normal/shuffle/audio/queue semantics remain a manual gate, including modern and localized layouts.
+
+The shared Stream Deck interface already matched the final endpoint. Add only bounded error-contract handling: consume at most 1,024 error-body bytes for this POST, retain only known code/status/dispatch combinations, and discard arbitrary native/server text. A missing/unknown extension shows Update Pear; an identified native 501 shows Unavailable. Known pre-dispatch failures remain rejected; any recognized unknown outcome, including cancellation's HTTP 503 after a permit, stays unconfirmed with no replay. Keys and selector share the same error/state behavior and connection.
+
+Pear's 39-test suite includes 33 new HTTP/resolver/broker/adapter tests and its existing Electron launch smoke test. Source/test type checks, builds, changed-file formatting, and new API lint pass; 17 unrelated base formatting failures and 17 existing lint warnings remain. The Stream Deck suite has 105 tests. A reproducible loopback integration script uses the actual Pear route/broker/adapter and shared client with synthetic native state; it also validates optional freshly fetched anonymous browse data. These are automatic contract/source-shape checks, not signed-in playback or hardware acceptance. Full evidence and upstream considerations are in [extension research](research/pear-playlist-api-extension.md).

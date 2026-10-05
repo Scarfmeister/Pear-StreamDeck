@@ -213,8 +213,11 @@ test('playlist configuration calls the shared interface; missing native capabili
     assert.equal(host.latest('title', 'playlist'), 'Play\nplaylist');
     f.client.startPlaylist = async () => { throw new PearPlaylistError('extension-required'); };
     await keys.press({action: ActionTypes.PLAY_PLAYLIST, context: 'playlist', payload: {}});
-    assert.equal(host.latest('title', 'playlist'), 'Stage 7\nrequired');
-    assert.match(String(host.latest('playlistStatus', 'playlist')), /Stage 7/);
+    assert.equal(host.latest('title', 'playlist'), 'Update\nPear');
+    assert.match(String(host.latest('playlistStatus', 'playlist')), /playlist API extension/);
+    f.client.startPlaylist = async () => { throw new PearPlaylistError('native-unavailable'); };
+    await keys.press(event(ActionTypes.PLAY_PLAYLIST, 'playlist'));
+    assert.equal(host.latest('title', 'playlist'), 'Unavailable');
     keys.appear(event(ActionTypes.VOLUME_UP, 'dial', {}, 'Encoder'));
     await keys.press({action: ActionTypes.VOLUME_UP, context: 'dial', payload: {}});
     await keys.press(event(ActionTypes.PLAY_PAUSE, 'other-dial', {}, 'Encoder'));

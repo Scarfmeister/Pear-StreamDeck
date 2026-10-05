@@ -49,3 +49,25 @@ export function playlistShuffle(mode: PlaylistStartupMode, shuffle: boolean | nu
 }
 
 export interface PlaylistDispatch {readonly playlistId: string; readonly shuffle: boolean; readonly status: 'dispatched';}
+
+// D013's closed error contract. Never retain arbitrary server/native text.
+const PLAYLIST_ERROR_STATUS = {
+    INVALID_PLAYLIST_REQUEST: 400, PLAYLIST_START_BUSY: 409, PLAYLIST_UNAVAILABLE: 422,
+    NATIVE_PLAYLIST_CONTROL_UNAVAILABLE: 501, NATIVE_PLAYLIST_DISPATCH_UNAVAILABLE: 501,
+    PLAYLIST_RESOLUTION_FAILED: 502, PLAYLIST_DISPATCH_FAILED: 502, PLAYER_NOT_READY: 503,
+    PLAYLIST_START_TIMEOUT: 504,
+} as const;
+export interface PlaylistFailure {
+    readonly code: keyof typeof PLAYLIST_ERROR_STATUS;
+    readonly dispatch: 'not_dispatched' | 'unknown';
+}
+
+export function parsePlaylistFailure(value: unknown, status: number): PlaylistFailure | undefined {
+    if (!isRecord(value) || !isRecord(value.error)) return undefined;
+    const {code, dispatch} = value.error;
+    if (typeof code !== 'string' || !Object.prototype.hasOwnProperty.call(PLAYLIST_ERROR_STATUS, code)) return undefined;
+    if (PLAYLIST_ERROR_STATUS[code as PlaylistFailure['code']] !== status) return undefined;
+    if (dispatch !== 'not_dispatched' && dispatch !== 'unknown') return undefined;
+    if (dispatch === 'unknown' && ![502, 503, 504].includes(status)) return undefined;
+    return Object.freeze({code: code as PlaylistFailure['code'], dispatch});
+}

@@ -176,7 +176,10 @@ test('selector keeps invalid/empty slots explicit; unsupported native startup fa
     await dials.rotate(rotate(ActionTypes.PLAYLIST_SELECTOR, 1));
     f.client.startPlaylist = async () => { throw new PearPlaylistError('extension-required'); };
     await dials.press(event(ActionTypes.PLAYLIST_SELECTOR));
-    assert.equal(host.feedback().status, 'Stage 7 required'); assert.match(String(host.latest('status')), /Stage 7/);
+    assert.equal(host.feedback().status, 'Update Pear'); assert.match(String(host.latest('status')), /playlist API extension/);
+    f.client.startPlaylist = async () => { throw new PearPlaylistError('native-unavailable'); };
+    await dials.press(event(ActionTypes.PLAYLIST_SELECTOR, 'dial'));
+    assert.equal(host.feedback().status, 'Unavailable');
     const result = deferred<never>(); f.client.startPlaylist = () => result.promise;
     const press = dials.press(event(ActionTypes.PLAYLIST_SELECTOR));
     await dials.rotate(rotate(ActionTypes.PLAYLIST_SELECTOR, -1));

@@ -149,7 +149,8 @@ export class PearDialActions {
         } catch (error) {
             if (!relevant()) return;
             if (entry.role === 'selector') {
-                entry.playlistError = error instanceof PearPlaylistError && error.reason === 'extension-required' ? 'Stage 7 required' : 'Start failed';
+                entry.playlistError = error instanceof PearPlaylistError && error.reason === 'extension-required' ? 'Update Pear'
+                    : error instanceof PearPlaylistError && error.reason === 'native-unavailable' ? 'Unavailable' : 'Start failed';
                 this.render(event.context, entry, this.client.getSnapshot());
                 this.host.playlistStatus?.(event.context, error instanceof Error ? error.message : 'Playlist startup failed.');
             }

@@ -215,7 +215,7 @@ test('PI displays every Track Info selection and saves it per context without ch
     assert.equal(b.requests.length, 0); b.host.close();
 });
 
-test('PI playlist URL normalizes to stored ID, validates malformed edits, and defaults Follow while exposing Stage 7', async () => {
+test('PI playlist URL normalizes to stored ID, validates malformed edits, and defaults Follow while exposing the Pear build requirement', async () => {
     const action = 'io.github.scarfmeister.pear-streamdeck.play-playlist';
     const b = browser('pear-pi', {action, settings: {playlistUrl: 'https://music.youtube.com/playlist?list=New', playlistId: 'Old', retained: true}});
     b.host.receive({event: 'didReceiveGlobalSettings', payload: {settings: {}}}); await b.clock.advance(1);
@@ -229,7 +229,7 @@ test('PI playlist URL normalizes to stored ID, validates malformed edits, and de
     input.value = 'https://evil.test/playlist?list=bad'; input.input(); b.elements.get('actionSave')?.onclick?.();
     assert.equal(b.host.sent.filter(m => m.event === 'setSettings').length, 1);
     assert.match(b.elements.get('actionMessage')!.textContent, /playlist ID/);
-    assert.ok(readFileSync('property-inspector.html', 'utf8').includes('Stage 7'));
+    assert.ok(readFileSync('property-inspector.html', 'utf8').includes('native playlist API extension'));
     assert.equal(b.requests.length, 0); b.host.close();
 });
 
@@ -265,8 +265,8 @@ test('browser playlist activation calls only the documented route and surfaces m
     assert.equal(commands.length, 1); assert.ok(commands[0].url.endsWith('/play-playlist'));
     assert.deepEqual(JSON.parse(String(commands[0].init?.body)), {playlistId: 'PL_Test', shuffle: true});
     assert.ok(b.host.sent.some(m => m.event === 'showAlert'));
-    assert.ok(b.host.sent.some(m => m.event === 'setTitle' && (m.payload as {title: string}).title === 'Stage 7\nrequired'));
-    assert.ok(b.host.sent.some(m => m.event === 'sendToPropertyInspector' && (m.payload as {message?: string}).message?.includes('Stage 7')));
+    assert.ok(b.host.sent.some(m => m.event === 'setTitle' && (m.payload as {title: string}).title === 'Update\nPear'));
+    assert.ok(b.host.sent.some(m => m.event === 'sendToPropertyInspector' && (m.payload as {message?: string}).message?.includes('playlist API extension')));
     assert.ok(!JSON.stringify(b.host.sent.filter(m => m.event === 'sendToPropertyInspector')).includes('browser-secret'));
     b.host.close(); assert.equal(b.clock.tasks.size, 0);
 });
@@ -331,8 +331,8 @@ test('browser selector saves selection and captures actual shuffle without legac
     const posts = b.requests.filter(r => r.init?.method === 'POST' && !r.url.includes('/auth/'));
     assert.equal(posts.length, 1); assert.ok(posts[0].url.endsWith('/play-playlist'));
     assert.deepEqual(JSON.parse(String(posts[0].init?.body)), {playlistId: 'B', shuffle: true});
-    assert.ok(b.host.sent.some(m => m.event === 'sendToPropertyInspector' && (m.payload as {message?: string}).message?.includes('Stage 7')));
-    assert.equal((b.host.sent.filter(m => m.event === 'setFeedback' && m.context === 'selector').at(-1)?.payload as {status: string}).status, 'Stage 7 required');
+    assert.ok(b.host.sent.some(m => m.event === 'sendToPropertyInspector' && (m.payload as {message?: string}).message?.includes('playlist API extension')));
+    assert.equal((b.host.sent.filter(m => m.event === 'setFeedback' && m.context === 'selector').at(-1)?.payload as {status: string}).status, 'Update Pear');
     assert.equal(b.sockets.length, 2); b.host.close(); assert.equal(b.clock.tasks.size, 0);
 });
 

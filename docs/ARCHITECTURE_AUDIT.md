@@ -194,6 +194,14 @@ The Stage 1 action/module tables above are historical plans. Stage 4/5 implement
 
 Dedicated encoder UUIDs now exist. Old Play/Pause and Volume Up encoder UUIDs remain aliases for placed profiles. Volume uses the already bounded confirmed-state command queue, replacing the planned extra timer; Transport bounds pending detents without waiting for position ticks. Selector rotation persists one local index through ordinary host settings; it does not create dynamic host stack entries. `$B1` and packaged `dial-layout.json` cover feedback. Exact framework/OpenDeck/renderer source verification, limits, and test boundaries are in [Stream Deck Plus SDK research](research/stream-deck-plus-sdk.md) and D016. Native playlist execution remains blocked on the separate Stage 7 extension; live hosts/hardware and Linux packaging remain unverified.
 
+## Stage 7 playlist extension integration
+
+The earlier Stage 3/5/6 descriptions above are historical. Stage 7 implements D013 in the separate Pear fork at [`b5f13f65c71ca8890c08f52c7d7becde5d855be9`](https://github.com/Scarfmeister/pear-desktop/commit/b5f13f65c71ca8890c08f52c7d7becde5d855be9), branch `feature/streamdeck-playlist-api`, based on fork/upstream `a8830222afffb4af98aaa9b19287ebc24952605b`. One protected route, owned broker, and API Server renderer adapter resolve and dispatch the native requested-header command through the signed-in app. Sender/frame/correlation/permit/deadline and lifecycle guards reject stale work; no global renderer or song-control subsystem was added.
+
+The shared client already sends the final strict request and accepts only matching dispatch acknowledgment. `src/pear/rest-client.ts` now reads at most 1,024 error bytes for that operation; `playlist.ts` retains only closed known code/status/dispatch fields. Missing extension and safe native 501 are distinct, and post-permit unknown outcomes remain unconfirmed. Standard keys and selector use the same interface and real Pear state. The optional `scripts/test-pear-extension.js` imports the actual separate checkout for real-HTTP integration without copying Pear source into this repository.
+
+Native watch-video controls can reuse a shuffled current playlist. The extension rejects that unverified normal-start case rather than synthesizing a clear/shuffle/skip sequence. Pear's 39 tests, plugin's 105 tests, builds, and loopback integration are automatic contract evidence; signed-in native playback and Elgato/OpenDeck/device acceptance remain unperformed. See [extension research](research/pear-playlist-api-extension.md), D017, and [manual acceptance](MANUAL_TESTING.md).
+
 ## Primary sources
 
 - [YTMD baseline source](https://github.com/XeroxDev/YTMD-StreamDeck/tree/8b0c3320ce59b741b3165a1c8ac3a54b66c2c97a) and [license](https://github.com/XeroxDev/YTMD-StreamDeck/blob/8b0c3320ce59b741b3165a1c8ac3a54b66c2c97a/LICENSE).
