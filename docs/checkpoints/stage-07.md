@@ -8,12 +8,12 @@ Read the committed status, decisions, Stage 3 investigation/D013, Stage 5–6 ch
 
 | Repository | Branch | Relevant commit |
 | --- | --- | --- |
-| Scarfmeister/Pear-StreamDeck | `dev/pear-port` | Starting Stage 6 close: `dafde761b9190fffd81b4f02557cb7acb02a7654`. Tested integration and closing remote head are recorded in the closing documentation update. |
+| Scarfmeister/Pear-StreamDeck | `dev/pear-port` | Starting Stage 6 close: `dafde761b9190fffd81b4f02557cb7acb02a7654`. Tested integration: [`d44fc520a4ac8dc51cd58adce58eea2cbbf0f715`](https://github.com/Scarfmeister/Pear-StreamDeck/commit/d44fc520a4ac8dc51cd58adce58eea2cbbf0f715), pushed and freshly verified equal to `origin/dev/pear-port`. Closing documentation head is verified/reported separately below. |
 | Scarfmeister/pear-desktop | `feature/streamdeck-playlist-api` | Final implementation: [`b5f13f65c71ca8890c08f52c7d7becde5d855be9`](https://github.com/Scarfmeister/pear-desktop/commit/b5f13f65c71ca8890c08f52c7d7becde5d855be9). Fresh fetch verifies local/remote equality and a clean tree. |
 | Pear fork/upstream | `master` (read-only) | Equal reviewed base `a8830222afffb4af98aaa9b19287ebc24952605b`, with zero divergence; original fork relationship/history retained. |
 | Plugin default branch | `master` (read-only) | Preserved `8b0c3320ce59b741b3165a1c8ac3a54b66c2c97a`. |
 
-The implementation is committed first, then a closing documentation commit records its actual SHA and CI result. A file cannot embed the SHA of the commit containing its own final bytes. Retrieve the final closing documentation SHA with `git log -1 --format=%H -- docs/checkpoints/stage-07.md`; the final stage report supplies that independently verified remote head. The closing commit changes documentation only.
+The implementation is committed first, then this closing documentation commit records its actual SHA and [successful GitHub CI run 37260620944](https://github.com/Scarfmeister/Pear-StreamDeck/actions/runs/37260620944). A file cannot embed the SHA of the commit containing its own final bytes. Retrieve the final closing documentation SHA with `git log -1 --format=%H -- docs/checkpoints/stage-07.md`; the final stage report supplies that independently verified remote head. The closing commit changes documentation only. Both working trees are clean after the commits and their remote development heads are verified before stopping.
 
 ## Work completed and changed components
 
@@ -43,7 +43,8 @@ The implementation is committed first, then a closing documentation commit recor
 | Fresh anonymous public browse shape | Both native normal and shuffle command resolutions pass. No signed-in/audio inference. |
 | Plugin browser build / manifest preparation / CLI 1.10.1 validate and pack | Pass; zero errors, retained category/name warning, version 2.3.0.0, 49 files / 236,763 unpacked bytes. |
 | Package, preservation, whitespace, local Markdown, and upstream history | Pass; 62 local Markdown targets/anchors, clean whitespace, retained MIT/spec/dependencies/AGENTS, original history/defaults, and package license. No dependency/package scope expansion. |
-| Plugin GitHub CI / remote development heads | Integration CI and final primary head are recorded after push. Pear remote already equals its implementation commit; both branches must be verified before stopping. |
+| Plugin GitHub implementation CI | Pass; [run 37260620944](https://github.com/Scarfmeister/Pear-StreamDeck/actions/runs/37260620944) at `d44fc520a4ac8dc51cd58adce58eea2cbbf0f715`, all install/type/test/build/validate/pack/upload steps successful. |
+| Remote development heads | Fresh fetch: Pear local/remote feature branch both `b5f13f65c71ca8890c08f52c7d7becde5d855be9`, plugin local/remote integration both `d44fc520a4ac8dc51cd58adce58eea2cbbf0f715`; defaults and upstream ancestry preserved. Final documentation head is verified after push. |
 | Signed-in native playback / Elgato / OpenDeck / physical hardware | **Not performed.** Automated contracts/source shapes and Electron launch are distinct from native queue/audio and device acceptance. |
 
 Development package: `build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`; SHA-256 `41b4e63bf0acc7d9c78841ccbed27d1335c2d2e12920bf8244b5deb426a277d1`. Its embedded original MIT license is byte-identical. No release is published.
