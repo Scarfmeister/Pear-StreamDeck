@@ -28,7 +28,7 @@ jobs:
       - name: Type-check plugin and tests
         run: npm run typecheck
 
-      - name: Test Pear client
+      - name: Test client, actions, settings, browser integration, and localization
         run: npm test
 
       - name: Build plugin package
@@ -42,6 +42,9 @@ jobs:
 
       - name: Pack plugin
         run: streamdeck pack --no-update-check build/io.github.scarfmeister.pear-streamdeck.sdPlugin --output build --force
+
+      - name: Check distributable contents and Linux manifest view
+        run: python3 scripts/validate-package.py
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4

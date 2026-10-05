@@ -4,6 +4,8 @@ const path = require('node:path');
 const {spawnSync} = require('node:child_process');
 
 async function main() {
+    const localization = spawnSync(process.execPath, ['scripts/validate-localization.js'], {stdio: 'inherit'});
+    if (localization.status !== 0) throw new Error('Localization validation failed.');
     const entries = fs.readdirSync('tests').filter(name => name.endsWith('.test.ts')).map(name => `tests/${name}`);
     if (!entries.length) throw new Error('No client tests found.');
     fs.rmSync('dist/tests', {recursive: true, force: true});

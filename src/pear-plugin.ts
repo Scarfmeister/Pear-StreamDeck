@@ -6,14 +6,16 @@ import {PearSession} from './streamdeck/pear-session';
 import {PearKeyActions} from './actions/pear-key-actions';
 import {PearDialActions} from './actions/pear-dial-actions';
 import {SDOnTouchTap} from './streamdeck/touch-events';
+import {translator, Translate} from './streamdeck/localization';
 
 class PearPlugin extends StreamDeckPluginHandler {
     readonly pear = new PearSession({saveGlobalSettings: settings => {
         this.settingsManager.cacheGlobalSettings(settings);
         this.setGlobalSettings(settings);
     }}, {log: (level, message) => this.logMessage(`[Pear/${level}] ${message}`)});
-    private readonly keys = new PearKeyActions(this.pear.client, this);
-    private readonly dials = new PearDialActions(this.pear.client, this);
+    private readonly translate: Translate = (text, parameters) => translator(this.info?.application.language)(text, parameters);
+    private readonly keys = new PearKeyActions(this.pear.client, this, this.translate);
+    private readonly dials = new PearDialActions(this.pear.client, this, this.translate);
     private readonly inspectors = new Map<string, string>();
     private configurationError?: string;
 

@@ -7,6 +7,8 @@
     "build": "node scripts/build.js",
     "prepare:streamdeck-cli": "node scripts/prepare-streamdeck-cli.js",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.tests.json",
+    "validate:localization": "node scripts/validate-localization.js",
+    "validate:package": "python3 scripts/validate-package.py",
     "test": "node scripts/test.js"
   },
   "repository": {

@@ -36,30 +36,19 @@ async function main() {
 
     // Copy files
     console.log('Copying files');
-    const rootEntries = fs.readdirSync('.');
+    // Explicit runtime resources: development examples and future root files
+    // must not enter the distributable just because they share an extension.
+    for (const name of ['manifest.json', 'manifest.linux.json', 'dial-layout.json',
+        'en.json', 'de.json', 'fr.json', 'action.html', 'property-inspector.html', 'sdpi.css']) {
+        fs.copyFileSync(name, `${outputDir}/${name}`);
+    }
 
-    const excludedJson = new Set([
-        'package.json',
-        'package-lock.json',
-        'tsconfig.json',
-        'tsconfig.tests.json',
-        'release-please-config.json',
-        '.release-please-manifest.json'
-    ]);
-
-    rootEntries
-        .filter((name) => name.endsWith('.json') && !excludedJson.has(name))
-        .forEach((name) => fs.copyFileSync(name, `${outputDir}/${name}`));
-
-    rootEntries
-        .filter((name) => name.endsWith('.html'))
-        .forEach((name) => fs.copyFileSync(name, `${outputDir}/${name}`));
-
-    rootEntries
-        .filter((name) => name.endsWith('.css'))
-        .forEach((name) => fs.copyFileSync(name, `${outputDir}/${name}`));
-
-    fs.cpSync('icons', `${outputDir}/icons`, {recursive: true});
+    fs.mkdirSync(`${outputDir}/icons`);
+    // SVGs are editable source assets. Ship one unambiguous raster rendition
+    // family per icon, including the PNG feedback required by OpenDeck.
+    for (const name of fs.readdirSync('icons').filter(name => name.endsWith('.png') || name === 'NOTICE.md')) {
+        fs.copyFileSync(`icons/${name}`, `${outputDir}/icons/${name}`);
+    }
     fs.copyFileSync('LICENSE', `${outputDir}/LICENSE`);
 
     // Done building plugin folder, check the build directory

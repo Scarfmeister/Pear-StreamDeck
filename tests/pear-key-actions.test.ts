@@ -82,7 +82,7 @@ test('visible duplicates render immediately and follow external playback, rating
     assert.equal(host.latest('state', 'shuffle'), 0);
     for (const repeat of ['NONE', 'ALL', 'ONE'] as const) {
         f.update({repeat});
-        assert.equal(host.latest('image', 'repeat'), `icons/repeat-${repeat.toLowerCase()}.svg`);
+        assert.equal(host.latest('image', 'repeat'), `icons/repeat-${repeat.toLowerCase()}.png`);
     }
     f.update({isPlaying: false, volume: 0, muted: false, shuffle: true, likeState: 'LIKE'});
     assert.equal(host.latest('state', 'play-a'), 0);

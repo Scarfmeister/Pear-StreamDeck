@@ -1,11 +1,10 @@
 {
   "Name": "Pear Desktop Connector",
   "Author": "XeroxDev; Matthew Wallace (Scarfmeister)",
-  "Description": "Pear Desktop Connector development fork. See the repository for implementation status.",
-  "URL": "https://github.com/Scarfmeister/Pear-StreamDeck",
+  "Description": "Control Pear Desktop from Stream Deck keys and dials using its local API Server.",
   "UUID": "io.github.scarfmeister.pear-streamdeck",
-  "Icon": "icons/action-image",
-  "Version": "2.3.0",
+  "Icon": "icons/plugin-icon",
+  "Version": "2.3.0.0",
   "Category": "Pear Desktop",
   "CategoryIcon": "icons/category-icon",
   "SDKVersion": 2,
@@ -15,27 +14,29 @@
   "OS": [
     {
       "Platform": "mac",
-      "MinimumVersion": "10.11"
+      "MinimumVersion": "13"
     },
     {
       "Platform": "windows",
-      "MinimumVersion": "10"
+      "MinimumVersion": "11"
     }
   ],
   "Actions": [
     {
       "Icon": "icons/music-play",
-      "Name": "Play-Pause",
+      "Name": "Play/Pause",
       "States": [
         {
           "Image": "icons/music-play",
           "TitleAlignment": "middle",
-          "FontSize": 16
+          "FontSize": 16,
+          "Name": "Play"
         },
         {
           "Image": "icons/music-pause",
           "TitleAlignment": "middle",
-          "FontSize": 16
+          "FontSize": 16,
+          "Name": "Pause"
         }
       ],
       "Controllers": [
@@ -47,80 +48,86 @@
         "layout": "dial-layout.json",
         "StackColor": "#AABBCC",
         "TriggerDescription": {
-          "Rotate": "Switch song",
-          "Push": "Plays or Pauses the current song",
+          "Rotate": "Clockwise next track; counter-clockwise previous track",
+          "Push": "Play or pause",
           "Touch": "Refresh display"
         }
       },
       "SupportedInMultiActions": true,
-      "Tooltip": "Plays or Pauses the current song",
+      "Tooltip": "Start or pause the current track",
       "UUID": "io.github.scarfmeister.pear-streamdeck.play-pause"
     },
     {
       "Icon": "icons/music-next",
-      "Name": "Next",
+      "Name": "Next Track",
       "States": [
         {
           "Image": "icons/music-next",
           "TitleAlignment": "middle",
-          "FontSize": 16
+          "FontSize": 16,
+          "Name": "Next Track"
         }
       ],
       "SupportedInMultiActions": true,
-      "Tooltip": "Go to next song",
+      "Tooltip": "Go to the next track",
       "UUID": "io.github.scarfmeister.pear-streamdeck.next"
     },
     {
       "Icon": "icons/music-prev",
-      "Name": "Prev",
+      "Name": "Previous Track",
       "States": [
         {
           "Image": "icons/music-prev",
           "TitleAlignment": "middle",
-          "FontSize": 16
+          "FontSize": 16,
+          "Name": "Previous Track"
         }
       ],
       "SupportedInMultiActions": true,
-      "Tooltip": "Go to prev song",
+      "Tooltip": "Go to the previous track",
       "UUID": "io.github.scarfmeister.pear-streamdeck.prev"
     },
     {
       "Icon": "icons/like-on",
-      "Name": "Like",
+      "Name": "Like Track",
       "States": [
         {
           "Image": "icons/like-off",
           "TitleAlignment": "middle",
-          "FontSize": 16
+          "FontSize": 16,
+          "Name": "Off"
         },
         {
           "Image": "icons/like-on",
           "TitleAlignment": "middle",
-          "FontSize": 16
+          "FontSize": 16,
+          "Name": "Like Track"
         }
       ],
       "SupportedInMultiActions": true,
-      "Tooltip": "Likes current song",
+      "Tooltip": "Like or clear Like for the current track",
       "UUID": "io.github.scarfmeister.pear-streamdeck.like",
       "DisableAutomaticStates": true
     },
     {
       "Icon": "icons/dislike-on",
-      "Name": "Dislike",
+      "Name": "Dislike Track",
       "States": [
         {
           "Image": "icons/dislike-off",
           "TitleAlignment": "middle",
-          "FontSize": 16
+          "FontSize": 16,
+          "Name": "Off"
         },
         {
           "Image": "icons/dislike-on",
           "TitleAlignment": "middle",
-          "FontSize": 16
+          "FontSize": 16,
+          "Name": "Dislike Track"
         }
       ],
       "SupportedInMultiActions": true,
-      "Tooltip": "Dislikes current song",
+      "Tooltip": "Dislike or clear Dislike for the current track",
       "UUID": "io.github.scarfmeister.pear-streamdeck.dislike",
       "DisableAutomaticStates": true
     },
@@ -131,16 +138,18 @@
         {
           "Image": "icons/volume-on",
           "TitleAlignment": "middle",
-          "FontSize": 16
+          "FontSize": 16,
+          "Name": "Volume"
         },
         {
           "Image": "icons/volume-mute",
           "TitleAlignment": "middle",
-          "FontSize": 16
+          "FontSize": 16,
+          "Name": "Muted"
         }
       ],
       "SupportedInMultiActions": true,
-      "Tooltip": "Mutes / unmutes volume",
+      "Tooltip": "Toggle mute on/off",
       "UUID": "io.github.scarfmeister.pear-streamdeck.mute",
       "DisableAutomaticStates": true
     },
@@ -151,11 +160,12 @@
         {
           "Image": "icons/volume-down",
           "TitleAlignment": "middle",
-          "FontSize": 16
+          "FontSize": 16,
+          "Name": "Volume Down"
         }
       ],
       "SupportedInMultiActions": true,
-      "Tooltip": "Volume Down",
+      "Tooltip": "Turn the player volume down",
       "UUID": "io.github.scarfmeister.pear-streamdeck.volume-down"
     },
     {
@@ -165,7 +175,8 @@
         {
           "Image": "icons/volume-up",
           "TitleAlignment": "middle",
-          "FontSize": 16
+          "FontSize": 16,
+          "Name": "Volume Up"
         }
       ],
       "Controllers": [
@@ -177,13 +188,13 @@
         "layout": "$B1",
         "StackColor": "#AABBCC",
         "TriggerDescription": {
-          "Rotate": "Volume control",
-          "Push": "Mute",
+          "Rotate": "Adjust volume by the configured step",
+          "Push": "Toggle mute",
           "Touch": "Refresh display"
         }
       },
       "SupportedInMultiActions": true,
-      "Tooltip": "Volume Up",
+      "Tooltip": "Turn the player volume up",
       "UUID": "io.github.scarfmeister.pear-streamdeck.volume-up"
     },
     {
@@ -195,11 +206,12 @@
           "TitleAlignment": "middle",
           "FontSize": 10,
           "FontFamily": "Arial",
-          "FontStyle": "Regular"
+          "FontStyle": "Regular",
+          "Name": "Track Info"
         }
       ],
       "SupportedInMultiActions": true,
-      "Tooltip": "Track title and artist; press to play or pause",
+      "Tooltip": "Show track metadata; press to play or pause",
       "UUID": "io.github.scarfmeister.pear-streamdeck.song-info"
     },
     {
@@ -209,53 +221,64 @@
         {
           "Image": "icons/shuffle-off",
           "TitleAlignment": "bottom",
-          "FontSize": 12
+          "FontSize": 12,
+          "Name": "Off"
         },
         {
           "Image": "icons/shuffle-on",
           "TitleAlignment": "bottom",
-          "FontSize": 12
+          "FontSize": 12,
+          "Name": "Shuffle"
         }
       ],
       "SupportedInMultiActions": true,
-      "Tooltip": "Shuffle",
+      "Tooltip": "Toggle real shuffle state",
       "UUID": "io.github.scarfmeister.pear-streamdeck.shuffle",
       "DisableAutomaticStates": true
     },
     {
       "Icon": "icons/repeat",
-      "Name": "Repeat",
+      "Name": "Repeat Mode",
       "States": [
         {
           "Image": "icons/repeat-none",
           "TitleAlignment": "bottom",
-          "FontSize": 12
+          "FontSize": 12,
+          "Name": "Off"
         }
       ],
       "SupportedInMultiActions": true,
-      "Tooltip": "Repeat",
+      "Tooltip": "Cycle repeat: Off, All, One",
       "UUID": "io.github.scarfmeister.pear-streamdeck.repeat",
       "DisableAutomaticStates": true
     },
     {
-      "Icon": "icons/music-play",
+      "Icon": "icons/playlist",
       "Name": "Play Playlist",
       "States": [
         {
-          "Image": "icons/music-play",
+          "Image": "icons/playlist",
           "TitleAlignment": "middle",
-          "FontSize": 16
+          "FontSize": 16,
+          "Name": "Play Playlist"
         }
       ],
       "SupportedInMultiActions": true,
-      "Tooltip": "Play a selected playlist",
+      "Tooltip": "Start a configured playlist with native Play or Shuffle Play",
       "UUID": "io.github.scarfmeister.pear-streamdeck.play-playlist"
     },
     {
       "Icon": "icons/volume-on",
       "Name": "Volume Dial",
-      "States": [{"Image": "icons/volume-on"}],
-      "Controllers": ["Encoder"],
+      "States": [
+        {
+          "Image": "icons/volume-on",
+          "Name": "Volume Dial"
+        }
+      ],
+      "Controllers": [
+        "Encoder"
+      ],
       "Encoder": {
         "layout": "$B1",
         "StackColor": "#5D9981",
@@ -266,14 +289,21 @@
         }
       },
       "SupportedInMultiActions": false,
-      "Tooltip": "Rotate for volume; press to mute. Shows confirmed Pear volume and mute.",
+      "Tooltip": "Rotate for volume; press to mute. Shows actual Pear state.",
       "UUID": "io.github.scarfmeister.pear-streamdeck.volume-dial"
     },
     {
       "Icon": "icons/music-play",
       "Name": "Transport Dial",
-      "States": [{"Image": "icons/music-play"}],
-      "Controllers": ["Encoder"],
+      "States": [
+        {
+          "Image": "icons/music-play",
+          "Name": "Transport Dial"
+        }
+      ],
+      "Controllers": [
+        "Encoder"
+      ],
       "Encoder": {
         "layout": "dial-layout.json",
         "StackColor": "#5D9981",
@@ -284,14 +314,21 @@
         }
       },
       "SupportedInMultiActions": false,
-      "Tooltip": "Rotate to change tracks; press to play or pause. Shows confirmed Pear playback.",
+      "Tooltip": "Rotate to change tracks; press to play or pause. Shows actual Pear state.",
       "UUID": "io.github.scarfmeister.pear-streamdeck.transport-dial"
     },
     {
-      "Icon": "icons/music-play",
+      "Icon": "icons/playlist",
       "Name": "Playlist Selector Dial",
-      "States": [{"Image": "icons/music-play"}],
-      "Controllers": ["Encoder"],
+      "States": [
+        {
+          "Image": "icons/playlist",
+          "Name": "Playlist Selector Dial"
+        }
+      ],
+      "Controllers": [
+        "Encoder"
+      ],
       "Encoder": {
         "layout": "dial-layout.json",
         "StackColor": "#5D9981",
@@ -302,7 +339,7 @@
         }
       },
       "SupportedInMultiActions": false,
-      "Tooltip": "Select and play a named playlist. Native execution requires the Stage 7 Pear API extension.",
+      "Tooltip": "Select and play a named playlist; requires the Pear playlist API extension.",
       "UUID": "io.github.scarfmeister.pear-streamdeck.playlist-selector"
     }
   ],

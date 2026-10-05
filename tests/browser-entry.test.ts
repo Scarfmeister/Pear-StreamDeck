@@ -5,7 +5,7 @@ import {runInNewContext} from 'node:vm';
 import {FakeScheduler, empty, json, PLAYER_INFO, settle} from './helpers';
 import {ActionTypes} from '../src/interfaces/enums';
 
-function browser(entry: 'pear-plugin' | 'pear-pi', options: {action?: string; settings?: unknown; piUuid?: string} = {}) {
+function browser(entry: 'pear-plugin' | 'pear-pi', options: {action?: string; settings?: unknown; piUuid?: string; language?: string} = {}) {
     const clock = new FakeScheduler();
     const sockets: HostSocket[] = [];
     const requests: {url: string; init?: RequestInit}[] = [];
@@ -59,7 +59,7 @@ function browser(entry: 'pear-plugin' | 'pear-pi', options: {action?: string; se
         addEventListener: () => {},
     };
     runInNewContext(readFileSync(`dist/browser-tests/${entry}.js`, 'utf8'), {
-        window, document: {readyState: 'complete', addEventListener: () => {},
+        window, document: {readyState: 'complete', addEventListener: () => {}, documentElement: {lang: ''}, querySelectorAll: () => [],
             createElement: () => new Element(),
             getElementById: (id: string) => {
                 if (!elements.has(id)) { const element = new Element(); element.id = id; }
@@ -75,7 +75,7 @@ function browser(entry: 'pear-plugin' | 'pear-pi', options: {action?: string; se
             return String(url).endsWith('/like-state') ? json({state: 'LIKE'}) : empty();
         },
     });
-    const info = JSON.stringify({application: {language: 'en'}, devices: []});
+    const info = JSON.stringify({application: {language: options.language ?? 'en'}, devices: []});
     window.connectElgatoStreamDeckSocket!('12345', entry === 'pear-plugin' ? 'plugin' : options.piUuid ?? 'ctx',
         entry === 'pear-plugin' ? 'registerPlugin' : 'registerPropertyInspector', info,
         JSON.stringify({action: options.action ?? 'io.github.scarfmeister.pear-streamdeck.next', context: 'ctx', payload: {settings: options.settings ?? {}}}));
@@ -136,6 +136,48 @@ test('browser PI sends connection messages through the host and opens no Pear tr
     b.host.close();
 });
 
+test('German and French PI status/errors are translated while saved settings retain their programmatic values', async () => {
+    for (const [language, connected, auth, invalid] of [
+        ['de', 'Verbunden', 'Authentifizierung deaktiviert', 'Lautstärkeschritt'],
+        ['fr', 'Connecté', 'Authentification désactivée', 'Le pas de volume'],
+    ]) {
+        const b = browser('pear-pi', {language, action: ActionTypes.VOLUME_UP});
+        b.host.receive({event: 'didReceiveGlobalSettings', payload: {settings: {}}});
+        await b.clock.advance(1);
+        b.host.receive({event: 'sendToPropertyInspector', payload: {type: 'pear-status',
+            connection: 'connected', authentication: 'disabled', settings: {host: '127.0.0.1', port: 26538, protocol: 'http'}}});
+        assert.equal(b.elements.get('globalConnectionStatus')?.textContent, connected);
+        assert.equal(b.elements.get('globalAuthStatus')?.textContent, auth);
+        b.host.receive({event: 'sendToPropertyInspector', payload: {type: 'pear-status',
+            connection: 'stopped', authentication: 'unknown', error: 'Stream Deck global settings are not loaded yet.'}});
+        assert.ok(b.elements.get('connectionError')?.textContent.startsWith(language === 'de' ? 'Die globalen' : 'Les paramètres globaux'));
+        const input = b.elements.get('volumeStep')!;
+        input.value = 'bad'; b.elements.get('actionSave')?.onclick?.();
+        assert.ok(b.elements.get('actionMessage')?.textContent.startsWith(invalid));
+        input.value = '7'; b.elements.get('actionSave')?.onclick?.();
+        const saved = b.host.sent.filter(message => message.event === 'setSettings').at(-1)!;
+        assert.equal((saved.payload as {steps: number}).steps, 7);
+        assert.equal(b.requests.length, 0); assert.equal(b.sockets.length, 1);
+        b.host.close();
+    }
+});
+
+test('French plugin feedback follows real player state and leaves track metadata untranslated', async () => {
+    const b = browser('pear-plugin', {language: 'fr'});
+    b.host.receive({event: 'didReceiveGlobalSettings', payload: {settings: {}}});
+    await b.clock.advance(1); await settle();
+    b.sockets[1].receive(PLAYER_INFO); await settle();
+    b.host.receive({event: 'willAppear', action: ActionTypes.SHUFFLE, context: 'shuffle', payload: {controller: 'Keypad', settings: {}}});
+    b.sockets[1].receive({type: 'SHUFFLE_CHANGED', shuffle: true});
+    const title = b.host.sent.filter(message => message.event === 'setTitle' && message.context === 'shuffle').at(-1)!;
+    assert.equal((title.payload as {title: string}).title, 'Activé');
+    b.host.receive({event: 'willAppear', action: ActionTypes.TRANSPORT_DIAL, context: 'transport', payload: {controller: 'Encoder', settings: {}}});
+    const feedback = b.host.sent.filter(message => message.event === 'setFeedback' && message.context === 'transport').at(-1)!;
+    assert.equal((feedback.payload as {title: string}).title, 'Track');
+    assert.notEqual((feedback.payload as {status: string}).status, 'Playing');
+    b.host.close();
+});
+
 test('browser host events render the manifest playback images and three distinct repeat images', async () => {
     const b = browser('pear-plugin');
     b.host.receive({event: 'didReceiveGlobalSettings', payload: {settings: {}}});
@@ -161,7 +203,7 @@ test('browser host events render the manifest playback images and three distinct
         pear.receive({type: 'REPEAT_CHANGED', repeat});
         const image = (b.host.sent.filter(message => message.event === 'setImage' && message.context === 'repeat').at(-1)?.payload as {image: string}).image;
         images.add(image);
-        assert.ok(readFileSync(image, 'utf8').startsWith('<svg'));
+        assert.deepEqual([...readFileSync(image).subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
     }
     assert.equal(images.size, 3);
     const count = b.host.sent.length;

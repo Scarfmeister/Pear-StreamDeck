@@ -4,6 +4,7 @@ import {ActionTypes} from './interfaces/enums';
 import {saveActionSettings, trackInfoFormat, volumeStep} from './streamdeck/action-settings';
 import {playlistInput, playlistStartupMode} from './pear/playlist';
 import {PlaylistSelectorEditor} from './streamdeck/playlist-selector-editor';
+import {localizeDocument, translator, Translate} from './streamdeck/localization';
 
 class PearPi extends StreamDeckPropertyInspectorHandler {
     constructor() { super(); }
@@ -25,6 +26,7 @@ class PearPi extends StreamDeckPropertyInspectorHandler {
     private startupInput: HTMLSelectElement;
     private actionMessage: HTMLElement;
     private selector?: PlaylistSelectorEditor;
+    private t: Translate = translator('en');
 
     // The retained framework omits action and assumes the PI UUID is the action context.
     override requestSettings(): void {
@@ -41,6 +43,8 @@ class PearPi extends StreamDeckPropertyInspectorHandler {
 
     @SDOnPiEvent('setupReady')
     ready() {
+        this.t = translator(this.info.application.language);
+        localizeDocument(document, this.info.application.language);
         this.hostInput = document.getElementById('globalHost') as HTMLInputElement;
         this.portInput = document.getElementById('globalPort') as HTMLInputElement;
         this.protocolInput = document.getElementById('globalProtocol') as HTMLSelectElement;
@@ -76,7 +80,7 @@ class PearPi extends StreamDeckPropertyInspectorHandler {
         if (selector) this.selector = new PlaylistSelectorEditor(document.getElementById('selectorEntries') as HTMLElement,
             document.getElementById('selectorAdd') as HTMLButtonElement,
             () => { this.actionDirty = true; this.actionMessage.textContent = ''; },
-            text => { this.actionMessage.textContent = text; });
+            text => { this.actionMessage.textContent = this.t(text); }, this.t);
         for (const input of [this.volumeInput, this.formatInput, this.playlistInputElement, this.startupInput]) {
             input.addEventListener('input', () => { this.actionDirty = true; this.actionMessage.textContent = ''; });
         }
@@ -91,10 +95,10 @@ class PearPi extends StreamDeckPropertyInspectorHandler {
                 this.actionSettings = settings;
                 this.actionDirty = false;
                 this.renderActionSettings();
-                this.actionMessage.textContent = 'Settings sent to Stream Deck.';
+                this.actionMessage.textContent = this.t('Settings sent to Stream Deck.');
                 this.requestSettings();
             } catch (error) {
-                this.actionMessage.textContent = error instanceof Error ? error.message : 'Could not save action settings.';
+                this.actionMessage.textContent = this.t(error instanceof Error ? error.message : 'Could not save action settings.');
             }
         };
         this.sendToPlugin({type: 'pear-get-status'});
@@ -123,7 +127,7 @@ class PearPi extends StreamDeckPropertyInspectorHandler {
         if (payload.type === 'pear-connection-saved') { this.dirty = false; return; }
         if (payload.type === 'pear-playlist-status') {
             if ([ActionTypes.PLAY_PLAYLIST, ActionTypes.PLAYLIST_SELECTOR].includes(this.actionInfo.action as ActionTypes) && typeof payload.message === 'string') {
-                this.actionMessage.textContent = payload.message;
+                this.actionMessage.textContent = this.t(payload.message);
             }
             return;
         }
@@ -139,13 +143,13 @@ class PearPi extends StreamDeckPropertyInspectorHandler {
             retrying: 'Pear unavailable', 'authorization-required': 'Use Reauthorize', error: 'Settings could not be saved'};
         const authLabels: Record<string, string> = {unknown: 'Checking', authorizing: 'Waiting for approval in Pear',
             authorized: 'Authorized', disabled: 'Authentication disabled', required: 'Authorization required', denied: 'Denied'};
-        this.connection.textContent = connectionLabels[String(payload.connection)] ?? 'Unknown';
+        this.connection.textContent = this.t(connectionLabels[String(payload.connection)] ?? 'Unknown');
         if (payload.connection === 'retrying' && typeof payload.retryInMs === 'number') {
-            this.connection.textContent += `; retry in ${Math.ceil(payload.retryInMs / 1000)}s`;
+            this.connection.textContent += this.t('; retry in {seconds}s', {seconds: Math.ceil(payload.retryInMs / 1000)});
         }
-        this.authorization.textContent = authLabels[String(payload.authentication)] ?? 'Unknown';
+        this.authorization.textContent = this.t(authLabels[String(payload.authentication)] ?? 'Unknown');
         this.reauthorizeButton.disabled = payload.connection === 'authorizing';
-        this.error.textContent = typeof payload.error === 'string' ? payload.error : '';
+        this.error.textContent = typeof payload.error === 'string' ? this.t(payload.error) : '';
     }
 }
 

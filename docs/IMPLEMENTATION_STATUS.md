@@ -1,12 +1,42 @@
 # Implementation status
 
-Localization status:
-- Existing locale JSON files were preserved structurally, but translated content was replaced with English during the Pear rewrite.
-- This is a known pre-release regression.
-- Stage 8 must restore/translate all supported locale files from the final English source strings.
-- Release is blocked until localization parity validation passes.
+Current stage: **Stage 8 — Assets, packaging, documentation, and release validation**.
 
-Current stage: **Stage 7 — Conditional Pear Desktop API extension and integration**.
+State: **Stage 8 implementation and local validation complete.** Source/documentation publication, GitHub CI and final remote-head evidence are closed in [the Stage 8 checkpoint](checkpoints/stage-08.md) before stopping. The installer is a development preview for manual testing, not a published release or hardware certification. No Pear modification or Stage 9 work is included.
+
+Localization: all inherited **en/de/fr** files retained, with **204 required leaf keys / 136 active runtime strings** per locale and validation in normal tests. Most German/French translations had survived earlier porting; the English root description, missing/obsolete bindings and new active English forms needed correction. Reusable translations are retained, changed/new Pear text is translated, and explicit identical-term exceptions are documented. See [LOCALIZATION.md](LOCALIZATION.md) and its complete inventory. Structural/browser validation passes; native-speaker/device review remains manual.
+
+## Completed Stage 8 work
+
+- Fetched/pulled and checked out `dev/pear-port`; started clean at `f7b1ce245b3b015d5603e4e05754d1bd7f09619f`. Reviewed all project documentation/checkpoints/research and recent history before edits.
+- Audited all inherited visual groups. Replaced all 32 inherited PNGs with project-created generic MIT controls; refreshed known Stage 4 geometry; added consistent playlist/metadata/plugin/category icons. Committed 23 editable SVGs and 46 rendered PNGs; removed unproven PSD/promotional thumbnail from the current tree while preserving upstream history/attribution and the unchanged original MIT.
+- Restored complete English/German/French manifest/action/state/encoder localization and active PI/dial/key status/help/fallback/error text. Same resources drive a small host-language browser adapter; actual metadata, names, URLs, IDs and settings are untouched. Added per-leaf exceptions, full baseline/final inventory, and fault-injection/browser tests.
+- Normalized the canonical manifest to Version 2.3.0.0 with supported fields; retained SDKVersion 2/HTML/framework and category identity. Corrected inherited OS minima to current Windows 11/macOS 13 targets using official requirements; software feature minimum remains 6.4 and physical host acceptance is unverified.
+- Added the native OpenDeck Linux manifest override with unchanged action IDs/HTML runtime. Replaced broad build copying with explicit runtime resources and PNG-only distribution; dynamic Repeat now uses PNG. Added real archive/CRC/resource/dimension/state-distinction/MIT/canonical/Linux checks.
+- Extended existing CI with package checks and existing release-build gates with type/tests/localization/archive checks. Verified current CLI/schema and release-please's preservation of a fourth version component; no SDK migration, dependency/version bump, DRM, new redundant workflow or release is needed.
+- Rewrote user setup/install/features/playlist/compatibility/development/license README. Added the concrete 40-row manual matrix with expected results for keys, Plus, Windows/OpenDeck/Linux/auth/restarts/reconnect/state/playlists/settings/localization/icons. Persisted research and D018.
+
+## Stage 8 local validation
+
+| Check | Result |
+| --- | --- |
+| Clean locked install | Pass: Node 24.21.0, 248 installed packages; package-lock/dependency selections unchanged. Sandbox install restriction was resolved by an authorized outside-sandbox rerun. |
+| Source/test type checks | Pass; no errors. |
+| Complete suite / individual Node 24 runner | **122 tests across 11 files**, no failures/cancellations/skips; includes retained client/state/key/dial/settings coverage plus localization failures and real browser-entry integration. |
+| Localization | Pass: three required locales, 204 keys, manifest/state/encoder/structure/parameter parity, no English copies or undocumented placeholders; complete inventory matches. |
+| Browser build / canonical preparation | Pass; both HTML/browser bundles and source/built manifest parity. |
+| Official CLI 1.10.1 / current schemas 0.5.1 | Validate/pack pass, zero errors; one documented category/name warning, no ambiguous icon resources. Current schemas fetched and independently hashed. |
+| Archive / Linux configuration / asset/license audit | Pass: 59 exact files, 381,423 unpacked bytes, PNG dimensions/pairs/distinct states/references, native Linux merged view, source/ZIP resource parity, unchanged MIT/notice. |
+| Production / full install audit | Zero production findings; same seven legacy development findings (2 moderate, 5 high), retained for explicit release disposition. |
+| Preservation | Original spec/MIT/AGENTS/lockfile/dependencies, all 15 action UUIDs, upstream ancestry/default branch retained; all 32 old PNG byte streams replaced. |
+| GitHub CI / source publication | Final commit/run/remote results are recorded in the closing checkpoint after push. No release workflow is triggered from this branch. |
+| Real Pear/native audio / Elgato/OpenDeck/device/host persistence | Not run; explicit manual gates, not implied by schema/messages/source checks. |
+
+Artifact: `build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`, SHA-256 `2a69ead01591f567e46e102e05b19066b17a55d01668250a4de134a7c5f32e74`. Build output is ignored and no installer binary is committed. [Tooling research](research/elgato-build-and-packaging.md) records reproduction, versions, schemas and platforms; [asset research](research/assets-and-licensing.md) records sources/licenses/removals and generation.
+
+Remaining release gates: installed Windows/macOS/OpenDeck/Linux/Flatpak and device readability/events; host auth/token/action settings persistence; signed-in native normal/Shuffle Play/queue/audio semantics; minimum-host and native-speaker review where claimed; disposition of development findings. Stock Pear 3.12.0 still lacks playlist startup; the separate extension remains `b5f13f65c71ca8890c08f52c7d7becde5d855be9`. Unsafe legacy shuffled same-playlist Normal startup remains a visible 501 limit. Artwork stays deferred. Cold-cache, same-track external ratings, legacy shuffle, half-open transport and host-write acknowledgment limits remain documented. Stage 8 stops here; Stage 9/PR/release requires its own request.
+
+## Stage 7 checkpoint history
 
 State: **Stage 7 complete, committed, and pushed.** The extension was still required by the committed Stage 3 contract and Stage 5–6 checkpoints. The separate Pear fork's `feature/streamdeck-playlist-api` contains [`b5f13f65c71ca8890c08f52c7d7becde5d855be9`](https://github.com/Scarfmeister/pear-desktop/commit/b5f13f65c71ca8890c08f52c7d7becde5d855be9), pushed and independently verified. The plugin's tested integration on `dev/pear-port` is [`d44fc520a4ac8dc51cd58adce58eea2cbbf0f715`](https://github.com/Scarfmeister/Pear-StreamDeck/commit/d44fc520a4ac8dc51cd58adce58eea2cbbf0f715); [GitHub CI passed](https://github.com/Scarfmeister/Pear-StreamDeck/actions/runs/37260620944). This closing documentation commit records the tested implementations; its final remote head is independently verified and supplied in the stage report. See [the Stage 7 checkpoint](checkpoints/stage-07.md), [extension research](research/pear-playlist-api-extension.md), and D017. Signed-in native playback, physical Elgato/OpenDeck/device acceptance, and Linux packaging remain unverified.
 

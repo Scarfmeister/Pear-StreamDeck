@@ -5,6 +5,7 @@ import {PearClient, PearPlaylistError, PearSnapshot} from '../pear/pear-client';
 import {PearSong} from '../pear/state';
 import {TrackInfoFormat, trackInfoFormat, volumeStep} from '../streamdeck/action-settings';
 import {parsePlaylistInput, playlistInput, playlistStartupMode} from '../pear/playlist';
+import {Translate} from '../streamdeck/localization';
 export {TRACK_INFO_FORMATS, TrackInfoFormat, trackInfoFormat, volumeStep} from '../streamdeck/action-settings';
 
 function readableLine(text: string, limit: number): string {
@@ -13,11 +14,11 @@ function readableLine(text: string, limit: number): string {
 }
 
 /** Small-key text; the song model retains the full metadata for future display choices. */
-export function formatTrackInfo(song: Readonly<PearSong> | null, format: TrackInfoFormat, limit = 12): string {
-    if (!song) return 'No track';
-    const title = song.title.trim() || 'Unknown title';
-    const artist = song.artist.trim() || 'Unknown artist';
-    const album = song.album?.trim() || 'No album';
+export function formatTrackInfo(song: Readonly<PearSong> | null, format: TrackInfoFormat, limit = 12, t: Translate = text => text): string {
+    if (!song) return t('No track');
+    const title = song.title.trim() || t('Unknown title');
+    const artist = song.artist.trim() || t('Unknown artist');
+    const album = song.album?.trim() || t('No album');
     const lines = {TITLE: [title], ARTIST: [artist], TITLE_ARTIST: [title, artist],
         ALBUM: [album], TITLE_ARTIST_ALBUM: [title, artist, album]};
     return lines[format].map(line => readableLine(line, limit)).join('\n');
@@ -54,7 +55,8 @@ export class PearKeyActions {
     private readonly unsubscribe: () => void;
     private disposed = false;
 
-    constructor(private readonly client: PearKeyClient, private readonly host: PearKeyHost) {
+    constructor(private readonly client: PearKeyClient, private readonly host: PearKeyHost,
+                private readonly t: Translate = text => text) {
         this.unsubscribe = client.subscribe(snapshot => {
             for (const [context, entry] of this.contexts) this.render(context, entry, snapshot);
         });
@@ -151,14 +153,14 @@ export class PearKeyActions {
     private display(entry: Context, snapshot: PearSnapshot): Render {
         if (entry.controller === 'Encoder') return {title: 'Dials pending', feedback: true};
         if (!snapshot.player.ready || snapshot.connection !== 'connected') {
-            return {title: snapshot.connection === 'authorizing' ? 'Approve\nin Pear' : 'Pear\noffline'};
+            return {title: this.t(snapshot.connection === 'authorizing' ? 'Approve\nin Pear' : 'Pear\noffline')};
         }
         const state = snapshot.player;
         switch (entry.action) {
             case ActionTypes.PLAY_PLAYLIST:
-                if (entry.playlistError) return {title: entry.playlistError};
-                try { parsePlaylistInput(playlistInput(entry.settings)); return {title: 'Play\nplaylist'}; }
-                catch { return {title: 'Set playlist'}; }
+                if (entry.playlistError) return {title: this.t(entry.playlistError)};
+                try { parsePlaylistInput(playlistInput(entry.settings)); return {title: this.t('Play\nplaylist')}; }
+                catch { return {title: this.t('Set playlist')}; }
             case ActionTypes.PLAY_PAUSE:
                 return {state: state.isPlaying === true ? 1 : 0, title: state.isPlaying === null ? '?' : ''};
             case ActionTypes.LIKE_TRACK:
@@ -171,12 +173,12 @@ export class PearKeyActions {
             case ActionTypes.VOLUME_UP:
                 return {title: state.volume === null ? '?' : `${Math.round(state.volume)}%`};
             case ActionTypes.SONG_INFO:
-                return {title: formatTrackInfo(state.song, trackInfoFormat(entry.settings))};
+                return {title: formatTrackInfo(state.song, trackInfoFormat(entry.settings), 12, this.t)};
             case ActionTypes.SHUFFLE:
-                return {state: state.shuffle === true ? 1 : 0, title: state.shuffle === null ? '?' : state.shuffle ? 'On' : 'Off'};
+                return {state: state.shuffle === true ? 1 : 0, title: state.shuffle === null ? '?' : this.t(state.shuffle ? 'On' : 'Off')};
             case ActionTypes.REPEAT:
-                return {image: `icons/repeat-${state.repeat?.toLowerCase() ?? 'none'}.svg`,
-                    title: state.repeat === null ? '?' : {NONE: 'Off', ALL: 'All', ONE: 'One'}[state.repeat]};
+                return {image: `icons/repeat-${state.repeat?.toLowerCase() ?? 'none'}.png`,
+                    title: state.repeat === null ? '?' : this.t({NONE: 'Off', ALL: 'All', ONE: 'One'}[state.repeat])};
             default: return {title: ''};
         }
     }

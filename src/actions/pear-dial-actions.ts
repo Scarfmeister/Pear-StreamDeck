@@ -4,6 +4,7 @@ import {PearPlaylistError, PearSnapshot} from '../pear/pear-client';
 import {volumeStep} from '../streamdeck/action-settings';
 import {playlistEntries, rotatePlaylistIndex, selectedPlaylistIndex} from '../streamdeck/playlist-selector-settings';
 import {PearKeyClient} from './pear-key-actions';
+import {Translate} from '../streamdeck/localization';
 
 export interface PearDialHost {
     setFeedback(context: string, payload: Record<string, unknown>): void;
@@ -47,7 +48,8 @@ export class PearDialActions {
     private readonly unsubscribe: () => void;
     private disposed = false;
 
-    constructor(private readonly client: PearKeyClient, private readonly host: PearDialHost) {
+    constructor(private readonly client: PearKeyClient, private readonly host: PearDialHost,
+                private readonly t: Translate = text => text) {
         this.unsubscribe = client.subscribe(snapshot => {
             for (const [context, entry] of this.contexts) {
                 if (!ready(snapshot)) this.cancelTransport(entry);
@@ -216,23 +218,23 @@ export class PearDialActions {
         const offline = snapshot.connection === 'authorizing' ? 'Approve in Pear' : 'Pear offline';
         let feedback: Record<string, unknown>;
         if (entry.role === 'volume') {
-            feedback = {title: connected ? state.muted === true ? 'Muted' : state.muted === false ? 'Volume' : 'Mute unknown' : offline,
+            feedback = {title: this.t(connected ? state.muted === true ? 'Muted' : state.muted === false ? 'Volume' : 'Mute unknown' : offline),
                 icon: connected && state.muted === true ? 'icons/volume-mute.png' : 'icons/volume-on.png',
                 value: connected && state.volume !== null ? `${Math.round(state.volume)}%` : '?',
                 indicator: {value: connected && state.volume !== null ? state.volume : 0, enabled: connected && state.volume !== null}};
         } else if (entry.role === 'transport') {
-            feedback = {title: line(state.song?.title || 'No track', 16), detail: line(state.song?.artist || '', 18),
-                status: connected ? state.isPlaying === true ? 'Playing' : state.isPlaying === false ? 'Paused / stopped' : 'Playback unknown' : offline,
+            feedback = {title: line(state.song?.title || this.t('No track'), 16), detail: line(state.song?.artist || '', 18),
+                status: this.t(connected ? state.isPlaying === true ? 'Playing' : state.isPlaying === false ? 'Paused / stopped' : 'Playback unknown' : offline),
                 icon: connected && state.isPlaying === true ? 'icons/music-pause.png' : 'icons/music-play.png'};
         } else {
             const entries = playlistEntries(entry.settings);
             const selected = entries[entry.index];
             const shuffle = selected?.startupMode === 'ALWAYS_NORMAL' ? 'Normal' : selected?.startupMode === 'ALWAYS_SHUFFLE' ? 'Shuffle'
                 : state.shuffle === null || !connected ? 'Follow (?)' : state.shuffle ? 'Follow: shuffle' : 'Follow: normal';
-            feedback = {title: line(selected?.name || (entries.length ? 'Unnamed playlist' : 'Set playlists'), 16),
-                detail: selected ? `${entry.index + 1}/${entries.length} · ${shuffle}` : '',
-                status: entry.playlistError ?? (!selected ? 'Configure in settings' : !selected.valid ? 'Invalid playlist entry' : !connected ? offline : 'Press to play'),
-                icon: selected?.image ?? 'icons/music-play.png'};
+            feedback = {title: line(selected?.name || this.t(entries.length ? 'Unnamed playlist' : 'Set playlists'), 16),
+                detail: selected ? `${entry.index + 1}/${entries.length} · ${this.t(shuffle)}` : '',
+                status: this.t(entry.playlistError ?? (!selected ? 'Configure in settings' : !selected.valid ? 'Invalid playlist entry' : !connected ? offline : 'Press to play')),
+                icon: selected?.image ?? 'icons/playlist.png'};
         }
         const rendered = JSON.stringify(feedback);
         if (force || entry.rendered !== rendered) this.host.setFeedback(context, feedback);

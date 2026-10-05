@@ -193,7 +193,7 @@ test('selector image resets on selection change and delayed startup never writes
     const image = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRmkAAAAASUVORK5CYII=';
     dials.appear(event(ActionTypes.PLAYLIST_SELECTOR, 'dial', {playlists: [{...playlists[0], image}, playlists[1]]}));
     assert.equal(host.feedback().icon, image);
-    await dials.rotate(rotate(ActionTypes.PLAYLIST_SELECTOR, 1)); assert.equal(host.feedback().icon, 'icons/music-play.png');
+    await dials.rotate(rotate(ActionTypes.PLAYLIST_SELECTOR, 1)); assert.equal(host.feedback().icon, 'icons/playlist.png');
     const result = deferred<never>(); f.client.startPlaylist = () => result.promise;
     const pressed = dials.press(event(ActionTypes.PLAYLIST_SELECTOR));
     dials.disappear('dial'); const count = host.events.length;

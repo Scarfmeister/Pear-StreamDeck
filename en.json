@@ -1,100 +1,330 @@
 {
   "Name": "Pear Desktop Connector",
   "Category": "Pear Desktop",
-  "Description": "Pear Desktop Connector development fork. See the repository for implementation status.",
+  "Description": "Control Pear Desktop from Stream Deck keys and dials using its local API Server.",
   "io.github.scarfmeister.pear-streamdeck.play-pause": {
     "Name": "Play/Pause",
-    "Tooltip": "Plays or pauses the current track"
+    "Tooltip": "Start or pause the current track",
+    "States": [
+      {
+        "Name": "Play"
+      },
+      {
+        "Name": "Pause"
+      }
+    ],
+    "Encoder": {
+      "TriggerDescription": {
+        "Rotate": "Clockwise next track; counter-clockwise previous track",
+        "Push": "Play or pause",
+        "Touch": "Refresh display"
+      }
+    }
   },
   "io.github.scarfmeister.pear-streamdeck.next": {
     "Name": "Next Track",
-    "Tooltip": "Go to the next track"
+    "Tooltip": "Go to the next track",
+    "States": [
+      {
+        "Name": "Next Track"
+      }
+    ]
   },
   "io.github.scarfmeister.pear-streamdeck.prev": {
     "Name": "Previous Track",
-    "Tooltip": "Go to the previous track"
+    "Tooltip": "Go to the previous track",
+    "States": [
+      {
+        "Name": "Previous Track"
+      }
+    ]
   },
   "io.github.scarfmeister.pear-streamdeck.like": {
     "Name": "Like Track",
-    "Tooltip": "Likes the current track"
+    "Tooltip": "Like or clear Like for the current track",
+    "States": [
+      {
+        "Name": "Off"
+      },
+      {
+        "Name": "Like Track"
+      }
+    ]
   },
   "io.github.scarfmeister.pear-streamdeck.dislike": {
     "Name": "Dislike Track",
-    "Tooltip": "Dislikes the current track"
+    "Tooltip": "Dislike or clear Dislike for the current track",
+    "States": [
+      {
+        "Name": "Off"
+      },
+      {
+        "Name": "Dislike Track"
+      }
+    ]
   },
   "io.github.scarfmeister.pear-streamdeck.mute": {
     "Name": "Mute",
-    "Tooltip": "Toggles mute on/off"
+    "Tooltip": "Toggle mute on/off",
+    "States": [
+      {
+        "Name": "Volume"
+      },
+      {
+        "Name": "Muted"
+      }
+    ]
   },
   "io.github.scarfmeister.pear-streamdeck.volume-down": {
     "Name": "Volume Down",
-    "Tooltip": "Turns the player volume down"
+    "Tooltip": "Turn the player volume down",
+    "States": [
+      {
+        "Name": "Volume Down"
+      }
+    ]
   },
   "io.github.scarfmeister.pear-streamdeck.volume-up": {
     "Name": "Volume Up",
-    "Tooltip": "Turns the player volume up"
+    "Tooltip": "Turn the player volume up",
+    "States": [
+      {
+        "Name": "Volume Up"
+      }
+    ],
+    "Encoder": {
+      "TriggerDescription": {
+        "Rotate": "Adjust volume by the configured step",
+        "Push": "Toggle mute",
+        "Touch": "Refresh display"
+      }
+    }
   },
   "io.github.scarfmeister.pear-streamdeck.song-info": {
     "Name": "Track Info",
-    "Tooltip": "Shows track title and cover"
+    "Tooltip": "Show track metadata; press to play or pause",
+    "States": [
+      {
+        "Name": "Track Info"
+      }
+    ]
   },
   "io.github.scarfmeister.pear-streamdeck.shuffle": {
     "Name": "Shuffle",
-    "Tooltip": "Toggle shuffle on/off"
+    "Tooltip": "Toggle real shuffle state",
+    "States": [
+      {
+        "Name": "Off"
+      },
+      {
+        "Name": "Shuffle"
+      }
+    ]
   },
   "io.github.scarfmeister.pear-streamdeck.repeat": {
-    "Name": "Repeat mode",
-    "Tooltip": "Change the repeat mode (None/All/One)"
+    "Name": "Repeat Mode",
+    "Tooltip": "Cycle repeat: Off, All, One",
+    "States": [
+      {
+        "Name": "Off"
+      }
+    ]
+  },
+  "io.github.scarfmeister.pear-streamdeck.play-playlist": {
+    "Name": "Play Playlist",
+    "Tooltip": "Start a configured playlist with native Play or Shuffle Play",
+    "States": [
+      {
+        "Name": "Play Playlist"
+      }
+    ]
+  },
+  "io.github.scarfmeister.pear-streamdeck.volume-dial": {
+    "Name": "Volume Dial",
+    "Tooltip": "Rotate for volume; press to mute. Shows actual Pear state.",
+    "States": [
+      {
+        "Name": "Volume Dial"
+      }
+    ],
+    "Encoder": {
+      "TriggerDescription": {
+        "Rotate": "Adjust volume by the configured step",
+        "Push": "Toggle mute",
+        "Touch": "Refresh display"
+      }
+    }
+  },
+  "io.github.scarfmeister.pear-streamdeck.transport-dial": {
+    "Name": "Transport Dial",
+    "Tooltip": "Rotate to change tracks; press to play or pause. Shows actual Pear state.",
+    "States": [
+      {
+        "Name": "Transport Dial"
+      }
+    ],
+    "Encoder": {
+      "TriggerDescription": {
+        "Rotate": "Clockwise next track; counter-clockwise previous track",
+        "Push": "Play or pause",
+        "Touch": "Refresh display"
+      }
+    }
+  },
+  "io.github.scarfmeister.pear-streamdeck.playlist-selector": {
+    "Name": "Playlist Selector Dial",
+    "Tooltip": "Select and play a named playlist; requires the Pear playlist API extension.",
+    "States": [
+      {
+        "Name": "Playlist Selector Dial"
+      }
+    ],
+    "Encoder": {
+      "TriggerDescription": {
+        "Rotate": "Select a configured playlist",
+        "Push": "Play the selected playlist",
+        "Touch": "Refresh display"
+      }
+    }
   },
   "Localization": {
-    "PI": {
-      "HOST": "Host",
-      "PORT": "Port",
-      "VOLUME_STEPS": "Volume Steps",
-      "SAVE": "Save",
-      "AUTOMATIC_SAVE": "This setting will save automatically",
-      "AUTH_BUTTON": "Authorize",
-      "AUTH_STATUS": "Auth Status",
-      "AUTH_STATUS_CONNECTING": "Connecting...",
-      "AUTH_STATUS_AUTHORIZING": "Authorizing...",
-      "AUTH_STATUS_NOT_CONNECTED": "Not authenticated!",
-      "AUTH_STATUS_CONNECTED": "Authenticated!",
-      "AUTH_STATUS_ERROR": "Authentication failed!",
-      "AUTH_CODE_STATUS": "AUTH CODE: {code}\n\n{compare}",
-      "AUTH_CODE_COMPARE": "Please compare the code with the one on the YTMDesktop app and confirm the authorization.",
-      "CUSTOM_LAYOUT_FILE": "Custom Layout File",
-      "DISPLAY_FORMAT": "Display Format",
-      "DISPLAY_TITLE": "Title Format",
-      "SUPPORT_FEEDBACK_TITLE": "Support & Feedback",
-      "SUPPORT_FEEDBACK_TEXT": "You found a bug? You have a feature request?<br>You can either send them via an <a href=\"https://github.com/XeroxDev/YTMD-StreamDeck/issues/new/choose\" rel=\"noopener\" target=\"_blank\">GitHub Issue</a> or <a href=\"https://x.xeroxdev.de/s/discord\" rel=\"noopener\" target=\"_blank\">Discord</a>!",
-      "VAR_USAGE": "<p><strong>Available variables:</strong> {current}, {remaining}, {duration}</p><p><strong>Special values:</strong> :S = seconds, :H = human readable time (default)</p><p><strong>Usage:</strong> {remaining:S} to display remaining time in seconds</p>",
-      "VAR_USAGE_CUSTOMLAYOUT": "<p><strong>Usage:</strong> Path to custom layout in the plugin folder</p><p>Use the following key values on text objects to get information</p><p><strong>Key values:</strong> song, author, album</p>",
-      "VAR_USAGE_TITLE": "<p><strong>Available variables:</strong> {title}, {author}, {album}</p><p><strong>Usage:</strong> {title} to display song title</p>",
-      "TOGGLE": "Toggle",
-      "PAUSE": "Pause",
-      "PLAY": "Play",
-      "ACTION": "Action",
-      "PLAYLIST": "Playlist",
-      "PLAYLIST_URL": "Playlist URL",
-      "PLAYLIST_URL_STATUS": "Playlist URL Status",
-      "PLAYLIST_URL_STATUS_VALID": "Valid playlist URL",
-      "PLAYLIST_URL_STATUS_INVALID": "Invalid URL",
-      "PLAYLIST_URL_STATUS_MISSING_LIST": "URL must include a list parameter",
-      "PLAYLIST_SOURCE": "Playlist Source",
-      "PLAYLIST_SOURCE_HELP": "Use one option below. If Playlist URL is set, it takes priority over the dropdown.",
-      "PLAYLIST_REFRESH": "Refresh Playlists",
-      "PLAYLIST_ERROR_TITLE": "Playlist error",
-      "PLAYLIST_ERROR_RATE_LIMIT": "Rate limited while fetching playlists. Try again in {seconds, plural, one {# second} other {# seconds}}.",
-      "PLAYLIST_SELECT": "Select playlist",
-      "PLAYLIST_AUTH_HINT": "Authorize using the connection settings above.",
-      "GLOBAL_SETTINGS_TITLE": "Connection Settings",
-      "CONNECTION_STATUS": "Connection Status",
-      "CONNECTION_STATUS_CONNECTED": "Connected",
-      "CONNECTION_STATUS_DISCONNECTED": "Disconnected",
-      "CONNECTION_STATUS_AUTH_REQUIRED": "Not authenticated",
-      "CONNECTION_STATUS_CHECKING": "Checking...",
-      "CONNECTION_STATUS_RATE_LIMIT": "Rate limited. Retry in {seconds, plural, one {# second} other {# seconds}}.",
-      "CONNECTION_STATUS_NOT_CHECKED": "Not checked yet"
+    "Strings": {
+      "Host": "Host",
+      "Port": "Port",
+      "Protocol": "Protocol",
+      "HTTPS": "HTTPS",
+      "HTTP (local default)": "HTTP (local default)",
+      "Step (%)": "Step (%)",
+      "Display": "Display",
+      "Title": "Title",
+      "Artist": "Artist",
+      "Title + Artist": "Title + Artist",
+      "Album": "Album",
+      "Title + Artist + Album": "Title + Artist + Album",
+      "Playlist": "Playlist",
+      "Playlist URL or ID": "Playlist URL or ID",
+      "Follow Shuffle State": "Follow Shuffle State",
+      "Always Normal": "Always Normal",
+      "Always Shuffle": "Always Shuffle",
+      "Start mode": "Start mode",
+      "Add playlist": "Add playlist",
+      "Save action settings": "Save action settings",
+      "Save connection": "Save connection",
+      "Reauthorize": "Reauthorize",
+      "Connection": "Connection",
+      "Authorization": "Authorization",
+      "Checking": "Checking",
+      "Waiting for plugin": "Waiting for plugin",
+      "Waiting for host settings": "Waiting for host settings",
+      "Connecting": "Connecting",
+      "Approve in Pear": "Approve in Pear",
+      "Waiting for player state": "Waiting for player state",
+      "Connected": "Connected",
+      "Pear unavailable": "Pear unavailable",
+      "Use Reauthorize": "Use Reauthorize",
+      "Settings could not be saved": "Settings could not be saved",
+      "Waiting for approval in Pear": "Waiting for approval in Pear",
+      "Authorized": "Authorized",
+      "Authentication disabled": "Authentication disabled",
+      "Authorization required": "Authorization required",
+      "Denied": "Denied",
+      "Unknown": "Unknown",
+      "; retry in {seconds}s": "; retry in {seconds}s",
+      "Settings sent to Stream Deck.": "Settings sent to Stream Deck.",
+      "Could not save action settings.": "Could not save action settings.",
+      "Playlist entry": "Playlist entry",
+      "Name": "Name",
+      "URL or ID": "URL or ID",
+      "Image": "Image",
+      "Playlist image preview": "Playlist image preview",
+      "Clear image": "Clear image",
+      "Remove entry": "Remove entry",
+      "Wait for the selected image to finish loading before saving.": "Wait for the selected image to finish loading before saving.",
+      "Choose a PNG or JPEG of at most 24 KiB.": "Choose a PNG or JPEG of at most 24 KiB.",
+      "Could not read a valid PNG or JPEG image.": "Could not read a valid PNG or JPEG image.",
+      "No track": "No track",
+      "Unknown title": "Unknown title",
+      "Unknown artist": "Unknown artist",
+      "No album": "No album",
+      "Muted": "Muted",
+      "Volume": "Volume",
+      "Mute unknown": "Mute unknown",
+      "Playing": "Playing",
+      "Paused / stopped": "Paused / stopped",
+      "Playback unknown": "Playback unknown",
+      "Normal": "Normal",
+      "Shuffle": "Shuffle",
+      "Follow (?)": "Follow (?)",
+      "Follow: shuffle": "Follow: shuffle",
+      "Follow: normal": "Follow: normal",
+      "Unnamed playlist": "Unnamed playlist",
+      "Set playlists": "Set playlists",
+      "Configure in settings": "Configure in settings",
+      "Invalid playlist entry": "Invalid playlist entry",
+      "Press to play": "Press to play",
+      "Pear offline": "Pear offline",
+      "Set playlist": "Set playlist",
+      "Update Pear": "Update Pear",
+      "Unavailable": "Unavailable",
+      "Start failed": "Start failed",
+      "Off": "Off",
+      "All": "All",
+      "One": "One",
+      "Pause": "Pause",
+      "Play": "Play",
+      "Refresh display": "Refresh display",
+      "Adjust volume by the configured step": "Adjust volume by the configured step",
+      "Toggle mute": "Toggle mute",
+      "Clockwise next track; counter-clockwise previous track": "Clockwise next track; counter-clockwise previous track",
+      "Play or pause": "Play or pause",
+      "Select a configured playlist": "Select a configured playlist",
+      "Play the selected playlist": "Play the selected playlist",
+      "Native playlist command dispatched. Check Pear state for playback.": "Native playlist command dispatched. Check Pear state for playback.",
+      "Playlist startup failed.": "Playlist startup failed.",
+      "Native playlist startup requires a Pear build with the playlist API extension.": "Native playlist startup requires a Pear build with the playlist API extension.",
+      "Pear cannot safely use this playlist's native control in the current player state. No startup was dispatched.": "Pear cannot safely use this playlist's native control in the current player state. No startup was dispatched.",
+      "Playlist startup could not be confirmed. Playback may have started; no automatic retry was sent.": "Playlist startup could not be confirmed. Playback may have started; no automatic retry was sent.",
+      "Configure a valid name and playlist URL or ID for the selected entry.": "Configure a valid name and playlist URL or ID for the selected entry.",
+      "Volume step must be a whole percentage from 1 to 100.": "Volume step must be a whole percentage from 1 to 100.",
+      "Choose a supported Track Info format.": "Choose a supported Track Info format.",
+      "Choose a supported playlist startup mode.": "Choose a supported playlist startup mode.",
+      "This action has no per-action settings.": "This action has no per-action settings.",
+      "Follow Shuffle State needs the current Pear shuffle state.": "Follow Shuffle State needs the current Pear shuffle state.",
+      "Connection settings must be an object.": "Connection settings must be an object.",
+      "Host must be a hostname or IP address.": "Host must be a hostname or IP address.",
+      "Host is invalid.": "Host is invalid.",
+      "Port must be an integer from 1 to 65535.": "Port must be an integer from 1 to 65535.",
+      "Protocol must be http or https.": "Protocol must be http or https.",
+      "Pear settings must be an object.": "Pear settings must be an object.",
+      "Unsupported Pear settings version.": "Unsupported Pear settings version.",
+      "Saved connection settings are invalid.": "Saved connection settings are invalid.",
+      "Could not update connection settings.": "Could not update connection settings.",
+      "Pear request failed (HTTP {status}).": "Pear request failed (HTTP {status}).",
+      "Pear request failed ({code}).": "Pear request failed ({code}).",
+      "Configure at most 16 playlists.": "Configure at most 16 playlists.",
+      "Playlist {index} needs a name of 1–64 characters.": "Playlist {index} needs a name of 1–64 characters.",
+      "Playlist {index} needs a valid playlist URL or ID.": "Playlist {index} needs a valid playlist URL or ID.",
+      "Choose a supported startup mode for playlist {index}.": "Choose a supported startup mode for playlist {index}.",
+      "Playlist {index} image must be an embedded PNG or JPEG of at most 24 KiB.": "Playlist {index} image must be an embedded PNG or JPEG of at most 24 KiB.",
+      "Project and current status": "Project and current status",
+      "Pear Desktop Connector — Settings": "Pear Desktop Connector — Settings",
+      "Connection settings apply to all Pear keys and dials.": "Connection settings apply to all Pear keys and dials.",
+      "Whole percentages from 1 to 100. Default: 5%. Volume stays within 0–100%.": "Whole percentages from 1 to 100. Default: 5%. Volume stays within 0–100%.",
+      "Configure up to 16 playlists. Rotate to select; press to play. Selection is saved per dial.": "Configure up to 16 playlists. Rotate to select; press to play. Selection is saved per dial.",
+      "Names: 1–64 characters. Optional images: PNG or JPEG up to 24 KiB, stored with this action.": "Names: 1–64 characters. Optional images: PNG or JPEG up to 24 KiB, stored with this action.",
+      "Follow Shuffle State reads Pear's real shuffle state when pressed. Playlist playback requires a compatible Pear build with the native playlist API extension.": "Follow Shuffle State reads Pear's real shuffle state when pressed. Playlist playback requires a compatible Pear build with the native playlist API extension.",
+      "Long lines are shortened to fit a key. Enable Show Title and clear a custom Stream Deck title to see metadata.": "Long lines are shortened to fit a key. Enable Show Title and clear a custom Stream Deck title to see metadata.",
+      "Save extracts and stores the playlist ID. Follow uses Pear's actual shuffle state when pressed.": "Save extracts and stores the playlist ID. Follow uses Pear's actual shuffle state when pressed.",
+      "Playlist playback requires a compatible Pear build with the native playlist API extension. Pear 3.12.0 cannot start playlists. A missing or unsupported native operation alerts; no fallback playback is sent.": "Playlist playback requires a compatible Pear build with the native playlist API extension. Pear 3.12.0 cannot start playlists. A missing or unsupported native operation alerts; no fallback playback is sent.",
+      "Clockwise increases volume or skips to the next track; counter-clockwise decreases volume or goes to the previous track. Volume press toggles mute; Transport press plays or pauses. Playlist Selector rotation changes the selected entry. A short touch refreshes the display; a hold does nothing. Clear custom host title/icon overrides to see Pear's display.": "Clockwise increases volume or skips to the next track; counter-clockwise decreases volume or goes to the previous track. Volume press toggles mute; Transport press plays or pauses. Playlist Selector rotation changes the selected entry. A short touch refreshes the display; a hold does nothing. Clear custom host title/icon overrides to see Pear's display.",
+      "Enable Pear's API Server. For local use, bind it to 127.0.0.1:26538. Approve the first request in Pear. A denied or revoked authorization needs Reauthorize.": "Enable Pear's API Server. For local use, bind it to 127.0.0.1:26538. Approve the first request in Pear. A denied or revoked authorization needs Reauthorize.",
+      "Approve\nin Pear": "Approve\nin Pear",
+      "Pear\noffline": "Pear\noffline",
+      "Play\nplaylist": "Play\nplaylist",
+      "Update\nPear": "Update\nPear",
+      "On": "On",
+      "Enter a playlist ID or a YouTube playlist/watch URL with one valid list value.": "Enter a playlist ID or a YouTube playlist/watch URL with one valid list value.",
+      "Stream Deck global settings are not loaded yet.": "Stream Deck global settings are not loaded yet."
     }
   }
 }

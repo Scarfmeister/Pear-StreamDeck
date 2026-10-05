@@ -1,5 +1,6 @@
 import {MAX_PLAYLIST_ENTRIES, MAX_PLAYLIST_IMAGE_BYTES, playlistEntries, playlistImage} from './playlist-selector-settings';
 import {PLAYLIST_STARTUP_MODES} from '../pear/playlist';
+import {Translate} from './localization';
 
 type Row = {name: HTMLInputElement; input: HTMLInputElement; mode: HTMLSelectElement; image?: string; revision: number};
 
@@ -9,7 +10,8 @@ export class PlaylistSelectorEditor {
     private nextId = 0;
     private pendingImages = 0;
     constructor(private readonly container: HTMLElement, private readonly add: HTMLButtonElement,
-                private readonly changed: () => void, private readonly message: (text: string) => void) {
+                private readonly changed: () => void, private readonly message: (text: string) => void,
+                private readonly t: Translate = text => text) {
         add.onclick = () => {
             if (this.rows.length >= MAX_PLAYLIST_ENTRIES) return;
             this.append('', '', 'FOLLOW_SHUFFLE_STATE');
@@ -35,7 +37,7 @@ export class PlaylistSelectorEditor {
         const fieldset = document.createElement('fieldset');
         fieldset.className = 'playlist-entry';
         const legend = document.createElement('legend');
-        legend.textContent = 'Playlist entry';
+        legend.textContent = this.t('Playlist entry');
         fieldset.appendChild(legend);
         const id = ++this.nextId;
         const text = (label: string, suffix: string, value: string, maxLength: number) => {
@@ -51,7 +53,7 @@ export class PlaylistSelectorEditor {
         for (const startupMode of PLAYLIST_STARTUP_MODES) {
             const option = document.createElement('option');
             option.value = startupMode;
-            option.textContent = {FOLLOW_SHUFFLE_STATE: 'Follow Shuffle State', ALWAYS_NORMAL: 'Always Normal', ALWAYS_SHUFFLE: 'Always Shuffle'}[startupMode];
+            option.textContent = this.t({FOLLOW_SHUFFLE_STATE: 'Follow Shuffle State', ALWAYS_NORMAL: 'Always Normal', ALWAYS_SHUFFLE: 'Always Shuffle'}[startupMode]);
             select.appendChild(option);
         }
         select.value = mode;
@@ -63,7 +65,7 @@ export class PlaylistSelectorEditor {
         imageInput.type = 'file'; imageInput.accept = 'image/png,image/jpeg';
         this.field(fieldset, 'Image', imageInput, `playlist-${id}-image`);
         const preview = document.createElement('img');
-        preview.alt = 'Playlist image preview'; preview.width = 38; preview.height = 38;
+        preview.alt = this.t('Playlist image preview'); preview.width = 38; preview.height = 38;
         const refreshPreview = () => { preview.hidden = !row.image; if (row.image) preview.src = row.image; else preview.removeAttribute('src'); };
         refreshPreview(); fieldset.appendChild(preview);
         imageInput.addEventListener('change', () => {
@@ -93,11 +95,11 @@ export class PlaylistSelectorEditor {
             reader.readAsDataURL(file);
         });
         const clear = document.createElement('button');
-        clear.type = 'button'; clear.textContent = 'Clear image';
+        clear.type = 'button'; clear.textContent = this.t('Clear image');
         clear.onclick = () => { ++row.revision; row.image = undefined; imageInput.value = ''; refreshPreview(); this.changed(); };
         fieldset.appendChild(clear);
         const remove = document.createElement('button');
-        remove.type = 'button'; remove.textContent = 'Remove entry';
+        remove.type = 'button'; remove.textContent = this.t('Remove entry');
         remove.onclick = () => {
             this.rows.splice(this.rows.indexOf(row), 1);
             fieldset.remove();
@@ -111,7 +113,7 @@ export class PlaylistSelectorEditor {
 
     private field(parent: HTMLElement, caption: string, input: HTMLElement, id: string): void {
         const wrapper = document.createElement('div'); wrapper.className = 'sdpi-item';
-        const label = document.createElement('label'); label.className = 'sdpi-item-label'; label.textContent = caption; label.htmlFor = id;
+        const label = document.createElement('label'); label.className = 'sdpi-item-label'; label.textContent = this.t(caption); label.htmlFor = id;
         input.id = id; input.className = 'sdpi-item-value';
         wrapper.appendChild(label); wrapper.appendChild(input); parent.appendChild(wrapper);
     }
