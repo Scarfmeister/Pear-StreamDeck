@@ -20,7 +20,7 @@
   "bugs": {
     "url": "https://github.com/Scarfmeister/Pear-StreamDeck/issues"
   },
-  "homepage": "https://github.com/Scarfmeister/Pear-StreamDeck#readme",
+  "homepage": "https://github.com/Scarfmeister/Pear-StreamDeck/tree/dev/pear-port#readme",
   "dependencies": {
     "intl-messageformat": "^10.7.10",
     "streamdeck-typescript": "^3.3.4"
