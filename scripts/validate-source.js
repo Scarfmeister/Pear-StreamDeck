@@ -13,6 +13,8 @@ function files(directory) {
 const read = name => fs.readFileSync(name, 'utf8');
 const manifest = JSON.parse(read('manifest.json'));
 const pkg = JSON.parse(read('package.json'));
+assert.equal(pkg.scripts.prepare, 'husky', 'Initialize the checked-in hook on a clean install');
+assert.equal(read('.husky/commit-msg').trim(), 'npx --no -- commitlint --edit "$1"', 'The commit hook must be tracked and use the local CLI');
 const ids = Object.values(Object.fromEntries([...read('src/interfaces/enums.ts')
     .matchAll(/(\w+) = '([^']+)'/g)].map(([, key, value]) => [key, value])));
 assert.equal(manifest.UUID, 'io.github.scarfmeister.pear-streamdeck');
