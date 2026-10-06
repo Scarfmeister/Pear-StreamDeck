@@ -18,7 +18,7 @@
     },
     {
       "Platform": "windows",
-      "MinimumVersion": "11"
+      "MinimumVersion": "10"
     }
   ],
   "Actions": [
