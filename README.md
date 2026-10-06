@@ -2,7 +2,7 @@
 
 Control [Pear Desktop](https://github.com/pear-devs/pear-desktop) from Stream Deck keys and Stream Deck Plus dials. One shared connection uses Pear's local API Server; displays follow actual player state, including changes made in Pear.
 
-**Development preview:** Stage 8 provides a validated installer and automated tests. Real devices, host installation/persistence, and signed-in native playlist playback still require [manual acceptance](docs/MANUAL_TESTING.md#stage-8-release-validation-matrix). No release or hardware compatibility certification is claimed.
+**Development preview:** Stage 9 completes the automated audit and opens [PR #1](https://github.com/Scarfmeister/Pear-StreamDeck/pull/1). The installer passes automated validation. Real devices, host installation/persistence, and signed-in native playlist playback still require [manual acceptance](docs/MANUAL_TESTING.md#stage-8-release-validation-matrix). No release or hardware compatibility certification is claimed. [Handoff](docs/HANDOFF.md) records the tested commits, package and remaining work.
 
 ## Requirements
 
@@ -18,7 +18,7 @@ The installed HTML plugin needs no separate Node.js installation. Node is used f
 
 ## Install and connect
 
-1. Obtain `io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`. During development, download the **streamdeck-plugin** artifact from a successful **dev/pear-port** [CI run](https://github.com/Scarfmeister/Pear-StreamDeck/actions/workflows/ci.yml) and extract its ZIP, or build it below. Check the run's commit against the [Stage 8 checkpoint](docs/checkpoints/stage-08.md). Stage 8 publishes no release.
+1. Obtain `io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`. During development, download the **streamdeck-plugin** artifact from a successful **dev/pear-port** [CI run](https://github.com/Scarfmeister/Pear-StreamDeck/actions/workflows/ci.yml) and extract its ZIP, or build it below. Check the run's commit against the [Stage 9 checkpoint](docs/checkpoints/stage-09.md). No public release has been published.
 2. On Windows/macOS, open the installer with Elgato Stream Deck and follow its prompt. In OpenDeck's plugin manager, choose **Install from file** and select the same installer. These are the intended install paths; record real results in the manual matrix.
 3. In Pear's **Plugins** menu, enable **API Server [Beta]** (the 3.12.0 label). Reopen its submenu and set **Hostname** to `127.0.0.1` and **Port** to `26538` for the same computer. Pear's default bind address is `0.0.0.0`; the connector defaults to `127.0.0.1`. Leave HTTPS off for this default local setup.
 4. Drag an action from **Pear Desktop** onto a key/dial. Select it to open its settings panel (Property Inspector). Connection settings apply to all Pear actions: **Host 127.0.0.1, Port 26538, Protocol HTTP**. Save changes if needed.
@@ -78,7 +78,8 @@ A missing route shows **Update Pear**. Unsupported native controls show **Unavai
 - Pear 3.12.0 does not push ratings. Same-track ratings changed elsewhere can remain stale until track change, reconnect or a connector rating command. Unsupported legacy shuffle-off alerts and stays visibly on.
 - Pear's cold cached routes can be incomplete before playback. An open but stalled WebSocket can retain stale state until recovery; there is no heartbeat or constant polling. Failed/unconfirmed commands alert without inventing state.
 - Native playlist support rejects unsafe/missing website controls. The separate Pear fork retains upstream formatting warnings; see [Stage 7](docs/checkpoints/stage-07.md). OBS metadata export is outside scope; use Pear's Tuna integration separately.
-- Dormant YTMD companion code is excluded from runtime. Seven known **development dependency** findings remain; production audit has zero findings. Their disposition and hardware/native acceptance remain release gates. German/French translations benefit from native-speaker review.
+- Multi Actions are disabled because explicit requested-state semantics are not implemented. Former timing/hold-repeat/custom-layout variables and a library dropdown are outside this port's requested controls. Use the documented steps, formats, IDs and dedicated dial list.
+- Stage 9 removes the dormant companion code and obsolete dependencies; the complete dependency audit reports zero findings at the checked date. German/French translations benefit from native-speaker review.
 
 The [manual matrix](docs/MANUAL_TESTING.md#stage-8-release-validation-matrix) gives concrete steps and expected results. Record actual versions/results before release.
 
@@ -88,6 +89,7 @@ Use `dev/pear-port`, **Node.js 24+**, npm, and Python 3 for the archive audit. D
 
 ```sh
 npm ci
+npm run lint
 npm run typecheck
 npm test
 npm run build
@@ -97,14 +99,14 @@ npx --yes @elgato/cli@1.10.1 pack --no-update-check build/io.github.scarfmeister
 npm run validate:package
 ```
 
-On Windows, the archive audit can instead use `py -3 scripts/validate-package.py`. `npm test` includes localization validation and client/state/action/settings/browser tests. `prepare:streamdeck-cli` verifies canonical/built manifest parity. `build` replaces the ignored build directory; `pack --force` replaces its local installer. Output: **`build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`**. Do not commit it.
+On Windows, the archive audit can instead use `py -3 scripts/validate-package.py`. `npm test` includes repository/syntax and localization validation plus client/state/action/settings/browser tests (124 individual cases). `prepare:streamdeck-cli` verifies canonical/built manifest parity. `build` replaces the ignored build directory; `pack --force` replaces its local installer. Output: **`build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`**. Do not commit it.
 
-CI runs those checks before uploading the development artifact. The existing release workflow has the same gates; Stage 8 does not trigger it. Validation has one documented warning: category **Pear Desktop** differs from name **Pear Desktop Connector**, as required by the project identity. No validation bypass is used. See [tooling/schema/platform evidence](docs/research/elgato-build-and-packaging.md).
+CI runs those checks before uploading the development artifact. The existing release workflow has the same gates; Stage 9 does not trigger it. Validation has one documented warning: category **Pear Desktop** differs from name **Pear Desktop Connector**, as required by the project identity. No validation bypass is used. See [tooling/schema/platform evidence](docs/research/elgato-build-and-packaging.md).
 
 `npm run watch` rebuilds active browser entries. Icon authors can regenerate committed assets with Python 3, Inkscape 1.4.4 and `python3 scripts/generate-icons.py`; these tools are not needed to install the plugin. Optional Node 24 cross-repository check: `node scripts/test-pear-extension.js /path/to/pear-desktop`. It simulates native player state and does not prove signed-in audio.
 
 ## Project records, attribution and license
 
-Durable records: [specification](docs/PROJECT_SPEC.md), [status](docs/IMPLEMENTATION_STATUS.md), [decisions](docs/DECISIONS.md), [localization](docs/LOCALIZATION.md), [Stage 8 checkpoint](docs/checkpoints/stage-08.md), [agent instructions](AGENTS.md). Inherited version 2.3.0 (manifest 2.3.0.0) remains a development identifier; a public version belongs to a separately authorized release stage.
+Durable records: [specification](docs/PROJECT_SPEC.md), [requirements matrix](docs/REQUIREMENTS_STATUS.md), [status](docs/IMPLEMENTATION_STATUS.md), [decisions](docs/DECISIONS.md), [localization](docs/LOCALIZATION.md), [Stage 9 checkpoint](docs/checkpoints/stage-09.md), [handoff](docs/HANDOFF.md), [agent instructions](AGENTS.md). Inherited version 2.3.0 (manifest 2.3.0.0) remains a development identifier; a public version belongs to a separately authorized release stage.
 
 Derived from **[XeroxDev/YTMD-StreamDeck](https://github.com/XeroxDev/YTMD-StreamDeck)** by Dominic “XeroxDev” Ris. Upstream history and the original 2021 notice remain intact. The **[MIT license](LICENSE)** is copied unchanged into the installer. Generic icons are project-created MIT geometry; no proprietary logo or third-party icon set is bundled. [Asset provenance/removals](docs/research/assets-and-licensing.md) and [icon notice](icons/NOTICE.md) record the replacement set.

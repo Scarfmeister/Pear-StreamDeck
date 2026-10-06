@@ -1,5 +1,39 @@
 # Implementation status
 
+Current stage: **Stage 9 — Final audit, defect correction, PR and handoff**.
+
+Automated implementation: **complete and verified** at final code commit **`5589784ca877ab49c1dacce2323c04345594d279`**. [Clean GitHub CI passed](https://github.com/Scarfmeister/Pear-StreamDeck/actions/runs/37393588427). [Fork PR #1](https://github.com/Scarfmeister/Pear-StreamDeck/pull/1) is open from `dev/pear-port` into `master`, **unmerged**. The closing `docs: complete final audit and handoff` commit records this evidence after PR creation; its exact final remote SHA is retrieved and verified as described in [Stage 9](checkpoints/stage-09.md#commits-pr-and-final-head). This distinguishes tested code from closing documentation without inventing a self-referential commit hash.
+
+All substantive requirements and justified upstream/runtime boundaries are individually classified in [REQUIREMENTS_STATUS.md](REQUIREMENTS_STATUS.md). [HANDOFF.md](HANDOFF.md) supplies the repository/branches/PR, architecture, setup, reproducible artifact, Pear dependency and exact recommended continuation without conversation history.
+
+## Final Stage 9 results
+
+| Check | Current result |
+| --- | --- |
+| Clean Node 24 locked install | Pass, 80 platform-applicable packages /81 audited including root; Husky 9 tracked hooks initialized. |
+| Source/syntax lint and source/test type checks | Pass; 22 active TS files and all 15 unique Pear action IDs. |
+| Complete suite / individual runner | **124 tests across 11 files**, no failures/cancellations/skips. Includes actual browser bundle/PI VM tests and key disappearance/controller/action/Multi Action regressions. |
+| Localization | Pass: all inherited en/de/fr, 204 required leaf keys /136 runtime strings each, structure/parameter/action parity and no English-copy placeholders. |
+| Cross-repository HTTP integration | Pass with unchanged actual Pear route/broker/adapter/client; six mode/state cases, auth, safe native 501, post-permit unknown 503, abort/late browse/no replay. Native IPC/state simulated; not audio acceptance. |
+| Clean build, official current schema validation, pack and archive | Pass; CLI 1.10.1 /schemas 0.5.1, zero errors; one intentional category/name warning. Real ZIP/resources/MIT/Linux view pass. |
+| Full npm dependency audit | **Zero findings**, including development packages. Stage 8's seven findings resolved. |
+| Source publication / PR | Both correction commits pushed; final implementation CI passed. PR source/destination/fork verified. Closing documentation is pushed and PR head verified before stopping. |
+| Physical host/device, real approval/disk persistence and signed-in native playback | **Not run**. All 42 manual matrix rows remain open acceptance gates. |
+
+Final audit corrections: remove 25 dormant companion/action/PI/example files and obsolete dependencies; guard key dispatch by visible matching context/action; disable unimplemented Multi Action capability and dead dial-pending rendering; modernize conventional-commit hooks; update fork issue/debugger metadata; add durable source guards. The hook directory initially omitted by an inherited ignore rule is explicitly tracked and tested in the final implementation commit. No major architecture replacement, copied Pear source, token leakage or unresolved stage-caused automated defect remains. D019 and [audit research](research/final-audit-and-dependencies.md) record the evidence and conservative extra-feature boundary.
+
+**Artifact:** `build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`; 59 files /381,402 unpacked bytes; local SHA-256 **`21872bc0d46aa1204854a3f7e0965ed130f7ea39467829d1092cbc4c8e66e6e6`**. It is ignored build output and a CI development artifact, **not a committed binary or public release**. README/handoff/tooling research give reproduction; timestamp-dependent ZIP hashes do not replace resource checks. Package version 2.3.0 /manifest 2.3.0.0 remains the inherited development identifier.
+
+**Pear-side dependency:** stock Pear 3.12.0 supports the normal API controls but lacks playlist startup. Both normal and native Shuffle Play execution require **Scarfmeister/pear-desktop**, branch **`feature/streamdeck-playlist-api`**, commit **`b5f13f65c71ca8890c08f52c7d7becde5d855be9`**; remote existence/fork relationship reverified in Stage 9. It adds one general-purpose authenticated native startup route. No Pear source change or upstream PR is made in Stage 9; prior 39-test/type/build evidence is historical, and the optional integration was rerun. Unsafe shuffled same-playlist legacy normal reuse rejects with 501; dispatch is not proof of audible success.
+
+**Remaining manual/release gates:** Windows/macOS Stream Deck and OpenDeck/Linux/Flatpak installation/WebView networking; keys/Plus/touch/glyphs/locale/native-speaker review; AUTH_AT_FIRST/NONE/revocation/token/action settings disk persistence; Pear/host/API restarts and WS reconnect; every state-aware action and PI draft/save; native normal/Shuffle Play/queue/first-audio and lifecycle unknown outcomes. Source/schema/unit/ZIP checks establish expected compatibility, not a physical pass. Known cold-cache, rating-push, legacy-shuffle, native-reuse, half-open, title/disk/stack limits are classified in the matrix. [MANUAL_TESTING.md](MANUAL_TESTING.md#stage-8-release-validation-matrix) supplies expected results for all 42 unrun rows.
+
+**Exact next action:** perform and record that physical/live acceptance, fix observed defects, then request separately authorized PR merge/public version/release and any upstream Pear contribution. Stage 9 stops after the closing commit/push/remote+PR-head checks. No automatic Stage 10, merge, release or upstream Pear PR is authorized.
+
+## Historical Stage 8 and earlier status
+
+The following records describe earlier checkpoints at their original revisions. Their test counts, dependency findings, package digest and recommended next stages are historical; the current evidence above supersedes them.
+
 Current stage: **Stage 8 — Assets, packaging, documentation, and release validation**.
 
 State: **Stage 8 complete, committed, and pushed.** Tested implementation: [`375819c752ab0aed4a6f4814f7cb73116ffb46cd`](https://github.com/Scarfmeister/Pear-StreamDeck/commit/375819c752ab0aed4a6f4814f7cb73116ffb46cd); [GitHub CI passed](https://github.com/Scarfmeister/Pear-StreamDeck/actions/runs/37390624755), including archive/Linux checks and artifact upload. Fresh fetch verifies equal local/remote implementation heads and unchanged default. This closing documentation commit records that evidence; its final remote SHA is retrieved/reported as described in [the Stage 8 checkpoint](checkpoints/stage-08.md). The installer is a development preview for manual testing, not a published release or hardware certification. No Pear modification or Stage 9 work is included.

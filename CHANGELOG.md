@@ -1,5 +1,7 @@
 # Changelog
 
+Pear Desktop Connector is an unreleased development port. Current features, final audit and acceptance gates are recorded in [the handoff](docs/HANDOFF.md) and [Stage 9](docs/checkpoints/stage-09.md). The versioned entries below preserve the original XeroxDev/YTMD-StreamDeck release history; they do not describe a new Pear release.
+
 ## [2.3.0](https://github.com/XeroxDev/YTMD-StreamDeck/compare/v2.2.0...v2.3.0) (2026-01-06)
 
 

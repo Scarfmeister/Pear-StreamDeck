@@ -1,12 +1,12 @@
 # Decisions
 
-Audit date: 2026-10-04 UTC / 2026-10-03 America/Chicago.
+Initial audit: 2026-10-04 UTC / 2026-10-03 America/Chicago. Final Stage 9 review: 2026-10-06 UTC / 2026-10-05 America/Chicago. Earlier decisions retain their historical evidence; D019 records the final corrections.
 
 ## D001 — Scope, requirements, and Git
 
 `PROJECT_SPEC.md` preserves the supplied specification byte-for-byte. Its SHA-256 is `798be8f52331034021c925dea263c7adba4b46c2b36e20b4309647e2dfd5436b`.
 
-Stages 1–7 completed the audit/client/keys/settings/dials and separate Pear playlist extension under D013/D017. Stage 8 explicitly authorizes generic asset replacement/license audit, restored localization, current manifest/package validation, user documentation and a concrete hardware test plan. Keep real host/native acceptance unverified until performed. Final PR/release and Stage 9 remain separately requested work. Stop after committing, pushing, and verifying Stage 8.
+Stages 1–8 completed the audit/client/keys/settings/dials, separate Pear playlist extension, assets/localization and distribution checks. Stage 9 explicitly authorizes the complete requirement/diff audit, scoped corrections, clean validation, fork PR into master and durable handoff. Keep real host/native acceptance unverified until performed. Stop after the closing documentation commit, push and PR-head verification. No merge, public release, new stage or upstream Pear PR is authorized.
 
 Work in `Scarfmeister/Pear-StreamDeck` on `dev/pear-port`. `origin` is the fork; `upstream` is `XeroxDev/YTMD-StreamDeck`. Preserve the default branch, upstream history, and original MIT license. Never push to upstream.
 
@@ -100,7 +100,7 @@ Build/watch now use `src/pear-plugin.ts` and `src/pear-pi.ts`. One plugin-owned 
 
 At Stage 2, the twelve inherited action classes and old PI classes remained dormant; keys showed “Actions pending”. Stage 4 replaces that active preview handler with `PearKeyActions` and shared `PearCommands` for the eleven standard keys. The inherited classes remain dormant reference source, including unported playlist/PI/dial code, and neither active bundle imports them. The connection panel was English only at that stage. Stage 5 adds action UI; Stage 8 supplies English/German/French active UI under D018.
 
-Keep the companion package temporarily as a **development-only** dependency to type-check that dormant source. This is not its complete removal from the lockfile. Remove it and `legacy-guards.ts` when the source port no longer needs those types. The guards use real runtime narrowing and fix all 14 inherited TypeScript errors without lowering compiler strictness. Production bundles and the production dependency graph exclude the companion and Socket.IO.
+Historical Stage 2 decision, superseded by D019: keep the companion package temporarily as a **development-only** dependency to type-check that dormant source. This is not its complete removal from the lockfile. Remove it and `legacy-guards.ts` when the source port no longer needs those types. The guards use real runtime narrowing and fix all 14 inherited TypeScript errors without lowering compiler strictness. Production bundles and the production dependency graph exclude the companion and Socket.IO.
 
 ## D010 — Versioned settings and explicit approval recovery
 
@@ -280,3 +280,17 @@ Retain streamdeck-typescript 3.3.4, browser entry points, SDKVersion 2, CLI 1.10
 Use an explicit runtime build allowlist and ship manifest.linux.json (RFC 7396 merged Linux OS + CodePathLin action.html) with identical action IDs/layouts. Validate the official canonical view and package-local merged OpenDeck view separately. The Python ZIP audit checks real packaged contents, references, PNG dimensions/state distinctions and original MIT; source SVGs/dormant examples/dev files are excluded. Extend existing CI, including release gates, rather than adding redundant workflows. Build the ignored development installer; do not commit it, publish a release or open a final/upstream PR in Stage 8.
 
 122 plugin tests, locale parity, official validation and archive checks are automatic evidence. OpenDeck 2.14.0 source supports expected events/import/WebView behavior; it is not a physical pass. Host install/auth/settings persistence, keys/Plus/touch/language rendering, Flatpak/WebView networking, signed-in normal/native Shuffle Play, and declared minimum-host behavior remain manual release gates. Known state/rating/legacy-shuffle/native-reuse/half-open limits and seven development dependency findings are documented, without unrequested dependency/source cleanup. Stage 8 stops after its checkpoint, commits, pushes and remote verification.
+
+## D019 — Stage 9 final audit and conservative capability claims
+
+Review the complete default-to-development diff and every substantive spec requirement rather than assuming earlier completion. Keep the retained framework/HTML/SDK 2 architecture: the shared session/client/state, central PI messaging, confirmed commands, dedicated/alias encoders and local selector remain suitable. Remove 25 dormant companion/action/PI/interface/helper/example files and the unused companion/intl dependencies; this supersedes D009's earlier retention for development type checking while preserving original history and MIT.
+
+Ordinary key releases must match a visible current context/action and controller, as dial events already do. Ignore absent/disappeared/reassigned/Encoder/Multi Action contexts. Remove dead Dials pending feedback. Two meaningful key regressions plus existing shared-client/browser tests cover the change; hardware lifecycle ordering remains manual R07.
+
+Do not advertise Multi Actions until explicit requested-state semantics and compatible host lifecycle are implemented. All action manifest flags are false, and Multi Action input is rejected. The original specification asks for normal keys and the dedicated dials; extra inherited timing/hold-repeat/layout variables/library dropdown remain outside this scope. Artwork stays deferred under D014/D018. Preserve encoder aliases and requested ordinary behavior.
+
+Keep conventional commits, replace deprecated Husky 3/commitlint with pinned Husky 9.1.7 /commitlint 21.2.3, and require Node 24 for build/tests. The tracked hook uses local commitlint `--edit`; the prepare script initializes Husky. The inherited dot-directory ignore rule needs an explicit `.husky/` exception. Source validation checks the actual hook/prepare presence after the first code commit omitted those files. Full dependency audit is now zero, superseding the seven earlier development findings in D012/D018. No framework/compiler/bundler upgrade or new style formatter is needed.
+
+Run the source/JavaScript repository audit as `npm run lint` and before normal tests, alongside source/test types, all 124 tests, locale/browser checks, clean build and current official CLI/real archive validation. Static guards cover important known invariants, not arbitrary correctness. Safe diagnostics and no replay remain architectural invariants. Update fork issue/debugger ownership while preserving original attribution.
+
+Open only the explicitly authorized Scarfmeister fork PR into master, then close durable matrix/status/handoff/checkpoint records and verify the pushed PR head. Tested final implementation is `5589784ca877ab49c1dacce2323c04345594d279`; PR is [#1](https://github.com/Scarfmeister/Pear-StreamDeck/pull/1). No merge/release/upstream Pear PR or next automated stage follows. Real host/device/auth persistence/native audio remain unrun; Pear extension remains `b5f13f65c71ca8890c08f52c7d7becde5d855be9` in its separate repository. Research: [final audit/dependencies](research/final-audit-and-dependencies.md); exact results/next action: [Stage 9](checkpoints/stage-09.md), [matrix](REQUIREMENTS_STATUS.md), [handoff](HANDOFF.md).

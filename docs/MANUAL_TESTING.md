@@ -1,10 +1,12 @@
 # Manual testing
 
+Stage 9 acceptance target: plugin implementation **`5589784ca877ab49c1dacce2323c04345594d279`**, [PR #1](https://github.com/Scarfmeister/Pear-StreamDeck/pull/1), and the installer recorded in [Stage 9](checkpoints/stage-09.md). The matrix below retains its Stage 8 anchor for existing links and adds the final audit's lifecycle/capability checks. All **42 rows remain Not run**. See [HANDOFF.md](HANDOFF.md) for setup and priorities; older sections are historical evidence and detailed procedures.
+
 ## Stage 8 release validation matrix
 
-**All physical/live rows below are Not run.** Stage 8 automatically verifies 122 plugin tests, three complete locales, current official schemas, the real installer, PNG resources and the merged Linux manifest. OpenDeck 2.14.0 source establishes expected HTML/events/layout/import behavior. Neither result establishes installed host/device operation or signed-in native audio.
+**All physical/live rows below are Not run.** Stage 9 automatically verifies 124 plugin tests, source/syntax contracts, three complete locales, current official schemas, the real installer, PNG resources and the merged Linux manifest; full dependency audit reports zero findings. OpenDeck 2.14.0 source establishes expected HTML/events/layout/import behavior. Neither result establishes installed host/device operation or signed-in native audio.
 
-Test the exact [Stage 8 package/commit](checkpoints/stage-08.md). Record OS, host software version, device/firmware, Pear version **and commit**, authentication strategy, API bind/protocol and host language. Use a disposable test profile and a known signed-in playlist with at least three distinguishable tracks. Establish native Normal Play/Shuffle Play baselines in Pear before comparing connector startup. For playlist execution use Pear feature commit `b5f13f65c71ca8890c08f52c7d7becde5d855be9`; also test stock 3.12.0's visible rejection. Do not include tokens, token-bearing URLs, account/tracking payloads or private playlist details in shared evidence.
+Test the exact [Stage 9 package/commit](checkpoints/stage-09.md). Record OS, host software version, device/firmware, Pear version **and commit**, authentication strategy, API bind/protocol and host language. Use a disposable test profile and a known signed-in playlist with at least three distinguishable tracks. Establish native Normal Play/Shuffle Play baselines in Pear before comparing connector startup. For playlist execution use Pear feature commit `b5f13f65c71ca8890c08f52c7d7becde5d855be9`; also test stock 3.12.0's visible rejection. Do not include tokens, token-bearing URLs, account/tracking payloads or private playlist details in shared evidence.
 
 Platform codes: **W-K** = Windows 11 x64/Intel-AMD + Elgato software 7.1+ + a normal key device; **W-+** = the same host + Stream Deck Plus; **L-K/L-+** = Linux + OpenDeck 2.14.0 + corresponding hardware. Run common tests on both Elgato and OpenDeck, recording any unavailable device as unverified. **M** = optional macOS 13+ Elgato run if available. An older 6.4 host check is a separate compatibility test, not implied by testing a current host.
 
@@ -15,6 +17,7 @@ Platform codes: **W-K** = Windows 11 x64/Intel-AMD + Elgato software 7.1+ + a no
 | H03 | L-K/L-+ | OpenDeck plugin manager → Install from file; select the same installer; place keys/dials. | Archive imports its `.sdPlugin` directory; Linux override selects native HTML WebView, without requiring host Node/Wine for this plugin. Actual runtime/devices are recorded separately. |
 | H04 | L-K/L-+, Flatpak if used | Repeat install and connect to loopback Pear from the actual OpenDeck distribution/Flatpak. | Browser HTTP/WS and PI work. Record WebView/loopback/permission defects; do not infer a Flatpak pass from native Linux or source tests. |
 | H05 | All; optional 6.4 | Record current host pass; separately run the declared minimum host if available. | All used messages/features work on the tested version. Untested 6.4/other OS remains unverified; current host requirements still apply. |
+| H06 | All | Inspect host Multi Action availability; place each supported ordinary key/dial and the retained encoder aliases. | Pear actions are not offered for Multi Actions. Ordinary keys, dedicated encoders and documented aliases still operate; no unsupported absolute-state promise appears. |
 | A01 | All | Enable Plugins → API Server [Beta] in Pear; set local bind 127.0.0.1:26538; start fresh connector with defaults. | One shared connection, matching defaults, initial snapshot; status becomes Connected. No companion port/connection is used. |
 | A02 | All | Use Authorize at first request; approve once in Pear; close/reopen several PIs; add duplicate keys/dials. | One prompt for the shared client, Authorized status, working controls, no token in panel/status/logs; added contexts reuse the connection. |
 | A03 | All | Deny or interrupt first approval; wait/restart host; then press Reauthorize and approve. | No automatic prompt loop across restart; explicit Reauthorize recovers. Repeated Reauthorize while pending does not duplicate requests. |
@@ -27,6 +30,7 @@ Platform codes: **W-K** = Windows 11 x64/Intel-AMD + Elgato software 7.1+ + a no
 | R04 | All | Close/drop the Pear WebSocket in a controlled network session, restore connectivity, and change state in Pear. | One reconnect sequence and fresh snapshot; every visible duplicate updates from real state. No accumulating socket/timer/listener or repeated stale callback. |
 | R05 | All | Suspend messages while leaving the socket open; then close/restore the transport. | Record known half-open stale-state limitation; recovery refreshes state. Do not record continuous liveness detection as implemented. |
 | R06 | All | Repeatedly switch profiles/open-close PIs; rotate rapidly, then remove actions/disconnect. | Shared connection remains one; contexts release work; at most bounded pending inputs; no late feedback on removed contexts or replay on reappearance. |
+| R07 | All | Hold a key, switch profile/remove/reassign its action before release, then press a newly visible action normally. | Release for an absent/replaced context sends no command. A matching newly visible key activates once. Record actual host lifecycle ordering, including Encoder aliases. |
 | K01 | W-K, L-K, Plus keys | Play/pause/stop from Pear and from duplicate keys. | Play icon when paused/stopped, Pause while playing; both keys follow external updates. Command acceptance alone cannot confirm state. |
 | K02 | Same | Press Next/Previous and change tracks in Pear. | Correct transport once per press; Track Info/transport display follows the resulting track. |
 | K03 | Same | Like → press active Like to clear; Dislike → press active Dislike to clear; switch ratings/tracks. | Native supported transitions and real fetched rating appear; Like/Dislike states are distinct. Same-track external rating may remain stale (known 3.12.0 limitation). |
@@ -151,11 +155,11 @@ Planned host matrix:
 
 | Host | Device | Minimum acceptance |
 | --- | --- | --- |
-| Elgato Stream Deck on Windows/macOS | Normal keys / XL | All 12 key actions, settings, artwork, state, and reconnect. |
+| Elgato Stream Deck on Windows/macOS | Normal keys / XL | All 12 key actions, settings, metadata, state, and reconnect. |
 | Elgato Stream Deck on Windows/macOS | Stream Deck Plus | All keys and dedicated Volume, Transport, Playlist Selector dials. |
 | OpenDeck 2.14.0 or later on Linux | Normal keys / XL | Native installation, all 12 actions, PI, token reuse, reconnect. |
 | OpenDeck 2.14.0 or later on Linux | Stream Deck Plus | Rotate/press/touch events, feedback layouts, all dedicated dials. |
-| OpenDeck Flatpak on Linux | Available devices | Webview networking to local Pear, PI settings, artwork, persistence. |
+| OpenDeck Flatpak on Linux | Available devices | WebView networking to local Pear, PI settings, metadata, persistence. |
 
 ## Installation and local API
 
@@ -214,7 +218,7 @@ Run these unperformed live acceptance tests against the separately recorded Stag
 2. Disable/re-enable the API Server. Restart Pear. Drop the WebSocket connection. Confirm one socket/reconnect timer and a fresh snapshot after recovery.
 3. Make REST calls fail or timeout. Confirm concise alerts and no falsely confirmed state.
 4. Open/close Property Inspectors and switch profiles repeatedly. Confirm one shared Pear connection, no extra approval prompts, and released subscriptions/timers.
-5. Keep several stateful keys/dials visible for an extended session. Confirm logs, artwork cache, memory, and request rate remain bounded. Pear-pushed fields must not cause continuous REST polling.
+5. Keep several stateful keys/dials visible for an extended session. Confirm logs, memory, and request rate remain bounded. Pear-pushed fields must not cause continuous REST polling.
 
 ## Release gate
 

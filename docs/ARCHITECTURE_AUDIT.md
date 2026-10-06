@@ -210,3 +210,11 @@ Native watch-video controls can reuse a shuffled current playlist. The extension
 - [Framework source](https://github.com/XeroxDev/Stream-Deck-TS-SDK) and [official SDK source](https://github.com/elgatosf/streamdeck); installed versions are pinned above.
 - Elgato [setup](https://docs.elgato.com/streamdeck/sdk/introduction/getting-started/), [manifest](https://docs.elgato.com/streamdeck/sdk/references/manifest/), [dials](https://docs.elgato.com/streamdeck/sdk/guides/dials/), [version 3 migration](https://docs.elgato.com/streamdeck/sdk/releases/upgrading/v3/), [distribution](https://docs.elgato.com/streamdeck/sdk/introduction/distribution/), and [CLI](https://docs.elgato.com/streamdeck/cli/intro/), read at the audit date.
 - [esbuild watch API](https://esbuild.github.io/api/#watch), used for the small bootstrap repair.
+
+## Stage 9 current implementation boundary
+
+The earlier Stage 1 tables and Stage 2/6/7 plans above remain historical. Stage 8 supplies the native Linux override, current manifests/resources/localization and real installer checks. Stage 9 removes 25 dormant companion/action/PI/interface/helper/example files and unused companion/intl dependencies; those paths no longer exist in the current tree. It preserves the retained framework/HTML/SDK 2 integration and one shared Pear session/client/model for every key/dial/PI.
+
+Key releases now require a matching visible context/action/controller. Unsupported Multi Actions are disabled/rejected, rather than claiming requested-state behavior; dedicated dials and inherited encoder aliases remain. Current lint checks actual source/manifest/PI/hook invariants, and the complete suite has 124 cases. Full npm audit now has zero findings after obsolete dependency/hook cleanup. Final code is `5589784ca877ab49c1dacce2323c04345594d279`; the separate Pear extension remains `b5f13f65c71ca8890c08f52c7d7becde5d855be9`. No Pear source is copied or changed here.
+
+[Requirements matrix](REQUIREMENTS_STATUS.md), [final audit research](research/final-audit-and-dependencies.md), D019, [Stage 9](checkpoints/stage-09.md) and [handoff](HANDOFF.md) supersede older implementation-status statements. Physical host/device/disk persistence/native audio remain unverified; expected OpenDeck source compatibility is not a running-host pass.
