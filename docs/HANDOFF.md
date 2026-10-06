@@ -1,6 +1,6 @@
 # Pear Desktop Connector — final engineering handoff
 
-Stage 9 completes automated engineering and opens the fork PR. Physical host/device acceptance and signed-in native playback are still unverified. Do not merge, publish a release or open an upstream Pear PR as part of this stage.
+Stage 9 completed the automated audit and opened the fork PR. The authorized Windows-version correction now supersedes its installer: Windows minimum is **10**, covering Windows 11's reported 10.0. [The followup checkpoint](checkpoints/stage-09-windows-version-fix.md) records the full rerun and new package. Physical host/device acceptance and signed-in native playback are still unverified. Do not merge, publish a release or open an upstream Pear PR as part of this stage.
 
 ## Repository and exact revisions
 
@@ -9,13 +9,13 @@ Stage 9 completes automated engineering and opens the fork PR. Physical host/dev
 | Plugin repository | [Scarfmeister/Pear-StreamDeck](https://github.com/Scarfmeister/Pear-StreamDeck) |
 | Default / development branch | `master` / `dev/pear-port` |
 | Unchanged default baseline | `8b0c3320ce59b741b3165a1c8ac3a54b66c2c97a` |
-| Final tested implementation SHA | **`5589784ca877ab49c1dacce2323c04345594d279`** |
+| Final tested implementation SHA | **`25e63d4906519ea57a1ea2d4bb73eb905284d65e`** |
 | Fork PR | **[PR #1](https://github.com/Scarfmeister/Pear-StreamDeck/pull/1)**, `dev/pear-port` → `master`, open and unmerged |
-| Implementation CI | [Successful run 37393588427](https://github.com/Scarfmeister/Pear-StreamDeck/actions/runs/37393588427) |
+| Implementation CI | [PR #1 checks](https://github.com/Scarfmeister/Pear-StreamDeck/pull/1/checks), verified at the pushed correction/closing head; exact local rerun in the followup checkpoint |
 | Pear repository / branch | [Scarfmeister/pear-desktop](https://github.com/Scarfmeister/pear-desktop) / `feature/streamdeck-playlist-api` |
 | Pear extension SHA | **`b5f13f65c71ca8890c08f52c7d7becde5d855be9`** |
 
-The closing `docs: complete final audit and handoff` commit adds these records after the tested implementation and PR. Its own SHA cannot be embedded in its own contents. Retrieve that exact final documentation commit using `git log -1 --format=%H --grep='^docs: complete final audit and handoff$' origin/dev/pear-port`; inspect `gh pr view 1 --repo Scarfmeister/Pear-StreamDeck --json headRefOid` for the PR's current head. Stage 9 verifies equality with the pushed closing head before stopping. Use the tested implementation SHA above for the code/package evidence; later documentation does not change runtime resources.
+The closing `docs: record Windows manifest correction validation` commit updates these records after the tested Windows correction. The prior Stage 9 closing commit is `0d894dd14c013c555237f085a727bb6893d5d19a`. Its own SHA cannot be embedded in its own contents. Retrieve that exact final documentation commit using `git log -1 --format=%H --grep='^docs: record Windows manifest correction validation$' origin/dev/pear-port`; inspect `gh pr view 1 --repo Scarfmeister/Pear-StreamDeck --json headRefOid` for the PR's current head. The authorized followup verifies equality with the pushed closing head before stopping. Use the tested implementation SHA above for the code/package evidence; later documentation does not change runtime resources.
 
 Read [AGENTS.md](../AGENTS.md), [PROJECT_SPEC.md](PROJECT_SPEC.md), [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md), [DECISIONS.md](DECISIONS.md), [REQUIREMENTS_STATUS.md](REQUIREMENTS_STATUS.md), [MANUAL_TESTING.md](MANUAL_TESTING.md), and [Stage 9](checkpoints/stage-09.md) before changing anything. Earlier checkpoints and source maps are historical evidence. Fetch/pull and confirm a clean `dev/pear-port`; preserve history/MIT and push only to the fork.
 
@@ -53,9 +53,9 @@ npm audit
 
 On Windows use `py -3 scripts/validate-package.py` for the last archive audit if needed. `npm run watch` watches the two active browser entries. Optional, with the separate Pear checkout at its recorded SHA: `node scripts/test-pear-extension.js /path/to/pear-desktop`. That real-HTTP check still simulates native state and is not signed-in audio acceptance.
 
-**Artifact:** `build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`. The Stage 9 local ZIP has 59 files / 381,402 unpacked bytes and SHA-256 **`21872bc0d46aa1204854a3f7e0965ed130f7ea39467829d1092cbc4c8e66e6e6`**. ZIP timestamps can produce different archive hashes on rebuild; the archive validator verifies actual resources, manifests/Linux view, states and MIT. The installer is ignored, not committed or published. Successful CI uploads the `streamdeck-plugin` development artifact; extract its outer ZIP and verify the run's commit before testing. There is no public release. Version 2.3.0 / manifest 2.3.0.0 remains an inherited development identifier.
+**Artifact:** `build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`. The corrected local ZIP has 59 files / 381,402 unpacked bytes and SHA-256 **`455a3a922e4b7a8767b00975cc62ddfe2462aa519883e1465157bebf48b76e07`**. ZIP timestamps can produce different archive hashes on rebuild; the archive validator verifies actual resources, manifests/Linux view, states and MIT. The installer is ignored, not committed or published. Successful CI uploads the `streamdeck-plugin` development artifact; extract its outer ZIP and verify the run's commit before testing. There is no public release. Version 2.3.0 / manifest 2.3.0.0 remains an inherited development identifier.
 
-Stage 9 passes a clean locked install, source/JS audit, source/test type checks, **124 individual tests across 11 files**, locale validation, browser build, current official schema validation/packing and real archive checks. Full npm audit reports **zero findings** at the checked date. The only CLI warning is the deliberate Category Pear Desktop / Name Pear Desktop Connector difference. [Checkpoint](checkpoints/stage-09.md) records exact commands and evidence limits. The original MIT/spec/agent instructions remain byte-identical.
+The Windows correction rerun passes a clean locked install, source/JS audit, source/test type checks, **124 individual tests across 11 files**, locale validation, browser build, current official schema validation/packing and real archive checks. Full npm audit reports **zero findings** at the checked date. The only CLI warning is the deliberate Category Pear Desktop / Name Pear Desktop Connector difference. [Correction checkpoint](checkpoints/stage-09-windows-version-fix.md) records exact commands and evidence limits; Stage 9's earlier results remain historical. The original MIT/spec/agent instructions remain byte-identical.
 
 ## Pear configuration and authentication
 
@@ -63,7 +63,7 @@ Standard controls target the source-reviewed **Pear Desktop 3.12.0** native API.
 
 Place a key/dial, open its PI and save the matching endpoint. With **Authorize at first request** (`AUTH_AT_FIRST`), approve the one request from `io.github.scarfmeister.pear-streamdeck` in Pear. The connector stores the returned token in host global settings, bound to that endpoint, and reuses it on restart. Wait for Connected and actual state. Denied/interrupted/revoked approval requires explicit **Reauthorize**; no prompt loop or token display is intended. Saving a new origin clears old credentials/work. `NONE` (No authorization) works without an approval/token; a previously accepted bearer alone cannot reveal that server strategy. Real approval, WebView transport and disk persistence remain manual tests.
 
-Open the installer in Windows/macOS Stream Deck; for OpenDeck select **Install from file** in its plugin manager. The same package contains a Linux override selecting native HTML and PNG feedback. These installation steps are expected from the verified host/source contract; no live import/device pass has occurred. See README for normal-user setup and the manual matrix for host/version coverage.
+Manifest OS minima are Windows **10** / macOS **13**. Windows 10/11 share numeric version 10.0; intended current-host testing remains Windows 11 under the host application's requirements. Metadata admission does not verify Windows 10 operation. Open the corrected installer in Windows/macOS Stream Deck; for OpenDeck select **Install from file** in its plugin manager. The same package contains a Linux override selecting native HTML and PNG feedback. These installation steps are expected from the verified host/source contract; no live import/device pass has occurred. See README for normal-user setup and the manual matrix for host/version coverage.
 
 ## Separate Pear playlist dependency
 
@@ -81,7 +81,7 @@ Recommended upstream plan: after signed-in acceptance, rebase/revalidate against
 
 All **42** rows of the [manual matrix](MANUAL_TESTING.md#stage-8-release-validation-matrix) are **Not run**. Prioritize:
 
-1. Windows 11 Stream Deck install and normal keys; approve/revoke/NONE, host/Pear restart, disabled API and reconnect, all real state-aware actions and independent saved settings.
+1. Corrected installer on Windows 11 (reported OS version 10.0), then normal keys; approve/revoke/NONE, host/Pear restart, disabled API and reconnect, all real state-aware actions and independent saved settings.
 2. Stream Deck Plus volume/transport signed detents, release press, touch feedback, selector wrapping/images/position/drafts and stock-Pear failures. Check key disappearance/reassignment and unsupported Multi Action visibility.
 3. OpenDeck 2.14.0 Linux keys/Plus, same-file import/native WebView and separate Flatpak loopback/persistence; optional macOS/minimum-6.4 host if claimed.
 4. Extension signed-in native normal/Shuffle Play against native baselines: same/different playlist, off/on/unknown Follow, modern/legacy/localized/private/empty controls, first audible track/queue and lifecycle unknown outcomes. A dispatch acknowledgment or first track chosen by chance is insufficient.

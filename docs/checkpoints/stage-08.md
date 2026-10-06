@@ -1,5 +1,7 @@
 # Stage 8 — Assets, packaging, documentation, and release validation
 
+**Later correction:** Stage 8's Windows `MinimumVersion: "11"` confused the product name with its numeric OS version. Windows 11 reports 10.0. The [authorized followup](stage-09-windows-version-fix.md) restores Windows minimum `10`, updates the current documentation and rebuilds the installer. Results below describe the historical Stage 8 revision, not a successful Windows installation.
+
 ## Scope and starting point
 
 Prepare a distributable development plugin and concrete manual testing plan: asset/license audit and generic replacements; complete inherited localization; current tooling/manifest/package validation; user-facing README; applicable automation; persistent research/status/decisions/checkpoint. Read authoritative docs and every existing checkpoint/research document after fetching/checking out/pulling `dev/pear-port`. Started clean at `f7b1ce245b3b015d5603e4e05754d1bd7f09619f`. No Stage 9, PR, release or Pear modification is authorized by this checkpoint.
