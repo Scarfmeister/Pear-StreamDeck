@@ -53,7 +53,7 @@
           "Touch": "Refresh display"
         }
       },
-      "SupportedInMultiActions": true,
+      "SupportedInMultiActions": false,
       "Tooltip": "Start or pause the current track",
       "UUID": "io.github.scarfmeister.pear-streamdeck.play-pause"
     },
@@ -68,7 +68,7 @@
           "Name": "Next Track"
         }
       ],
-      "SupportedInMultiActions": true,
+      "SupportedInMultiActions": false,
       "Tooltip": "Go to the next track",
       "UUID": "io.github.scarfmeister.pear-streamdeck.next"
     },
@@ -83,7 +83,7 @@
           "Name": "Previous Track"
         }
       ],
-      "SupportedInMultiActions": true,
+      "SupportedInMultiActions": false,
       "Tooltip": "Go to the previous track",
       "UUID": "io.github.scarfmeister.pear-streamdeck.prev"
     },
@@ -104,7 +104,7 @@
           "Name": "Like Track"
         }
       ],
-      "SupportedInMultiActions": true,
+      "SupportedInMultiActions": false,
       "Tooltip": "Like or clear Like for the current track",
       "UUID": "io.github.scarfmeister.pear-streamdeck.like",
       "DisableAutomaticStates": true
@@ -126,7 +126,7 @@
           "Name": "Dislike Track"
         }
       ],
-      "SupportedInMultiActions": true,
+      "SupportedInMultiActions": false,
       "Tooltip": "Dislike or clear Dislike for the current track",
       "UUID": "io.github.scarfmeister.pear-streamdeck.dislike",
       "DisableAutomaticStates": true
@@ -148,7 +148,7 @@
           "Name": "Muted"
         }
       ],
-      "SupportedInMultiActions": true,
+      "SupportedInMultiActions": false,
       "Tooltip": "Toggle mute on/off",
       "UUID": "io.github.scarfmeister.pear-streamdeck.mute",
       "DisableAutomaticStates": true
@@ -164,7 +164,7 @@
           "Name": "Volume Down"
         }
       ],
-      "SupportedInMultiActions": true,
+      "SupportedInMultiActions": false,
       "Tooltip": "Turn the player volume down",
       "UUID": "io.github.scarfmeister.pear-streamdeck.volume-down"
     },
@@ -193,7 +193,7 @@
           "Touch": "Refresh display"
         }
       },
-      "SupportedInMultiActions": true,
+      "SupportedInMultiActions": false,
       "Tooltip": "Turn the player volume up",
       "UUID": "io.github.scarfmeister.pear-streamdeck.volume-up"
     },
@@ -210,7 +210,7 @@
           "Name": "Track Info"
         }
       ],
-      "SupportedInMultiActions": true,
+      "SupportedInMultiActions": false,
       "Tooltip": "Show track metadata; press to play or pause",
       "UUID": "io.github.scarfmeister.pear-streamdeck.song-info"
     },
@@ -231,7 +231,7 @@
           "Name": "Shuffle"
         }
       ],
-      "SupportedInMultiActions": true,
+      "SupportedInMultiActions": false,
       "Tooltip": "Toggle real shuffle state",
       "UUID": "io.github.scarfmeister.pear-streamdeck.shuffle",
       "DisableAutomaticStates": true
@@ -247,7 +247,7 @@
           "Name": "Off"
         }
       ],
-      "SupportedInMultiActions": true,
+      "SupportedInMultiActions": false,
       "Tooltip": "Cycle repeat: Off, All, One",
       "UUID": "io.github.scarfmeister.pear-streamdeck.repeat",
       "DisableAutomaticStates": true
@@ -263,7 +263,7 @@
           "Name": "Play Playlist"
         }
       ],
-      "SupportedInMultiActions": true,
+      "SupportedInMultiActions": false,
       "Tooltip": "Start a configured playlist with native Play or Shuffle Play",
       "UUID": "io.github.scarfmeister.pear-streamdeck.play-playlist"
     },

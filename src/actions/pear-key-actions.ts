@@ -36,7 +36,6 @@ export interface PearKeyHost {
     setState(state: 0 | 1, context: string): void;
     setTitle(title: string, context: string): void;
     setImage(image: string, context: string): void;
-    setFeedback(context: string, payload: Record<string, unknown>): void;
     showAlert(context: string): void;
     playlistStatus?(context: string, message: string): void;
 }
@@ -44,9 +43,9 @@ export interface PearKeyHost {
 export interface KeyContextEvent {
     action: string;
     context: string;
-    payload: {settings?: unknown; controller?: string};
+    payload: {settings?: unknown; controller?: string; isInMultiAction?: boolean};
 }
-type Render = {title: string; state?: 0 | 1; image?: string; feedback?: boolean};
+type Render = {title: string; state?: 0 | 1; image?: string};
 type Context = {action: string; controller?: string; settings: unknown; rendered?: Render; playlistError?: string};
 
 /** One shared subscription, with independently cached displays for all visible contexts. */
@@ -63,7 +62,7 @@ export class PearKeyActions {
     }
 
     appear(event: KeyContextEvent): void {
-        if (this.disposed) return;
+        if (this.disposed || event.payload.controller === 'Encoder' || event.payload.isInMultiAction === true) return;
         const entry: Context = {action: event.action, controller: event.payload.controller, settings: event.payload.settings};
         this.contexts.set(event.context, entry);
         this.render(event.context, entry, this.client.getSnapshot());
@@ -82,7 +81,10 @@ export class PearKeyActions {
     async press(event: KeyContextEvent): Promise<void> {
         if (this.disposed) return;
         const visible = this.contexts.get(event.context);
-        if ((event.payload.controller ?? visible?.controller) === 'Encoder') return;
+        // A release can arrive after a profile switch or action replacement.
+        // Multi Actions need explicit desired-state semantics and are not advertised.
+        if (!visible || visible.action !== event.action || event.payload.isInMultiAction === true ||
+            (event.payload.controller ?? visible.controller) === 'Encoder') return;
         const settings = event.payload.settings ?? visible?.settings;
         const commands = this.client.commands;
         try {
@@ -140,18 +142,13 @@ export class PearKeyActions {
     private render(context: string, entry: Context, snapshot: PearSnapshot): void {
         const next = this.display(entry, snapshot);
         const previous = entry.rendered;
-        if (next.feedback) {
-            if (previous?.title !== next.title) this.host.setFeedback(context, {title: next.title});
-        } else {
-            if (next.state !== undefined && next.state !== previous?.state) this.host.setState(next.state, context);
-            if (next.image !== undefined && next.image !== previous?.image) this.host.setImage(next.image, context);
-            if (next.title !== previous?.title) this.host.setTitle(next.title, context);
-        }
+        if (next.state !== undefined && next.state !== previous?.state) this.host.setState(next.state, context);
+        if (next.image !== undefined && next.image !== previous?.image) this.host.setImage(next.image, context);
+        if (next.title !== previous?.title) this.host.setTitle(next.title, context);
         entry.rendered = next;
     }
 
     private display(entry: Context, snapshot: PearSnapshot): Render {
-        if (entry.controller === 'Encoder') return {title: 'Dials pending', feedback: true};
         if (!snapshot.player.ready || snapshot.connection !== 'connected') {
             return {title: this.t(snapshot.connection === 'authorizing' ? 'Approve\nin Pear' : 'Pear\noffline')};
         }

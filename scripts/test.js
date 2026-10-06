@@ -4,6 +4,8 @@ const path = require('node:path');
 const {spawnSync} = require('node:child_process');
 
 async function main() {
+    const source = spawnSync(process.execPath, ['scripts/validate-source.js'], {stdio: 'inherit'});
+    if (source.status !== 0) throw new Error('Source audit failed.');
     const localization = spawnSync(process.execPath, ['scripts/validate-localization.js'], {stdio: 'inherit'});
     if (localization.status !== 0) throw new Error('Localization validation failed.');
     const entries = fs.readdirSync('tests').filter(name => name.endsWith('.test.ts')).map(name => `tests/${name}`);

@@ -9,7 +9,9 @@
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.tests.json",
     "validate:localization": "node scripts/validate-localization.js",
     "validate:package": "python3 scripts/validate-package.py",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "prepare": "husky",
+    "lint": "node scripts/validate-source.js"
   },
   "repository": {
     "type": "git",
@@ -22,7 +24,6 @@
   },
   "homepage": "https://github.com/Scarfmeister/Pear-StreamDeck/tree/dev/pear-port#readme",
   "dependencies": {
-    "intl-messageformat": "^10.7.10",
     "streamdeck-typescript": "^3.3.4"
   },
   "keywords": [
@@ -34,18 +35,15 @@
     "media-controls"
   ],
   "devDependencies": {
-    "@commitlint/cli": "^18.6.0",
-    "@commitlint/config-conventional": "^18.6.0",
+    "@commitlint/cli": "21.2.3",
+    "@commitlint/config-conventional": "21.2.3",
     "@tsconfig/recommended": "^1.0.3",
     "@types/node": "^24.0.0",
     "esbuild": "^0.25.10",
-    "husky": "^3.1.0",
-    "typescript": "^5.3.3",
-    "ytmdesktop-ts-companion": "^1.1.0"
+    "husky": "9.1.7",
+    "typescript": "^5.3.3"
   },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
+  "engines": {
+    "node": ">=24"
   }
 }

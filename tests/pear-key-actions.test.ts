@@ -62,8 +62,11 @@ test('all standard key activations call the shared commands with default/configu
         [ActionTypes.PLAY_PAUSE, 'play', {action: 'PLAY'}], [ActionTypes.PLAY_PAUSE, 'pause', {action: 'PAUSE'}],
     ];
     for (const [action, name, settings, delta] of bindings) {
+        keys.appear(event(action, 'key', settings));
+        host.events.length = 0;
         await keys.press(event(action, 'key', settings));
         assert.deepEqual(f.calls.at(-1), delta === undefined ? {name} : {name, delta});
+        assert.equal(host.events.length, 0, 'button presses alone do not alter confirmed displays');
     }
     assert.equal(f.calls.length, bindings.length);
     assert.equal(host.events.length, 0, 'button presses alone do not alter confirmed displays');
@@ -222,7 +225,35 @@ test('playlist configuration calls the shared interface; missing native capabili
     await keys.press({action: ActionTypes.VOLUME_UP, context: 'dial', payload: {}});
     await keys.press(event(ActionTypes.PLAY_PAUSE, 'other-dial', {}, 'Encoder'));
     assert.equal(f.calls.length, 1);
-    assert.deepEqual(host.latest('feedback', 'dial'), {title: 'Dials pending'});
+    assert.equal(host.latest('feedback', 'dial'), undefined, 'encoders belong exclusively to the dial controller');
+    keys.dispose();
+});
+
+test('late key releases cannot dispatch after disappearance, action replacement, or an encoder appearance', async () => {
+    const f = fakeClient(); const host = new KeyHost(); const keys = new PearKeyActions(f.client, host);
+    const next = event(ActionTypes.NEXT_TRACK);
+    await keys.press(next);
+    keys.appear(next);
+    keys.disappear('key');
+    await keys.press(next);
+    keys.appear(event(ActionTypes.PREV_TRACK));
+    await keys.press(next);
+    keys.disappear('key');
+    keys.appear(event(ActionTypes.PLAY_PAUSE, 'key', {}, 'Encoder'));
+    await keys.press(event(ActionTypes.PLAY_PAUSE));
+    assert.equal(f.calls.length, 0);
+    keys.appear(event(ActionTypes.PREV_TRACK));
+    await keys.press(event(ActionTypes.PREV_TRACK));
+    assert.deepEqual(f.calls, [{name: 'previous'}]);
+    keys.dispose();
+});
+
+test('unimplemented Multi Action requested-state semantics cannot dispatch ordinary toggle commands', async () => {
+    const f = fakeClient(); const keys = new PearKeyActions(f.client, new KeyHost());
+    keys.appear(event(ActionTypes.PLAY_PAUSE));
+    await keys.press({action: ActionTypes.PLAY_PAUSE, context: 'key',
+        payload: {controller: 'Keypad', isInMultiAction: true}});
+    assert.equal(f.calls.length, 0);
     keys.dispose();
 });
 
