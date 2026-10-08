@@ -1,5 +1,7 @@
 # Stage 9 followup — Windows OS version correction
 
+**Later manual-acceptance correction:** [PI context bug fix 02](manual-bugfix-02-pi-context.md) supersedes this installer while retaining Windows minimum 10. The user observed installation/actions/backend on Windows 11 /Stream Deck 7.4.2, then rejected PI messages; the separate scoped fix restores framework routing. Its Windows retest is Pending. Counts/hashes and unavailable-host statements below remain this checkpoint's historical evidence.
+
 Checked **2026-10-06 UTC / America/Chicago**. This is the explicitly requested correction and rebuild after Stage 9, not a new automatically started stage.
 
 ## Scope, starting point and work completed

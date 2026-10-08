@@ -2,7 +2,7 @@
 
 Control [Pear Desktop](https://github.com/pear-devs/pear-desktop) from Stream Deck keys and Stream Deck Plus dials. One shared connection uses Pear's local API Server; displays follow actual player state, including changes made in Pear.
 
-**Development preview:** Stage 9 completes the automated audit and opens [PR #1](https://github.com/Scarfmeister/Pear-StreamDeck/pull/1). The installer passes automated validation. Real devices, host installation/persistence, and signed-in native playlist playback still require [manual acceptance](docs/MANUAL_TESTING.md#stage-8-release-validation-matrix). No release or hardware compatibility certification is claimed. [Handoff](docs/HANDOFF.md) records the tested commits, package and remaining work.
+**Development preview:** Stage 9 completed the automated audit and opened [PR #1](https://github.com/Scarfmeister/Pear-StreamDeck/pull/1), still unmerged. The user observed Windows 11 installation/actions/backend startup, then a PI routing failure. The [PI bug fix](docs/checkpoints/manual-bugfix-02-pi-context.md) passes all automated gates; its Windows retest is **Pending**. Device controls, approval/persistence, other hosts and signed-in native playlist playback still require [manual acceptance](docs/MANUAL_TESTING.md#stage-8-release-validation-matrix). [Handoff](docs/HANDOFF.md) records commits/package; no release or hardware certification is claimed.
 
 ## Requirements
 
@@ -10,7 +10,7 @@ Control [Pear Desktop](https://github.com/pear-devs/pear-desktop) from Stream De
 | --- | --- |
 | Pear Desktop | API contract reviewed against **3.12.0**. Standard controls target that version; later releases need compatibility checks. Enable API Server and let the player load. |
 | Playlist playback | Requires the separate **Pear playlist API extension** below. Stock Pear 3.12.0 has no playlist-start endpoint. |
-| Elgato Stream Deck | SDK 2 HTML plugin, software minimum **6.4**; manifest Windows minimum **10** (Windows 10/11 report OS version **10.0**), macOS minimum **13**. Current host targets remain **Windows 11 (64-bit Intel/AMD)** or **macOS 13+** under [official host requirements](https://help.elgato.com/hc/en-us/articles/34512594204049-Elgato-Stream-Deck-Software-System-Requirements). Windows 10 host/device operation is unverified. Development guidance recommends Stream Deck 7.1+. Messages/schema pass automatic tests; installation/devices are unverified. [Version distinction](docs/research/elgato-build-and-packaging.md#windows-os-version-correction-after-stage-9). |
+| Elgato Stream Deck | SDK 2 HTML plugin, software minimum **6.4**; Windows minimum **10** (Windows 10/11 report **10.0**), macOS minimum **13**. Current host targets remain **Windows 11 (64-bit Intel/AMD)** or **macOS 13+** under [official host requirements](https://help.elgato.com/hc/en-us/articles/34512594204049-Elgato-Stream-Deck-Software-System-Requirements). Windows 11 Pro 25H2 /Stream Deck 7.4.2 installed the prior corrected package; the PI fix awaits retest. Windows 10/macOS/device operation is unverified. Development guidance recommends Stream Deck 7.1+. [Version distinction](docs/research/elgato-build-and-packaging.md#windows-os-version-correction-after-stage-9). |
 | OpenDeck/Linux | Expected compatibility from pinned **OpenDeck 2.14.0** source. The package includes a Linux manifest override and PNG feedback for its native HTML WebView. Merged manifest/resource checks pass; Linux/OpenDeck/Flatpak/device runtime is unverified. |
 | Languages | English, German, French. All inherited locales retained and validated; native-speaker and on-device review remain useful. |
 
@@ -18,7 +18,7 @@ The installed HTML plugin needs no separate Node.js installation. Node is used f
 
 ## Install and connect
 
-1. Obtain `io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`. During development, download the **streamdeck-plugin** artifact from a successful **dev/pear-port** [CI run](https://github.com/Scarfmeister/Pear-StreamDeck/actions/workflows/ci.yml) and extract its ZIP, or build it below. Use the [Windows-version correction package](docs/checkpoints/stage-09-windows-version-fix.md); the earlier Stage 9 installer has the incorrect Windows minimum. No public release has been published.
+1. Obtain `io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`. During development, download the **streamdeck-plugin** artifact from a successful **dev/pear-port** [CI run](https://github.com/Scarfmeister/Pear-StreamDeck/actions/workflows/ci.yml) and extract its ZIP, or build it below. Use the [PI routing correction package](docs/checkpoints/manual-bugfix-02-pi-context.md), which also retains Windows minimum 10; earlier packages have the rejected PI routing or Windows-minimum defect. No public release has been published.
 2. On Windows/macOS, open the installer with Elgato Stream Deck and follow its prompt. In OpenDeck's plugin manager, choose **Install from file** and select the same installer. These are the intended install paths; record real results in the manual matrix.
 3. In Pear's **Plugins** menu, enable **API Server [Beta]** (the 3.12.0 label). Reopen its submenu and set **Hostname** to `127.0.0.1` and **Port** to `26538` for the same computer. Pear's default bind address is `0.0.0.0`; the connector defaults to `127.0.0.1`. Leave HTTPS off for this default local setup.
 4. Drag an action from **Pear Desktop** onto a key/dial. Select it to open its settings panel (Property Inspector). Connection settings apply to all Pear actions: **Host 127.0.0.1, Port 26538, Protocol HTTP**. Save changes if needed.
@@ -74,7 +74,7 @@ A missing route shows **Update Pear**. Unsupported native controls show **Unavai
 
 ## Known limitations
 
-- Physical keys/Plus displays, Windows/macOS Stream Deck, Linux/OpenDeck/Flatpak installation, language rendering, and host token/settings persistence are unverified. Automatic messages/schema/source checks are separate from hardware acceptance.
+- Windows 11 Pro 25H2 /10.0.26200, Stream Deck 7.4.2.22730 installed the previous corrected package and connected its backend, but rejected PI messages. The inherited-framework routing is now restored; [Windows retest](docs/MANUAL_TESTING.md#windows-pi-routing-retest) is pending. Keys/Plus displays, macOS/OpenDeck/Flatpak, language rendering and host token/settings persistence remain unverified.
 - Pear 3.12.0 does not push ratings. Same-track ratings changed elsewhere can remain stale until track change, reconnect or a connector rating command. Unsupported legacy shuffle-off alerts and stays visibly on.
 - Pear's cold cached routes can be incomplete before playback. An open but stalled WebSocket can retain stale state until recovery; there is no heartbeat or constant polling. Failed/unconfirmed commands alert without inventing state.
 - Native playlist support rejects unsafe/missing website controls. The separate Pear fork retains upstream formatting warnings; see [Stage 7](docs/checkpoints/stage-07.md). OBS metadata export is outside scope; use Pear's Tuna integration separately.
@@ -97,11 +97,12 @@ npm run prepare:streamdeck-cli
 npx --yes @elgato/cli@1.10.1 validate --force-update-check build/io.github.scarfmeister.pear-streamdeck.sdPlugin
 npx --yes @elgato/cli@1.10.1 pack --no-update-check build/io.github.scarfmeister.pear-streamdeck.sdPlugin --output build --force --no-file-list
 npm run validate:package
+npm audit
 ```
 
-On Windows, the archive audit can instead use `py -3 scripts/validate-package.py`. `npm test` includes repository/syntax and localization validation plus client/state/action/settings/browser tests (124 individual cases). `prepare:streamdeck-cli` verifies canonical/built manifest parity. `build` replaces the ignored build directory; `pack --force` replaces its local installer. Output: **`build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`**. Do not commit it.
+On Windows, the archive audit can instead use `py -3 scripts/validate-package.py`. `npm test` includes repository/syntax and localization validation plus client/state/action/settings/browser tests (**129 individual cases**, including five PI registration-routing regressions). `prepare:streamdeck-cli` verifies canonical/built manifest parity. `build` replaces the ignored build directory; `pack --force` replaces its local installer. Output: **`build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`**. Do not commit it.
 
-CI runs those checks before uploading the development artifact. The existing release workflow has the same gates; Stage 9 does not trigger it. Validation has one documented warning: category **Pear Desktop** differs from name **Pear Desktop Connector**, as required by the project identity. No validation bypass is used. See [tooling/schema/platform evidence](docs/research/elgato-build-and-packaging.md).
+CI runs install, types, tests (including source/localization checks), build and CLI/archive checks before uploading the development artifact. Run the full dependency audit as a local preflight too. The existing release workflow has the same build gates; this bug fix does not trigger it. Validation has one documented warning: category **Pear Desktop** differs from name **Pear Desktop Connector**, as required by the project identity. No validation bypass is used. See [tooling/schema/platform evidence](docs/research/elgato-build-and-packaging.md).
 
 `npm run watch` rebuilds active browser entries. Icon authors can regenerate committed assets with Python 3, Inkscape 1.4.4 and `python3 scripts/generate-icons.py`; these tools are not needed to install the plugin. Optional Node 24 cross-repository check: `node scripts/test-pear-extension.js /path/to/pear-desktop`. It simulates native player state and does not prove signed-in audio.
 

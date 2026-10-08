@@ -1,5 +1,7 @@
 # Stage 9 — Final audit, defect correction, PR and handoff
 
+**Later manual-acceptance correction:** [PI context bug fix 02](manual-bugfix-02-pi-context.md) supersedes the package/acceptance target after the Windows-version fix. Real Windows installation/backend succeeded, but the host rejected PI messages; inherited registration routing is restored with five new regressions. Post-fix Windows retest is Pending. The Stage 9 results below remain historical.
+
 **Authorized followup:** the [Windows-version correction](stage-09-windows-version-fix.md) supersedes this checkpoint's package/acceptance target. The earlier manifest minimum `11` was incorrect for Windows 11's reported OS version 10.0; the new installer uses minimum `10`. Historical test counts/results/commits below remain the Stage 9 record and did not prove live Windows installation.
 
 Checked 2026-10-06 UTC / 2026-10-05 America/Chicago. Final automated engineering stage; no physical host/device or signed-in native playlist session was available.
