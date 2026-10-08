@@ -1,6 +1,36 @@
 # Manual testing
 
-Current acceptance target: the fresh installer at implementation **`23cf3daa14d45a27310551d7ee727bdfaceba587`**, recorded in the [PI context bug-fix checkpoint](checkpoints/manual-bugfix-02-pi-context.md), on [PR #1](https://github.com/Scarfmeister/Pear-StreamDeck/pull/1). It retains the Windows-minimum correction and fixes rejected PI messages. Initial Windows installation/backend evidence and the failed connection/authentication PI checks are recorded below; **post-fix retest is Pending**. The 42-row matrix remains the release gate; partial observations do not complete an entire row. See [HANDOFF.md](HANDOFF.md) for setup; older sections are historical evidence.
+Current acceptance target: the fresh installer at implementation **`23cf3daa14d45a27310551d7ee727bdfaceba587`**, recorded in the [PI context bug-fix checkpoint](checkpoints/manual-bugfix-02-pi-context.md), on [PR #1](https://github.com/Scarfmeister/Pear-StreamDeck/pull/1). It retains the Windows-minimum correction and fixes rejected PI messages. Initial Windows installation/backend evidence and the failed connection/authentication PI checks are recorded below; **full PI post-fix retest is Pending; the scoped Windows volume pass is recorded below**. The 42-row matrix remains the release gate; partial observations do not complete an entire row. See [HANDOFF.md](HANDOFF.md) for setup; older sections are historical evidence.
+
+## Windows volume acceptance — corrected Pear API
+
+Recorded **2026-10-07**, from the user's manual report. Tester: repository owner/user; no separate tester name supplied. Prior recorded environment: **Windows 11 Pro 25H2 /10.0.26200**, **Stream Deck 7.4.2.22730**, Pear API **127.0.0.1:26538**, **AUTH_AT_FIRST**. This report confirms Windows with actual keys and a **Stream Deck Plus Volume Dial**; it does not independently reconfirm every earlier environment field. Exact plugin installer hash/installed commit, firmware, normal-key device model and test time were not supplied. No authentication acceptance is inferred.
+
+Recommended Pear build: **Scarfmeister/pear-desktop / `feature/streamdeck-api-extensions`**, tested branch revision resolved from the pushed branch to **`a9ea223c99ede0876343db5898b944ea5170ad1f`** by `git ls-remote` on 2026-10-07. The user identified the built branch, not a separately captured embedded build SHA; this records its retrieved head, not invented binary metadata. Previous playlist-only branch **`feature/streamdeck-playlist-api` / `b5f13f65c71ca8890c08f52c7d7becde5d855be9`** remains historical evidence.
+
+Default Pear reproduction, in reported order, using POST `/api/v1/volume` then GET:
+
+| Requested percentage | Returned percentage |
+| --- | --- |
+| 75 | 47 |
+| 50 | 20 |
+| 75 | 47 |
+| 25 | 6 |
+| 100 | 100 |
+| 95 | 86 |
+| 60 | 29 |
+| 90 | 74 |
+
+This confirms the nonlinear write/read mismatch described in [Pear issue #4458](https://github.com/pear-devs/pear-desktop/issues/4458) and [PR #4672](https://github.com/pear-devs/pear-desktop/pull/4672). The original Stream Deck failure included default step 5, large nonlinear jumps, unconfirmed warnings and the same failure on Plus; mute worked. The client sends absolute targets and displays confirmed Pear state. The defect was Pear's transformed player-bar write path, not the Stream Deck command logic.
+
+| Acceptance area | Observed result on corrected Pear | Still unverified |
+| --- | --- | --- |
+| Direct PowerShell POST → GET | **Pass:** all tested requested percentages round-trip correctly; immediate visible player feedback. Exact patched value list was not supplied. | Unreported values, invalid inputs and all other API scenarios. |
+| K05 Volume Down / Volume Up | **Pass — observed subset:** both directions, working step behavior, successive changes, immediate Pear feedback and resulting confirmed Stream Deck displays. No prior nonlinear jumps or warning overlays during valid changes. | Bounds at 0/100, all custom steps, invalid/malformed settings, persistence and other platforms. |
+| D01 Plus Volume Dial | **Pass — observed subset:** both directions, step behavior, rapid/sequential changes, immediate Pear feedback, confirmed display updates and continued working mute. No prior jumps/warning overlays. | Bounds, alternate/custom step matrix, external-change interleaving, zero-volume mute distinctions, press/touch ordering, persistence and OpenDeck. |
+| K04 / D01 mute regression | **Pass — continued working mute only.** | The complete zero-unmuted/external/duplicate-context matrix. |
+
+No runtime change was needed in this connector. Full K05/D01/K04 rows remain incomplete; PI approval/restart/persistence, authentication strategies, unrelated actions, native playlist acceptance and untested hosts remain pending/not run. See [verification checkpoint](checkpoints/manual-verification-03-volume-api.md).
 
 ## Windows manual acceptance — PI routing failure
 
@@ -30,9 +60,9 @@ Stream Deck warnings were `Received messageType 'getSettings' from the wrong con
 
 ## Stage 8 release validation matrix
 
-**Windows observations/failures are above; the corrected retest is Pending and other scenarios are Not run.** The current fix automatically verifies **129 plugin tests**, source/syntax contracts, three complete locales, official CLI validation, the real installer, PNG resources and the merged Linux manifest; full dependency audit reports zero findings. OpenDeck 2.14.0 source establishes expected HTML/events/layout/import behavior. Automated results do not establish live approval, disk persistence, device operation or signed-in native audio.
+**Windows volume-key/Plus observations pass only the subsets recorded above; full PI retest and remaining scenarios are Pending/Not run.** The current fix automatically verifies **129 plugin tests**, source/syntax contracts, three complete locales, official CLI validation, the real installer, PNG resources and the merged Linux manifest; full dependency audit reports zero findings. OpenDeck 2.14.0 source establishes expected HTML/events/layout/import behavior. Automated results do not establish live approval, disk persistence, device operation or signed-in native audio.
 
-Test the exact [corrected package/commit](checkpoints/manual-bugfix-02-pi-context.md). Record OS product name **and reported numeric version**, host software version, device/firmware, Pear version **and commit**, authentication strategy, API bind/protocol and host language. Windows 11 reports 10.0; the manifest uses Windows minimum `10`, which also admits Windows 10 at the metadata level but does not verify that host. Use a disposable test profile and a known signed-in playlist with at least three distinguishable tracks. Establish native Normal Play/Shuffle Play baselines in Pear before comparing connector startup. For playlist execution use Pear feature commit `b5f13f65c71ca8890c08f52c7d7becde5d855be9`; also test stock 3.12.0's visible rejection. Do not include tokens, token-bearing URLs, account/tracking payloads or private playlist details in shared evidence.
+Test the exact [corrected package/commit](checkpoints/manual-bugfix-02-pi-context.md). Record OS product name **and reported numeric version**, host software version, device/firmware, Pear version **and commit**, authentication strategy, API bind/protocol and host language. Windows 11 reports 10.0; the manifest uses Windows minimum `10`, which also admits Windows 10 at the metadata level but does not verify that host. Use a disposable test profile and a known signed-in playlist with at least three distinguishable tracks. Establish native Normal Play/Shuffle Play baselines in Pear before comparing connector startup. Use recommended combined Pear branch `feature/streamdeck-api-extensions` at `a9ea223c99ede0876343db5898b944ea5170ad1f` (the original playlist-only commit remains historical); also test stock 3.12.0's visible rejection. Do not include tokens, token-bearing URLs, account/tracking payloads or private playlist details in shared evidence.
 
 Platform codes: **W-K** = Windows 11 x64/Intel-AMD + Elgato software 7.1+ + a normal key device; **W-+** = the same host + Stream Deck Plus; **L-K/L-+** = Linux + OpenDeck 2.14.0 + corresponding hardware. Run common tests on both Elgato and OpenDeck, recording any unavailable device as unverified. **M** = optional macOS 13+ Elgato run if available. An older 6.4 host check is a separate compatibility test, not implied by testing a current host.
 
@@ -61,7 +91,7 @@ Platform codes: **W-K** = Windows 11 x64/Intel-AMD + Elgato software 7.1+ + a no
 | K02 | Same | Press Next/Previous and change tracks in Pear. | Correct transport once per press; Track Info/transport display follows the resulting track. |
 | K03 | Same | Like → press active Like to clear; Dislike → press active Dislike to clear; switch ratings/tracks. | Native supported transitions and real fetched rating appear; Like/Dislike states are distinct. Same-track external rating may remain stale (known 3.12.0 limitation). |
 | K04 | Same | Toggle mute in Pear/key; set volume to zero while unmuted; restore volume. | Actual mute state/icon follows Pear; zero unmuted volume does not appear muted. |
-| K05 | Same | Save steps 1, 5, 7 and 100; test Up at 97 and Down at 3; submit 0/negative/decimal/text; load malformed older settings. | Whole valid steps take effect; bounds stay 0–100; invalid edits do not save; invalid stored steps safely use 5. Display remains confirmed volume. |
+| K05 | Same | Save steps 1, 5, 7 and 100; test Up at 97 and Down at 3; submit 0/negative/decimal/text; load malformed older settings. | Whole valid steps take effect; bounds stay 0–100; invalid edits do not save; invalid stored steps safely use 5. Display remains confirmed volume. **Windows observed subset: Pass**, see volume record above; untested parts of K05 remain Not run. |
 | K06 | Same | Select/save all five Track Info formats; pause; test long/Unicode/missing-album/podcast metadata; enable Show Title/clear custom title. | Correct per-key fields, bounded lines/ellipsis and localized fallbacks; supplied titles/artists remain unchanged. No remote artwork loading or stale artwork claim. |
 | K07 | Same | Toggle shuffle from Pear/key off→on→off; include a legacy queue if available. | Real off/on images update. Unsupported legacy off alerts and remains actual on; no guessed off transition. |
 | K08 | Same | Start at NONE; press through ALL, ONE, NONE; change repeat in Pear. | Native documented cycle and three distinct images/labels on every copy, including external changes. |
@@ -72,7 +102,7 @@ Platform codes: **W-K** = Windows 11 x64/Intel-AMD + Elgato software 7.1+ + a no
 | P04 | Same | Follow mode with actual shuffle off/on; externally change shuffle just before press; test unknown-state session. | Mode captures current real state; unknown gets one bounded refresh or clear failure without guessed startup. Keys and dials behave consistently. |
 | P05 | Same | Run stock Pear 3.12.0; then extension with unavailable/private/empty/unsupported-native playlist. | Missing route visibly requires Update Pear; native unsupported gives Unavailable; other errors are honest. No fallback playback or claimed audible success from a dispatch response. |
 | P06 | Same | Overlap presses; delay browse/abort/reload/rebind/disable before and after dispatch permit. | One active start, bounded deadline, no stale permit/replay. Pre-dispatch rejection starts nothing; unknown post-permit outcome stays unknown even if playback began. Use Stage 7 acceptance details below. |
-| D01 | W-+, L-+ | Rotate volume both ways with default/custom steps and near bounds; press; change volume/mute externally. | Signed step behavior/clamp, true mute, actual percentage/indicator/icon; press or rotation alone does not assume a result. |
+| D01 | W-+, L-+ | Rotate volume both ways with default/custom steps and near bounds; press; change volume/mute externally. | Signed step behavior/clamp, true mute, actual percentage/indicator/icon; press or rotation alone does not assume a result. **Windows Plus observed subset: Pass**, see volume record above; untested parts of D01 remain Not run. |
 | D02 | W-+, L-+ | Rotate transport ±1/multiple detents; press once; test paused/stopped/external playback. | One Next/Previous per accepted detent, one play/pause on release, current real playback/title/artist. Oversized/error/disconnected work is bounded/discarded. |
 | D03 | W-+, L-+ | Save 0, 1, several and 16 selector entries; rotate/wrap; edit/remove/reorder; restart; use duplicate selectors. | Empty is explicit; one remains selected; wrapping/bounds/position persistence work; duplicates are independent. Rotation never plays or overwrites an unsaved PI draft. |
 | D04 | W-+, L-+ | Add bounded PNG/JPEG images; switch entries including default-image entry; press with each mode; rotate before delayed failure. | Correct selected image/name/index/mode; stock/unsupported mode fails honestly. A delayed result cannot mark another selection as failed. IDs and selected index persist. |
@@ -98,7 +128,7 @@ See [SDK/runtime source verification](research/stream-deck-plus-sdk.md), D016, a
 
 ## Stage 7 extension acceptance
 
-1. Build the separate Pear fork at the recorded commit on `feature/streamdeck-playlist-api` with its frozen lockfile. Record the exact plugin and Pear commits, OS, account/layout, auth strategy, and host/device. Enable API Server on `127.0.0.1:26538`; do not infer endpoint availability from version 3.12.0 alone.
+1. Build the separate Pear fork at the recorded commit on `feature/streamdeck-api-extensions` with its frozen lockfile; the original `feature/streamdeck-playlist-api` remains historical. Record the exact plugin and Pear commits, OS, account/layout, auth strategy, and host/device. Enable API Server on `127.0.0.1:26538`; do not infer endpoint availability from version 3.12.0 alone.
 2. Verify the existing approval/JWT/authorized-client flow and `NONE` mode. Check the new OpenAPI route and strict ID/boolean JSON. Unauthorized, malformed, overlapping, unavailable, and unsupported requests must return the documented status without starting a playlist. Never capture tokens, account data, opaque command contents, or token-bearing URLs in public evidence.
 3. Run **Native playlist startup** below with public, signed-in/private, unavailable/empty, legacy, modern entity-based, and localized layouts where available. Compare native Play and Shuffle Play with both key and selector. Check actual first audible track and queue/shuffle state; a dispatch acknowledgment alone does not pass.
 4. With a shuffled queue of the same playlist, exercise Always Normal and Follow off. A legacy video watch command that could reuse that order must show Unavailable / 501 with zero new startup. Record this limitation rather than marking normal playback passed. A supplied native watch-playlist fresh-queue command must prove normal order in live acceptance before shipping.
