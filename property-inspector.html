@@ -1,136 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>YTMD - PI</title>
+    <title data-i18n="Pear Desktop Connector — Settings">Pear Desktop Connector — Settings</title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="sdpi.css">
+    <style>
+        [hidden] { display: none !important; }
+        .playlist-entry { margin: 12px 0; border: 1px solid #666; padding: 8px; }
+        .playlist-entry button { margin: 4px; }
+        .playlist-entry img { vertical-align: middle; object-fit: contain; }
+    </style>
     <script src="bundle-pi.js"></script>
 </head>
 <body>
-<div class="sdpi-wrapper" id="errors">
-    <div class="error-item" id="error-template">
-        <h3 class="error-title">Something went wrong</h3>
-        <p class="error-message">Oops. This is awkward. You shouldn't be able to see me. :c</p>
-    </div>
-</div>
-<div class="sdpi-wrapper" id="globalSettings">
+<div class="sdpi-wrapper">
+    <section id="actionSettings" hidden>
+        <section id="volumeSettings" hidden>
+            <div class="sdpi-item">
+                <label class="sdpi-item-label" for="volumeStep" data-i18n="Step (%)">Step (%)</label>
+                <input class="sdpi-item-value" type="number" id="volumeStep" min="1" max="100" step="1" value="5">
+            </div>
+            <p data-i18n="Whole percentages from 1 to 100. Default: 5%. Volume stays within 0–100%.">Whole percentages from 1 to 100. Default: 5%. Volume stays within 0–100%.</p>
+        </section>
+        <section id="selectorSettings" hidden>
+            <p data-i18n="Configure up to 16 playlists. Rotate to select; press to play. Selection is saved per dial.">Configure up to 16 playlists. Rotate to select; press to play. Selection is saved per dial.</p>
+            <div id="selectorEntries"></div>
+            <button id="selectorAdd" type="button" data-i18n="Add playlist">Add playlist</button>
+            <p data-i18n="Names: 1–64 characters. Optional images: PNG or JPEG up to 24 KiB, stored with this action.">Names: 1–64 characters. Optional images: PNG or JPEG up to 24 KiB, stored with this action.</p>
+            <p data-i18n="Follow Shuffle State reads Pear&#x27;s real shuffle state when pressed. Playlist playback requires a compatible Pear build with the native playlist API extension.">Follow Shuffle State reads Pear's real shuffle state when pressed. Playlist playback requires a compatible Pear build with the native playlist API extension.</p>
+        </section>
+        <section id="trackInfoSettings" hidden>
+            <div class="sdpi-item">
+                <label class="sdpi-item-label" for="trackInfoFormat" data-i18n="Display">Display</label>
+                <select class="sdpi-item-value" id="trackInfoFormat">
+                    <option value="TITLE" data-i18n="Title">Title</option>
+                    <option value="ARTIST" data-i18n="Artist">Artist</option>
+                    <option value="TITLE_ARTIST" selected data-i18n="Title + Artist">Title + Artist</option>
+                    <option value="ALBUM" data-i18n="Album">Album</option>
+                    <option value="TITLE_ARTIST_ALBUM" data-i18n="Title + Artist + Album">Title + Artist + Album</option>
+                </select>
+            </div>
+            <p data-i18n="Long lines are shortened to fit a key. Enable Show Title and clear a custom Stream Deck title to see metadata.">Long lines are shortened to fit a key. Enable Show Title and clear a custom Stream Deck title to see metadata.</p>
+        </section>
+        <section id="playlistSettings" hidden>
+            <div class="sdpi-item">
+                <label class="sdpi-item-label" for="playlistInput" data-i18n="Playlist">Playlist</label>
+                <input class="sdpi-item-value" type="text" id="playlistInput" maxlength="4096" placeholder="Playlist URL or ID" data-i18n-placeholder="Playlist URL or ID" spellcheck="false">
+            </div>
+            <div class="sdpi-item">
+                <label class="sdpi-item-label" for="playlistStartupMode" data-i18n="Start mode">Start mode</label>
+                <select class="sdpi-item-value" id="playlistStartupMode">
+                    <option value="FOLLOW_SHUFFLE_STATE" data-i18n="Follow Shuffle State">Follow Shuffle State</option>
+                    <option value="ALWAYS_NORMAL" data-i18n="Always Normal">Always Normal</option>
+                    <option value="ALWAYS_SHUFFLE" data-i18n="Always Shuffle">Always Shuffle</option>
+                </select>
+            </div>
+            <p data-i18n="Save extracts and stores the playlist ID. Follow uses Pear&#x27;s actual shuffle state when pressed.">Save extracts and stores the playlist ID. Follow uses Pear's actual shuffle state when pressed.</p>
+            <p id="playlistRequirement" data-i18n="Playlist playback requires a compatible Pear build with the native playlist API extension. Pear 3.12.0 cannot start playlists. A missing or unsupported native operation alerts; no fallback playback is sent.">Playlist playback requires a compatible Pear build with the native playlist API extension.
+                Pear 3.12.0 cannot start playlists. A missing or unsupported native operation alerts; no fallback playback is sent.</p>
+        </section>
+        <div class="sdpi-item"><button class="sdpi-item-value" id="actionSave" data-i18n="Save action settings">Save action settings</button></div>
+        <p id="actionMessage" role="status" aria-live="polite"></p>
+    </section>
+    <p id="dialHelp" hidden data-i18n="Clockwise increases volume or skips to the next track; counter-clockwise decreases volume or goes to the previous track. Volume press toggles mute; Transport press plays or pauses. Playlist Selector rotation changes the selected entry. A short touch refreshes the display; a hold does nothing. Clear custom host title/icon overrides to see Pear&#x27;s display.">Clockwise increases volume or skips to the next track; counter-clockwise decreases volume or goes to the previous track.
+        Volume press toggles mute; Transport press plays or pauses. Playlist Selector rotation changes the selected entry.
+        A short touch refreshes the display; a hold does nothing. Clear custom host title/icon overrides to see Pear's display.</p>
+    <p data-i18n="Connection settings apply to all Pear keys and dials.">Connection settings apply to all Pear keys and dials.</p>
     <div class="sdpi-item">
-        <div class="sdpi-item-label auth-label" data-i18n="AUTH_STATUS">Auth Status</div>
-        <div class="sdpi-item-value">
-            <strong id="globalAuthStatus" class="auth-status-label" style="color: red;" data-i18n="AUTH_STATUS_NOT_CONNECTED">Not authenticated</strong>
-        </div>
+        <div class="sdpi-item-label" data-i18n="Connection">Connection</div>
+        <strong class="sdpi-item-value" id="globalConnectionStatus" data-i18n="Waiting for plugin">Waiting for plugin</strong>
     </div>
     <div class="sdpi-item">
-        <div class="sdpi-item-label connection-status-label" data-i18n="CONNECTION_STATUS">Connection Status</div>
-        <div class="sdpi-item-value">
-            <strong id="globalConnectionStatus" class="connection-status-value" data-i18n="CONNECTION_STATUS_CHECKING">Checking...</strong>
-        </div>
+        <div class="sdpi-item-label" data-i18n="Authorization">Authorization</div>
+        <strong class="sdpi-item-value" id="globalAuthStatus" data-i18n="Checking">Checking</strong>
     </div>
-    <details id="globalSettingsDetails" class="message">
-        <summary class="global-settings-title" data-i18n="GLOBAL_SETTINGS_TITLE">Connection Settings</summary>
-        <div class="sdpi-item">
-            <button class="sdpi-item-value auth-button-label" id="globalAuthButton" data-i18n="AUTH_BUTTON">Authorize</button>
-            <br>
-        </div>
-        <div class="sdpi-item">
-            <div class="sdpi-item-label host-label" data-i18n="HOST">Host</div>
-            <input class="sdpi-item-value" type="text" id="globalHost" value="127.0.0.1">
-        </div>
-        <div class="sdpi-item">
-            <div class="sdpi-item-label port-label" data-i18n="PORT">Port</div>
-            <input class="sdpi-item-value" type="number" id="globalPort" value="9863">
-        </div>
-        <div class="sdpi-item">
-            <button class="sdpi-item-value save-label" id="globalSave" data-i18n="SAVE">Save</button>
-        </div>
-    </details>
-</div>
-<div class="sdpi-wrapper" id="playPauseSettings" style="display: none">
     <div class="sdpi-item">
-        <div class="sdpi-item-label action-label" data-i18n="ACTION">Action</div>
-        <select class="sdpi-item-value" id="action">
-            <option class="toggle-label" value="TOGGLE" selected data-i18n="TOGGLE">Toggle</option>
-            <option class="pause-label" value="PAUSE" data-i18n="PAUSE">Pause</option>
-            <option class="play-label" value="PLAY" data-i18n="PLAY">Play</option>
+        <label class="sdpi-item-label" for="globalHost" data-i18n="Host">Host</label>
+        <input class="sdpi-item-value" type="text" id="globalHost" value="127.0.0.1">
+    </div>
+    <div class="sdpi-item">
+        <label class="sdpi-item-label" for="globalPort" data-i18n="Port">Port</label>
+        <input class="sdpi-item-value" type="number" id="globalPort" value="26538" min="1" max="65535">
+    </div>
+    <div class="sdpi-item">
+        <label class="sdpi-item-label" for="globalProtocol" data-i18n="Protocol">Protocol</label>
+        <select class="sdpi-item-value" id="globalProtocol">
+            <option value="http" data-i18n="HTTP (local default)">HTTP (local default)</option>
+            <option value="https" data-i18n="HTTPS">HTTPS</option>
         </select>
     </div>
     <div class="sdpi-item">
-        <div class="sdpi-item-label display-label" data-i18n="DISPLAY_FORMAT">Display Format</div>
-        <textarea class="sdpi-item-value" type="text" id="displayFormat">{current}</textarea>
+        <button class="sdpi-item-value" id="globalSave" data-i18n="Save connection">Save connection</button>
+        <button class="sdpi-item-value" id="globalAuthButton" data-i18n="Reauthorize">Reauthorize</button>
     </div>
-    <div style="padding: 5px;" class="var-usage-label" data-i18n-html="VAR_USAGE">
-        <p><strong>Available variables:</strong> {current}, {remaining}, {duration}</p>
-        <p><strong>Special values:</strong> :S = seconds, :H = human readable time (default)</p>
-        <p><strong>Usage:</strong> {remaining:S} to display remaining time in seconds</p>
-    </div>
-    <div id="sdplus-settings" style="display: none;">
-        <div class="sdpi-item">
-            <div class="sdpi-item-label display-label" data-i18n="DISPLAY_TITLE">Title Format</div>
-            <textarea class="sdpi-item-value" type="text" id="displayTitleFormat">{title}</textarea>
-        </div>
-        <div style="padding: 5px;" class="var-usage-label" data-i18n-html="VAR_USAGE_TITLE">
-            <p><strong>Available variables:</strong> {title}, {author}, {album}</p>
-            <p><strong>Usage:</strong> {title} to display song title</p>
-        </div>
-        <div class="sdpi-item">
-            <div class="sdpi-item-label display-label" data-i18n="CUSTOM_LAYOUT_FILE">Custom Layout File</div>
-            <textarea class="sdpi-item-value" type="text" id="sdplus-customLayout"></textarea>
-        </div>
-        <div style="padding: 5px;" class="var-usage-label" data-i18n-html="VAR_USAGE_CUSTOMLAYOUT">
-            <p><strong>Usage:</strong> Path to custom layout in the plugin folder</p>
-            <p>Use the following key values on text objects to get information</p>
-            <p><strong>Key values:</strong> song, author, album</p>
-        </div>
-    </div>
-    <div class="sdpi-item">
-        <button class="sdpi-item-value save-label" id="save" data-i18n="SAVE">Save</button>
-    </div>
+    <p id="connectionError" role="alert"></p>
+    <p data-i18n="Enable Pear&#x27;s API Server. For local use, bind it to 127.0.0.1:26538. Approve the first request in Pear. A denied or revoked authorization needs Reauthorize.">Enable Pear's API Server. For local use, bind it to 127.0.0.1:26538.
+       Approve the first request in Pear. A denied or revoked authorization needs Reauthorize.</p>
+    <p><a href="https://github.com/Scarfmeister/Pear-StreamDeck/tree/dev/pear-port" target="_blank" rel="noopener" data-i18n="Project and current status">Project and current status</a></p>
 </div>
-<div class="sdpi-wrapper" id="playlistSettings" style="display: none">
-    <div class="sdpi-item">
-        <div class="sdpi-item-label playlist-source-label" data-i18n="PLAYLIST_SOURCE">Playlist Source</div>
-        <div class="sdpi-item-value playlist-source-help" data-i18n="PLAYLIST_SOURCE_HELP">
-            Use one option below. If Playlist URL is set, it takes priority over the dropdown.
-        </div>
-    </div>
-    <div class="sdpi-item">
-        <div class="sdpi-item-label playlist-label" data-i18n="PLAYLIST">Playlist</div>
-        <select class="sdpi-item-value" id="playlistSelect">
-            <option value="" data-i18n="PLAYLIST_SELECT">Select playlist</option>
-        </select>
-    </div>
-    <div class="sdpi-item">
-        <div class="sdpi-item-label playlist-url-label" data-i18n="PLAYLIST_URL">Playlist URL</div>
-        <input class="sdpi-item-value" type="text" id="playlistUrl">
-    </div>
-    <div class="sdpi-item">
-        <div class="sdpi-item-label playlist-url-status-label" data-i18n="PLAYLIST_URL_STATUS">Playlist URL Status</div>
-        <div class="sdpi-item-value" id="playlistUrlStatus"></div>
-    </div>
-    <div class="sdpi-item">
-        <button class="sdpi-item-value playlist-refresh-label" id="playlistRefresh" data-i18n="PLAYLIST_REFRESH">Refresh Playlists</button>
-    </div>
-    <div class="sdpi-item">
-        <button class="sdpi-item-value save-label" id="playlistSave" data-i18n="SAVE">Save</button>
-    </div>
-</div>
-<div class="sdpi-wrapper" id="volumeSettings" style="display: none">
-    <div class="sdpi-item">
-        <div class="sdpi-item-label volume-steps-label" data-i18n="VOLUME_STEPS">Volume steps</div>
-        <input class="sdpi-item-value" type="number" id="volumeInput">
-    </div>
-    <div class="sdpi-item">
-        <details class="message question">
-            <summary class="automatic-save-label" data-i18n="AUTOMATIC_SAVE">This saves automatically</summary>
-        </details>
-    </div>
-</div>
-<hr>
-<h3 class="support-feedback-title-label" data-i18n="SUPPORT_FEEDBACK_TITLE">Support / Feedback</h3>
-<p class="support-feedback-text-label" data-i18n-html="SUPPORT_FEEDBACK_TEXT">
-    You found a bug? You have a feature request? <br>
-    I would love to hear about it <a href="https://github.com/XeroxDev/YTMD-StreamDeck/issues/new/choose" rel="noopener"
-                                     target="_blank">here</a>!
-</p>
 </body>
 </html>

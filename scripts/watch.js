@@ -1,7 +1,7 @@
 const esbuild = require('esbuild');
 
-function watchBundle(entryPoint, outFile, label) {
-  return esbuild.build({
+async function watchBundle(entryPoint, outFile, label) {
+  const context = await esbuild.context({
     entryPoints: [entryPoint],
     outfile: outFile,
     bundle: true,
@@ -9,21 +9,22 @@ function watchBundle(entryPoint, outFile, label) {
     platform: 'browser',
     target: ['es2017'],
     sourcemap: true,
-    watch: {
-      onRebuild(error) {
-        if (error) {
-          console.error(`[${label}] rebuild failed`, error);
-        } else {
-          console.log(`[${label}] rebuild succeeded`);
-        }
+    plugins: [{
+      name: 'watch-reporter',
+      setup(build) {
+        build.onEnd(result => {
+          console.log(`[${label}] rebuild ${result.errors.length ? 'failed' : 'succeeded'}`);
+        });
       }
-    }
+    }]
   });
+  await context.watch();
+  return context;
 }
 
 Promise.all([
-  watchBundle('src/ytmd-pi.ts', 'bundle-pi.js', 'property-inspector'),
-  watchBundle('src/ytmd.ts', 'bundle.js', 'plugin')
+  watchBundle('src/pear-pi.ts', 'bundle-pi.js', 'property-inspector'),
+  watchBundle('src/pear-plugin.ts', 'bundle.js', 'plugin')
 ])
   .then(() => {
     console.log('Watching for changes...');

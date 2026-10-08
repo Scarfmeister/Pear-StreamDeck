@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - master
+      - dev/pear-port
 
 jobs:
   build:
@@ -16,13 +17,19 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Install dependencies
         run: npm ci
 
       - name: Install Stream Deck CLI
-        run: npm install -g @elgato/cli@latest
+        run: npm install -g @elgato/cli@1.10.1
+
+      - name: Type-check plugin and tests
+        run: npm run typecheck
+
+      - name: Test client, actions, settings, browser integration, and localization
+        run: npm test
 
       - name: Build plugin package
         run: npm run build
@@ -31,13 +38,16 @@ jobs:
         run: npm run prepare:streamdeck-cli
 
       - name: Validate plugin package
-        run: streamdeck validate --no-update-check build/fun.shiro.ytmd.sdPlugin
+        run: streamdeck validate --no-update-check build/io.github.scarfmeister.pear-streamdeck.sdPlugin
 
       - name: Pack plugin
-        run: streamdeck pack --no-update-check build/fun.shiro.ytmd.sdPlugin --output build --force
+        run: streamdeck pack --no-update-check build/io.github.scarfmeister.pear-streamdeck.sdPlugin --output build --force
+
+      - name: Check distributable contents and Linux manifest view
+        run: python3 scripts/validate-package.py
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: streamdeck-plugin
-          path: build/fun.shiro.ytmd.streamDeckPlugin
+          path: build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin

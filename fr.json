@@ -1,96 +1,330 @@
 {
-  "Name": "YTMD Connector",
-  "Category": "YTMD Connector",
-  "Description": "Ce plugin Stream Deck permet de contrôler l'application YouTube Music Desktop (https://github.com/ytmdesktop/ytmdesktop)",
-  "fun.shiro.ytmdc.play-pause": {
+  "Name": "Pear Desktop Connector",
+  "Category": "Pear Desktop",
+  "Description": "Contrôlez Pear Desktop avec les touches et molettes Stream Deck via son API Server local.",
+  "io.github.scarfmeister.pear-streamdeck.play-pause": {
     "Name": "Lecture/Pause",
-    "Tooltip": "Jouer ou mettre en pause la musique"
+    "Tooltip": "Lire ou mettre en pause la piste actuelle",
+    "States": [
+      {
+        "Name": "Lecture"
+      },
+      {
+        "Name": "Pause"
+      }
+    ],
+    "Encoder": {
+      "TriggerDescription": {
+        "Rotate": "Sens horaire : piste suivante ; sens antihoraire : piste précédente",
+        "Push": "Lire ou mettre en pause",
+        "Touch": "Actualiser l’affichage"
+      }
+    }
   },
-  "fun.shiro.ytmdc.next": {
+  "io.github.scarfmeister.pear-streamdeck.next": {
     "Name": "Piste suivante",
-    "Tooltip": "Jouer la piste suivante"
+    "Tooltip": "Jouer la piste suivante",
+    "States": [
+      {
+        "Name": "Piste suivante"
+      }
+    ]
   },
-  "fun.shiro.ytmdc.prev": {
+  "io.github.scarfmeister.pear-streamdeck.prev": {
     "Name": "Piste précédente",
-    "Tooltip": "Jouer la piste précédente"
+    "Tooltip": "Jouer la piste précédente",
+    "States": [
+      {
+        "Name": "Piste précédente"
+      }
+    ]
   },
-  "fun.shiro.ytmdc.like": {
-    "Name": "J'aime",
-    "Tooltip": "Mettre un \"J'aime\" à la piste actuelle"
+  "io.github.scarfmeister.pear-streamdeck.like": {
+    "Name": "J’aime",
+    "Tooltip": "Aimer la piste actuelle ou retirer la mention J’aime",
+    "States": [
+      {
+        "Name": "Désactivé"
+      },
+      {
+        "Name": "J’aime"
+      }
+    ]
   },
-  "fun.shiro.ytmdc.dislike": {
-    "Name": "Je n'aime pas",
-    "Tooltip": "Mettre un \"Je n'aime pas\" à la piste actuelle"
+  "io.github.scarfmeister.pear-streamdeck.dislike": {
+    "Name": "Je n’aime pas",
+    "Tooltip": "Ne pas aimer la piste actuelle ou retirer cette mention",
+    "States": [
+      {
+        "Name": "Désactivé"
+      },
+      {
+        "Name": "Je n’aime pas"
+      }
+    ]
   },
-  "fun.shiro.ytmdc.mute": {
+  "io.github.scarfmeister.pear-streamdeck.mute": {
     "Name": "Couper le son",
-    "Tooltip": "Couper ou rétablir le son"
+    "Tooltip": "Couper ou rétablir le son",
+    "States": [
+      {
+        "Name": "Volume"
+      },
+      {
+        "Name": "Muet"
+      }
+    ]
   },
-  "fun.shiro.ytmdc.volume-down": {
+  "io.github.scarfmeister.pear-streamdeck.volume-down": {
     "Name": "Réduire le volume",
-    "Tooltip": "Réduire le volume"
+    "Tooltip": "Réduire le volume",
+    "States": [
+      {
+        "Name": "Réduire le volume"
+      }
+    ]
   },
-  "fun.shiro.ytmdc.volume-up": {
+  "io.github.scarfmeister.pear-streamdeck.volume-up": {
     "Name": "Augmenter le volume",
-    "Tooltip": "Augmenter le volume"
+    "Tooltip": "Augmenter le volume",
+    "States": [
+      {
+        "Name": "Augmenter le volume"
+      }
+    ],
+    "Encoder": {
+      "TriggerDescription": {
+        "Rotate": "Régler le volume selon le pas configuré",
+        "Push": "Basculer le son",
+        "Touch": "Actualiser l’affichage"
+      }
+    }
   },
-  "fun.shiro.ytmdc.song-info": {
+  "io.github.scarfmeister.pear-streamdeck.song-info": {
     "Name": "Infos sur la piste",
-    "Tooltip": "Afficher les informations sur la piste actuelle (titre et image)"
+    "Tooltip": "Afficher les métadonnées ; appuyer pour lire ou mettre en pause",
+    "States": [
+      {
+        "Name": "Infos sur la piste"
+      }
+    ]
   },
-  "fun.shiro.ytmdc.shuffle": {
+  "io.github.scarfmeister.pear-streamdeck.shuffle": {
     "Name": "Lecture aléatoire",
-    "Tooltip": "Activer ou désactiver la lecture aléatoire"
+    "Tooltip": "Basculer l’état réel de lecture aléatoire",
+    "States": [
+      {
+        "Name": "Désactivé"
+      },
+      {
+        "Name": "Aléatoire"
+      }
+    ]
   },
-  "fun.shiro.ytmdc.repeat": {
+  "io.github.scarfmeister.pear-streamdeck.repeat": {
     "Name": "Lecture en boucle",
-    "Tooltip": "Activer ou désactiver la lecture en boucle"
+    "Tooltip": "Changer la répétition : Désactivé, Toutes, Une",
+    "States": [
+      {
+        "Name": "Désactivé"
+      }
+    ]
+  },
+  "io.github.scarfmeister.pear-streamdeck.play-playlist": {
+    "Name": "Lire une playlist",
+    "Tooltip": "Démarrer une playlist configurée par lecture native normale ou aléatoire",
+    "States": [
+      {
+        "Name": "Lire une playlist"
+      }
+    ]
+  },
+  "io.github.scarfmeister.pear-streamdeck.volume-dial": {
+    "Name": "Molette de volume",
+    "Tooltip": "Tourner pour régler le volume ; appuyer pour basculer le son. Affiche l’état réel de Pear.",
+    "States": [
+      {
+        "Name": "Molette de volume"
+      }
+    ],
+    "Encoder": {
+      "TriggerDescription": {
+        "Rotate": "Régler le volume selon le pas configuré",
+        "Push": "Basculer le son",
+        "Touch": "Actualiser l’affichage"
+      }
+    }
+  },
+  "io.github.scarfmeister.pear-streamdeck.transport-dial": {
+    "Name": "Molette de transport",
+    "Tooltip": "Tourner pour changer de piste ; appuyer pour lire ou mettre en pause. Affiche l’état réel de Pear.",
+    "States": [
+      {
+        "Name": "Molette de transport"
+      }
+    ],
+    "Encoder": {
+      "TriggerDescription": {
+        "Rotate": "Sens horaire : piste suivante ; sens antihoraire : piste précédente",
+        "Push": "Lire ou mettre en pause",
+        "Touch": "Actualiser l’affichage"
+      }
+    }
+  },
+  "io.github.scarfmeister.pear-streamdeck.playlist-selector": {
+    "Name": "Molette de sélection de playlist",
+    "Tooltip": "Sélectionner et lire une playlist nommée ; nécessite l’extension API de playlist de Pear.",
+    "States": [
+      {
+        "Name": "Molette de sélection de playlist"
+      }
+    ],
+    "Encoder": {
+      "TriggerDescription": {
+        "Rotate": "Sélectionner une playlist configurée",
+        "Push": "Lire la playlist sélectionnée",
+        "Touch": "Actualiser l’affichage"
+      }
+    }
   },
   "Localization": {
-    "PI": {
-      "HOST": "Hôte",
-      "PORT": "Port",
-      "VOLUME_STEPS": "Taille des pas",
-      "SAVE": "Sauvegarder",
-      "AUTOMATIC_SAVE": "Ce paramètre sera sauvegardé automatiquement",
-      "AUTH_BUTTON": "Lier à YTMDesktop",
-      "AUTH_STATUS": "Statut",
-      "AUTH_STATUS_CONNECTING": "Connexion...",
-      "AUTH_STATUS_AUTHORIZING": "Autorisation...",
-      "AUTH_STATUS_NOT_CONNECTED": "Non authentifié",
-      "AUTH_STATUS_CONNECTED": "Authentifié",
-      "AUTH_STATUS_ERROR": "Authentification échouée :",
-      "AUTH_CODE_STATUS": "CODE D’AUTH : {code}\n\n{compare}",
-      "AUTH_CODE_COMPARE": "Comparez le code avec celui de l'application YTMDesktop et confirmer l'autorisation.",
-      "DISPLAY_FORMAT": "Format d'affichage",
-      "SUPPORT_FEEDBACK_TITLE": "Support & Retours",
-      "SUPPORT_FEEDBACK_TEXT": "Vous avez trouvé un bug ? Vous avez une idée de fonctionnalité ?<br>Vous pouvez les envoyer sur <a href=\"https://github.com/XeroxDev/YTMD-StreamDeck/issues/new/choose\" rel=\"noopener\" target=\"_blank\">GitHub</a> ou sur <a href=\"https://x.xeroxdev.de/s/discord\" rel=\"noopener\" target=\"_blank\">Discord</a> !",
-      "VAR_USAGE": "<p><strong>Variables disponibles :</strong> {current}, {remaining}, {duration}</p><p><strong>Valeurs spéciales :</strong> :S = en secondes, :H = format naturel (par défaut)</p><p><strong>Utilisation :</strong> {remaining:S} pour afficher le temps restant en secondes</p>",
-    "TOGGLE": "Basculer",
-    "PAUSE": "Pause",
-    "PLAY": "Lecture",
-    "ACTION": "Action",
-      "PLAYLIST": "Playlist",
-      "PLAYLIST_URL": "URL de la playlist",
-      "PLAYLIST_URL_STATUS": "Statut de l’URL de la playlist",
-      "PLAYLIST_URL_STATUS_VALID": "URL de playlist valide",
-      "PLAYLIST_URL_STATUS_INVALID": "URL invalide",
-      "PLAYLIST_URL_STATUS_MISSING_LIST": "L’URL doit inclure un paramètre list",
-      "PLAYLIST_SOURCE": "Source de la playlist",
-      "PLAYLIST_SOURCE_HELP": "Utilisez une option ci-dessous. L’URL a la priorité sur la sélection.",
-      "PLAYLIST_REFRESH": "Actualiser les playlists",
-      "PLAYLIST_ERROR_TITLE": "Erreur de playlist",
-      "PLAYLIST_ERROR_RATE_LIMIT": "Limite atteinte lors du chargement des playlists. Réessayez dans {seconds, plural, one {# seconde} other {# secondes}}.",
-      "PLAYLIST_SELECT": "Sélectionner une playlist",
-      "PLAYLIST_AUTH_HINT": "Autorisez via les paramètres de connexion ci-dessus.",
-      "GLOBAL_SETTINGS_TITLE": "Paramètres de connexion",
-      "CONNECTION_STATUS": "Statut de connexion",
-      "CONNECTION_STATUS_CONNECTED": "Connecté",
-      "CONNECTION_STATUS_DISCONNECTED": "Déconnecté",
-      "CONNECTION_STATUS_AUTH_REQUIRED": "Non authentifié",
-      "CONNECTION_STATUS_CHECKING": "Vérification...",
-      "CONNECTION_STATUS_RATE_LIMIT": "Limite atteinte. Nouvel essai dans {seconds, plural, one {# seconde} other {# secondes}}.",
-      "CONNECTION_STATUS_NOT_CHECKED": "Pas encore vérifié"
+    "Strings": {
+      "Host": "Hôte",
+      "Port": "Port",
+      "Protocol": "Protocole",
+      "HTTPS": "HTTPS",
+      "HTTP (local default)": "HTTP (valeur locale par défaut)",
+      "Step (%)": "Pas (%)",
+      "Display": "Affichage",
+      "Title": "Titre",
+      "Artist": "Artiste",
+      "Title + Artist": "Titre + Artiste",
+      "Album": "Album",
+      "Title + Artist + Album": "Titre + Artiste + Album",
+      "Playlist": "Playlist",
+      "Playlist URL or ID": "URL ou ID de playlist",
+      "Follow Shuffle State": "Suivre l’état aléatoire",
+      "Always Normal": "Toujours normal",
+      "Always Shuffle": "Toujours aléatoire",
+      "Start mode": "Mode de démarrage",
+      "Add playlist": "Ajouter une playlist",
+      "Save action settings": "Enregistrer les paramètres de l’action",
+      "Save connection": "Enregistrer la connexion",
+      "Reauthorize": "Autoriser à nouveau",
+      "Connection": "Connexion",
+      "Authorization": "Autorisation",
+      "Checking": "Vérification",
+      "Waiting for plugin": "En attente du plugin",
+      "Waiting for host settings": "En attente des paramètres de l’hôte",
+      "Connecting": "Connexion en cours",
+      "Approve in Pear": "Approuver dans Pear",
+      "Waiting for player state": "En attente de l’état du lecteur",
+      "Connected": "Connecté",
+      "Pear unavailable": "Pear indisponible",
+      "Use Reauthorize": "Choisir Autoriser à nouveau",
+      "Settings could not be saved": "Paramètres non enregistrés",
+      "Waiting for approval in Pear": "En attente d’approbation dans Pear",
+      "Authorized": "Autorisé",
+      "Authentication disabled": "Authentification désactivée",
+      "Authorization required": "Autorisation requise",
+      "Denied": "Refusé",
+      "Unknown": "Inconnu",
+      "; retry in {seconds}s": " ; nouvel essai dans {seconds}s",
+      "Settings sent to Stream Deck.": "Paramètres envoyés à Stream Deck.",
+      "Could not save action settings.": "Impossible d’enregistrer les paramètres de l’action.",
+      "Playlist entry": "Entrée de playlist",
+      "Name": "Nom",
+      "URL or ID": "URL ou ID",
+      "Image": "Image",
+      "Playlist image preview": "Aperçu de l’image de la playlist",
+      "Clear image": "Effacer l’image",
+      "Remove entry": "Supprimer l’entrée",
+      "Wait for the selected image to finish loading before saving.": "Attendez la fin du chargement de l’image avant d’enregistrer.",
+      "Choose a PNG or JPEG of at most 24 KiB.": "Choisissez un PNG ou JPEG de 24 KiB maximum.",
+      "Could not read a valid PNG or JPEG image.": "Impossible de lire une image PNG ou JPEG valide.",
+      "No track": "Aucune piste",
+      "Unknown title": "Titre inconnu",
+      "Unknown artist": "Artiste inconnu",
+      "No album": "Aucun album",
+      "Muted": "Muet",
+      "Volume": "Volume",
+      "Mute unknown": "État muet inconnu",
+      "Playing": "Lecture",
+      "Paused / stopped": "En pause / arrêté",
+      "Playback unknown": "Lecture inconnue",
+      "Normal": "Normal",
+      "Shuffle": "Aléatoire",
+      "Follow (?)": "Suivre (?)",
+      "Follow: shuffle": "Suivre : aléatoire",
+      "Follow: normal": "Suivre : normal",
+      "Unnamed playlist": "Playlist sans nom",
+      "Set playlists": "Configurer les playlists",
+      "Configure in settings": "Configurer dans les paramètres",
+      "Invalid playlist entry": "Entrée de playlist invalide",
+      "Press to play": "Appuyer pour lire",
+      "Pear offline": "Pear hors ligne",
+      "Set playlist": "Configurer la playlist",
+      "Update Pear": "Mettre à jour Pear",
+      "Unavailable": "Indisponible",
+      "Start failed": "Échec du démarrage",
+      "Off": "Désactivé",
+      "All": "Toutes",
+      "One": "Une piste",
+      "Pause": "Pause",
+      "Play": "Lecture",
+      "Refresh display": "Actualiser l’affichage",
+      "Adjust volume by the configured step": "Régler le volume selon le pas configuré",
+      "Toggle mute": "Basculer le son",
+      "Clockwise next track; counter-clockwise previous track": "Sens horaire : piste suivante ; sens antihoraire : piste précédente",
+      "Play or pause": "Lire ou mettre en pause",
+      "Select a configured playlist": "Sélectionner une playlist configurée",
+      "Play the selected playlist": "Lire la playlist sélectionnée",
+      "Native playlist command dispatched. Check Pear state for playback.": "Commande native de playlist envoyée. Vérifiez la lecture dans l’état de Pear.",
+      "Playlist startup failed.": "Échec du démarrage de la playlist.",
+      "Native playlist startup requires a Pear build with the playlist API extension.": "Le démarrage natif des playlists nécessite une version de Pear avec l’extension API de playlist.",
+      "Pear cannot safely use this playlist's native control in the current player state. No startup was dispatched.": "Pear ne peut pas utiliser cette commande native en toute sûreté dans l’état actuel du lecteur. Aucun démarrage n’a été envoyé.",
+      "Playlist startup could not be confirmed. Playback may have started; no automatic retry was sent.": "Démarrage de playlist non confirmé. La lecture peut avoir commencé ; aucun nouvel essai automatique n’a été envoyé.",
+      "Configure a valid name and playlist URL or ID for the selected entry.": "Configurez un nom et une URL ou ID de playlist valides pour l’entrée sélectionnée.",
+      "Volume step must be a whole percentage from 1 to 100.": "Le pas de volume doit être un pourcentage entier de 1 à 100.",
+      "Choose a supported Track Info format.": "Choisissez un format d’informations de piste pris en charge.",
+      "Choose a supported playlist startup mode.": "Choisissez un mode de démarrage de playlist pris en charge.",
+      "This action has no per-action settings.": "Cette action n’a pas de paramètres spécifiques.",
+      "Follow Shuffle State needs the current Pear shuffle state.": "Suivre l’état aléatoire nécessite l’état aléatoire actuel de Pear.",
+      "Connection settings must be an object.": "Les paramètres de connexion doivent être un objet.",
+      "Host must be a hostname or IP address.": "L’hôte doit être un nom d’hôte ou une adresse IP.",
+      "Host is invalid.": "Hôte invalide.",
+      "Port must be an integer from 1 to 65535.": "Le port doit être un entier de 1 à 65535.",
+      "Protocol must be http or https.": "Le protocole doit être http ou https.",
+      "Pear settings must be an object.": "Les paramètres de Pear doivent être un objet.",
+      "Unsupported Pear settings version.": "Version des paramètres de Pear non prise en charge.",
+      "Saved connection settings are invalid.": "Les paramètres de connexion enregistrés sont invalides.",
+      "Could not update connection settings.": "Impossible de modifier les paramètres de connexion.",
+      "Pear request failed (HTTP {status}).": "Échec de la requête Pear (HTTP {status}).",
+      "Pear request failed ({code}).": "Échec de la requête Pear ({code}).",
+      "Configure at most 16 playlists.": "Configurez 16 playlists au maximum.",
+      "Playlist {index} needs a name of 1–64 characters.": "La playlist {index} nécessite un nom de 1 à 64 caractères.",
+      "Playlist {index} needs a valid playlist URL or ID.": "La playlist {index} nécessite une URL ou un ID de playlist valide.",
+      "Choose a supported startup mode for playlist {index}.": "Choisissez un mode de démarrage pris en charge pour la playlist {index}.",
+      "Playlist {index} image must be an embedded PNG or JPEG of at most 24 KiB.": "L’image de la playlist {index} doit être un PNG ou JPEG intégré de 24 KiB maximum.",
+      "Project and current status": "Projet et état actuel",
+      "Pear Desktop Connector — Settings": "Pear Desktop Connector — Paramètres",
+      "Connection settings apply to all Pear keys and dials.": "Les paramètres de connexion s’appliquent à toutes les touches et molettes Pear.",
+      "Whole percentages from 1 to 100. Default: 5%. Volume stays within 0–100%.": "Pourcentages entiers de 1 à 100. Défaut : 5 %. Le volume reste entre 0 et 100 %.",
+      "Configure up to 16 playlists. Rotate to select; press to play. Selection is saved per dial.": "Configurez jusqu’à 16 playlists. Tournez pour sélectionner ; appuyez pour lire. La sélection est enregistrée par molette.",
+      "Names: 1–64 characters. Optional images: PNG or JPEG up to 24 KiB, stored with this action.": "Noms : 1 à 64 caractères. Images facultatives : PNG ou JPEG jusqu’à 24 KiB, enregistrées avec cette action.",
+      "Follow Shuffle State reads Pear's real shuffle state when pressed. Playlist playback requires a compatible Pear build with the native playlist API extension.": "Suivre l’état aléatoire lit l’état réel de Pear à l’appui. La lecture de playlists nécessite une version compatible de Pear avec l’extension API native.",
+      "Long lines are shortened to fit a key. Enable Show Title and clear a custom Stream Deck title to see metadata.": "Les longues lignes sont raccourcies pour la touche. Activez l’affichage du titre et effacez le titre personnalisé Stream Deck pour voir les métadonnées.",
+      "Save extracts and stores the playlist ID. Follow uses Pear's actual shuffle state when pressed.": "Enregistrer extrait et conserve l’ID de playlist. Suivre utilise l’état aléatoire réel de Pear à l’appui.",
+      "Playlist playback requires a compatible Pear build with the native playlist API extension. Pear 3.12.0 cannot start playlists. A missing or unsupported native operation alerts; no fallback playback is sent.": "La lecture de playlists nécessite une version compatible de Pear avec l’extension API native. Pear 3.12.0 standard ne peut pas démarrer de playlists. Une commande native absente ou non prise en charge déclenche une alerte ; aucune lecture de secours n’est envoyée.",
+      "Clockwise increases volume or skips to the next track; counter-clockwise decreases volume or goes to the previous track. Volume press toggles mute; Transport press plays or pauses. Playlist Selector rotation changes the selected entry. A short touch refreshes the display; a hold does nothing. Clear custom host title/icon overrides to see Pear's display.": "Le sens horaire augmente le volume ou passe à la piste suivante ; le sens antihoraire le réduit ou revient à la piste précédente. Appuyer sur Volume bascule le son ; sur Transport, lit ou met en pause. Tourner le sélecteur change l’entrée. Un bref toucher actualise l’affichage ; un appui long ne fait rien. Effacez les titres/icônes personnalisés pour voir l’affichage Pear.",
+      "Enable Pear's API Server. For local use, bind it to 127.0.0.1:26538. Approve the first request in Pear. A denied or revoked authorization needs Reauthorize.": "Activez API Server dans Pear. Pour un usage local, liez-le à 127.0.0.1:26538. Approuvez la première demande dans Pear. Une autorisation refusée ou révoquée nécessite Autoriser à nouveau.",
+      "Approve\nin Pear": "Approuver\ndans Pear",
+      "Pear\noffline": "Pear\nhors ligne",
+      "Play\nplaylist": "Lire la\nplaylist",
+      "Update\nPear": "Mettre à jour\nPear",
+      "On": "Activé",
+      "Enter a playlist ID or a YouTube playlist/watch URL with one valid list value.": "Saisissez un identifiant de playlist ou une URL YouTube de playlist/vidéo contenant une seule valeur list valide.",
+      "Stream Deck global settings are not loaded yet.": "Les paramètres globaux de Stream Deck ne sont pas encore chargés."
     }
   }
 }
