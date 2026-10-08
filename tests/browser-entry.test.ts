@@ -5,7 +5,8 @@ import {runInNewContext} from 'node:vm';
 import {FakeScheduler, empty, json, PLAYER_INFO, settle} from './helpers';
 import {ActionTypes} from '../src/interfaces/enums';
 
-function browser(entry: 'pear-plugin' | 'pear-pi', options: {action?: string; settings?: unknown; piUuid?: string; language?: string} = {}) {
+function browser(entry: 'pear-plugin' | 'pear-pi', options: {action?: string; settings?: unknown; piUuid?: string;
+    actionContext?: string; language?: string} = {}) {
     const clock = new FakeScheduler();
     const sockets: HostSocket[] = [];
     const requests: {url: string; init?: RequestInit}[] = [];
@@ -75,10 +76,12 @@ function browser(entry: 'pear-plugin' | 'pear-pi', options: {action?: string; se
             return String(url).endsWith('/like-state') ? json({state: 'LIKE'}) : empty();
         },
     });
-    const info = JSON.stringify({application: {language: options.language ?? 'en'}, devices: []});
-    window.connectElgatoStreamDeckSocket!('12345', entry === 'pear-plugin' ? 'plugin' : options.piUuid ?? 'ctx',
+    const info = JSON.stringify({application: {language: options.language ?? 'en', platform: 'windows',
+        platformVersion: '10.0.26200', version: '7.4.2.22730'}, devices: []});
+    window.connectElgatoStreamDeckSocket!('12345', entry === 'pear-plugin' ? 'plugin' : options.piUuid ?? 'pi-registration',
         entry === 'pear-plugin' ? 'registerPlugin' : 'registerPropertyInspector', info,
-        JSON.stringify({action: options.action ?? 'io.github.scarfmeister.pear-streamdeck.next', context: 'ctx', payload: {settings: options.settings ?? {}}}));
+        JSON.stringify({action: options.action ?? 'io.github.scarfmeister.pear-streamdeck.next',
+            context: options.actionContext ?? 'ctx', payload: {settings: options.settings ?? {}}}));
     const host = sockets[0];
     host.open();
     return {host, sockets, clock, requests, elements, readers};
@@ -135,6 +138,70 @@ test('browser PI sends connection messages through the host and opens no Pear tr
     assert.equal(b.requests.length, 0);
     b.host.close();
 });
+
+test('registered PI initial getSettings uses the UI registration UUID, distinct from action UUID and instance', () => {
+    const piUuid = 'initial-ui-registration';
+    const action = ActionTypes.VOLUME_DOWN;
+    const actionContext = 'initial-volume-key-instance';
+    assert.equal(new Set([piUuid, action, actionContext]).size, 3);
+    const b = browser('pear-pi', {piUuid, action, actionContext});
+    const registration = b.host.sent.find(message => message.event === 'registerPropertyInspector')!;
+    assert.equal(registration.uuid, piUuid);
+    assert.deepEqual(b.host.sent.filter(message => message.event === 'getSettings'),
+        [{event: 'getSettings', context: registration.uuid}]);
+    assert.equal(b.requests.length, 0); assert.equal(b.sockets.length, 1);
+    b.host.close();
+});
+
+test('registered PI Save action settings uses the UI registration context for setSettings and readback', async () => {
+    const piUuid = 'save-ui-registration';
+    const action = ActionTypes.VOLUME_UP;
+    const actionContext = 'saved-volume-key-instance';
+    assert.equal(new Set([piUuid, action, actionContext]).size, 3);
+    const b = browser('pear-pi', {piUuid, action, actionContext, settings: {steps: 5, retained: true}});
+    const registration = b.host.sent.find(message => message.event === 'registerPropertyInspector')!;
+    b.host.receive({event: 'didReceiveGlobalSettings', payload: {settings: {}}});
+    await b.clock.advance(1);
+    b.elements.get('volumeStep')!.value = '7'; b.elements.get('volumeStep')!.input();
+    b.elements.get('actionSave')!.onclick!();
+    assert.deepEqual(b.host.sent.filter(message => message.event === 'setSettings'),
+        [{event: 'setSettings', context: registration.uuid, payload: {steps: 7, retained: true}}]);
+    assert.deepEqual(b.host.sent.filter(message => message.event === 'getSettings'),
+        [{event: 'getSettings', context: registration.uuid}, {event: 'getSettings', context: registration.uuid}]);
+    assert.equal(b.requests.length, 0); assert.equal(b.sockets.length, 1);
+    b.host.close();
+});
+
+for (const [type, control] of [
+    ['pear-get-status', undefined], ['pear-save-connection', 'globalSave'], ['pear-reauthorize', 'globalAuthButton'],
+] as const) {
+    test(`registered PI ${type} uses its UI context and preserves the action UUID`, async () => {
+        const piUuid = `${type}-ui-registration`;
+        const action = ActionTypes.VOLUME_DIAL;
+        const actionContext = `${type}-dial-instance`;
+        assert.equal(new Set([piUuid, action, actionContext]).size, 3);
+        const b = browser('pear-pi', {piUuid, action, actionContext});
+        const registration = b.host.sent.find(message => message.event === 'registerPropertyInspector')!;
+        assert.equal(registration.uuid, piUuid);
+        b.host.receive({event: 'didReceiveGlobalSettings', payload: {settings: {}}});
+        await b.clock.advance(1);
+        if (control === 'globalSave') {
+            b.elements.get('globalHost')!.value = '127.0.0.1';
+            b.elements.get('globalPort')!.value = '26538';
+            b.elements.get('globalProtocol')!.value = 'http';
+        }
+        if (control) b.elements.get(control)!.onclick!();
+        const messages = b.host.sent.filter(message => message.event === 'sendToPlugin' &&
+            (message.payload as {type: string}).type === type);
+        assert.deepEqual(messages, [{event: 'sendToPlugin', context: registration.uuid, action,
+            payload: type === 'pear-save-connection'
+                ? {type, configuration: {host: '127.0.0.1', port: '26538', protocol: 'http'}} : {type}}]);
+        assert.notEqual(messages[0].context, actionContext);
+        assert.notEqual(messages[0].context, action);
+        assert.equal(b.requests.length, 0); assert.equal(b.sockets.length, 1);
+        b.host.close();
+    });
+}
 
 test('German and French PI status/errors are translated while saved settings retain their programmatic values', async () => {
     for (const [language, connected, auth, invalid] of [
@@ -215,11 +282,12 @@ test('browser host events render the manifest playback images and three distinct
     assert.equal(b.clock.tasks.size, 0);
 });
 
-test('PI volume defaults/validation/persistence use the action context, retaining early host settings and unsaved edits', async () => {
+test('PI volume settings use registered UI routing, retaining early action settings and unsaved edits', async () => {
     const action = 'io.github.scarfmeister.pear-streamdeck.volume-down';
     const b = browser('pear-pi', {action, settings: {steps: 1}, piUuid: 'ui-registration'});
     const update = (settings: unknown) => b.host.receive({event: 'didReceiveSettings', action, context: 'ctx', payload: {settings}});
-    assert.ok(b.host.sent.some(message => message.event === 'getSettings' && message.action === action && message.context === 'ctx'));
+    assert.deepEqual(b.host.sent.filter(message => message.event === 'getSettings'),
+        [{event: 'getSettings', context: 'ui-registration'}]);
     update({steps: '10', retained: true}); // Arrives before setupReady.
     b.host.receive({event: 'didReceiveGlobalSettings', payload: {settings: {}}});
     await b.clock.advance(1);
@@ -235,8 +303,7 @@ test('PI volume defaults/validation/persistence use the action context, retainin
     assert.equal(b.host.sent.filter(m => m.event === 'setSettings').length, 0);
     input.value = '2'; input.input(); b.elements.get('actionSave')?.onclick?.();
     const write = b.host.sent.filter(m => m.event === 'setSettings').at(-1)!;
-    assert.equal(write.action, action); assert.equal(write.context, 'ctx');
-    assert.deepEqual(write.payload, {steps: 2, retained: 'new'});
+    assert.deepEqual(write, {event: 'setSettings', context: 'ui-registration', payload: {steps: 2, retained: 'new'}});
     assert.equal(b.host.sent.filter(m => m.event === 'setGlobalSettings').length, 0);
     assert.equal(b.requests.length, 0); assert.equal(b.sockets.length, 1);
     update({steps: 'invalid'}); assert.equal(input.value, '5');
@@ -398,7 +465,7 @@ test('selector PI edits/normalizes entries, preserves rotation during edits, and
     const png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRmkAAAAASUVORK5CYII=';
     b.readers[0].finish(png); b.elements.get('actionSave')?.onclick?.();
     const saved = b.host.sent.filter(m => m.event === 'setSettings').at(-1)!;
-    assert.equal(saved.action, action); assert.equal(saved.context, 'ctx');
+    assert.equal(saved.context, 'inspector-id'); assert.equal(Object.hasOwn(saved, 'action'), false);
     assert.deepEqual(saved.payload, {selectedIndex: 1, retained: true, playlists: [
         {name: '<b>New name</b>', playlistId: 'New', startupMode: 'FOLLOW_SHUFFLE_STATE', image: png},
         {name: 'Second', playlistId: 'Second', startupMode: 'FOLLOW_SHUFFLE_STATE'}]});

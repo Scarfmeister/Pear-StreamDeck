@@ -28,19 +28,6 @@ class PearPi extends StreamDeckPropertyInspectorHandler {
     private selector?: PlaylistSelectorEditor;
     private t: Translate = translator('en');
 
-    // The retained framework omits action and assumes the PI UUID is the action context.
-    override requestSettings(): void {
-        this.send('getSettings', {action: this.actionInfo.action, context: this.actionInfo.context});
-    }
-
-    override setSettings<T>(settings: T): void {
-        this.send('setSettings', {action: this.actionInfo.action, context: this.actionInfo.context, payload: settings});
-    }
-
-    override sendToPlugin(payload: unknown, action?: string): void {
-        this.send('sendToPlugin', {action: action ?? this.actionInfo.action, context: this.actionInfo.context, payload});
-    }
-
     @SDOnPiEvent('setupReady')
     ready() {
         this.t = translator(this.info.application.language);
