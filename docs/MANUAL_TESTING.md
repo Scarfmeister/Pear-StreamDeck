@@ -1,5 +1,11 @@
 # Manual testing
 
+## New roadmap Stage 1 freeze and next acceptance
+
+[Baseline checkpoint](checkpoints/roadmap-stage-01-baseline-freeze.md) freezes the evidence below; Stage 1 runs no new hardware tests and changes no result to Pass. Before Stage 2, complete the [manual-test usability stage D023](DECISIONS.md#d023--manual-test-usability-prerequisite): investigate Python/Tkinter or a reorganized/generated document. This Markdown remains durable evidence, not necessarily the primary interactive interface. No tool was built here.
+
+Stage 2 should first execute the corrected Windows PI routing retest below, then outstanding authentication/restart/persistence, complete volume bounds/custom/invalid settings, keys/dials/recovery, signed-in native playlist and other-host matrix scenarios. Record each scenario separately; K05/D01 remain partial. Current installed “Transport Dial” is the legacy label for future **Control Dial**. Existing touch tests verify refresh-only behavior; D022 future short/long-touch choices must not be treated as current expectations or applied to normal keys.
+
 Current acceptance target: the fresh installer at implementation **`23cf3daa14d45a27310551d7ee727bdfaceba587`**, recorded in the [PI context bug-fix checkpoint](checkpoints/manual-bugfix-02-pi-context.md), on [PR #1](https://github.com/Scarfmeister/Pear-StreamDeck/pull/1). It retains the Windows-minimum correction and fixes rejected PI messages. Initial Windows installation/backend evidence and the failed connection/authentication PI checks are recorded below; **full PI post-fix retest is Pending; the scoped Windows volume pass is recorded below**. The 42-row matrix remains the release gate; partial observations do not complete an entire row. See [HANDOFF.md](HANDOFF.md) for setup; older sections are historical evidence.
 
 ## Windows volume acceptance — corrected Pear API

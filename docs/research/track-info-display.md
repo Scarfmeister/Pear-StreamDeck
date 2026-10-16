@@ -1,5 +1,7 @@
 # Track Info title/layout limits
 
+**Stage 0 authority (2026-10-16):** [D022](../DECISIONS.md#d022--stage-0-productux-authority-for-the-new-sequential-roadmap) supersedes conflicting future UX recommendations here. Baseline implementation/evidence below remains historical; no redesign was implemented in Stage 1.
+
 Stage 5 investigation, 2026-10-04. Reviewed readable metadata formats and the host's title controls.
 
 ## Sources

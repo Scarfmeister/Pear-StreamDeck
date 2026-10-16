@@ -1,5 +1,9 @@
 # Pear Desktop Connector
 
+## Pre-redesign baseline
+
+[New roadmap Stage 1 checkpoint](docs/checkpoints/roadmap-stage-01-baseline-freeze.md) pins both integration repositories and separates existing automated results from partial device evidence. The redesign has not started. [Stage 0 decisions](docs/DECISIONS.md#d022--stage-0-productux-authority-for-the-new-sequential-roadmap) govern future UX: **Control Dial** is the planned name; the baseline installer still uses **Transport Dial**. Track Info remains the key name. Future artwork/text, touch, Queue/Seek and playlist-write requirements are not shipped. Next is the manual-test usability stage before Stage 2; no runner was implemented in Stage 1.
+
 Control [Pear Desktop](https://github.com/pear-devs/pear-desktop) from Stream Deck keys and Stream Deck Plus dials. One shared connection uses Pear's local API Server; displays follow actual player state, including changes made in Pear.
 
 **Development preview:** Stage 9 completed the automated audit and opened [PR #1](https://github.com/Scarfmeister/Pear-StreamDeck/pull/1), still unmerged. The user observed Windows 11 installation/actions/backend startup, then a PI routing failure. The [PI bug fix](docs/checkpoints/manual-bugfix-02-pi-context.md) passes all automated gates; its full PI Windows retest is **Pending**. Windows volume keys and Plus dial pass the observed subset with the corrected Pear API; remaining device controls, approval/persistence, other hosts and signed-in native playlist playback still require [manual acceptance](docs/MANUAL_TESTING.md#stage-8-release-validation-matrix). [Handoff](docs/HANDOFF.md) records commits/package; no release or hardware certification is claimed.
@@ -74,7 +78,7 @@ A missing route shows **Update Pear**. Unsupported native controls show **Unavai
 
 ## Known limitations
 
-- Windows 11 Pro 25H2 /10.0.26200, Stream Deck 7.4.2.22730 installed the previous corrected package and connected its backend, but rejected PI messages. The inherited-framework routing is now restored; [Windows retest](docs/MANUAL_TESTING.md#windows-pi-routing-retest) is pending. Keys/Plus displays, macOS/OpenDeck/Flatpak, language rendering and host token/settings persistence remain unverified.
+- Windows 11 Pro 25H2 /10.0.26200, Stream Deck 7.4.2.22730 installed the previous corrected package and connected its backend, but rejected PI messages. The inherited-framework routing is now restored; [Windows retest](docs/MANUAL_TESTING.md#windows-pi-routing-retest) is pending. The observed Windows volume-key/Plus subset is recorded separately; other controls/displays, macOS/OpenDeck/Flatpak, language rendering and host token/settings persistence remain unverified.
 - Pear 3.12.0 does not push ratings. Same-track ratings changed elsewhere can remain stale until track change, reconnect or a connector rating command. Unsupported legacy shuffle-off alerts and stays visibly on.
 - Pear's cold cached routes can be incomplete before playback. An open but stalled WebSocket can retain stale state until recovery; there is no heartbeat or constant polling. Failed/unconfirmed commands alert without inventing state.
 - Native playlist support rejects unsafe/missing website controls. The separate Pear fork retains upstream formatting warnings; see [Stage 7](docs/checkpoints/stage-07.md). OBS metadata export is outside scope; use Pear's Tuna integration separately.

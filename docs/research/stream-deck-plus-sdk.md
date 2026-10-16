@@ -1,5 +1,7 @@
 # Stream Deck Plus SDK/runtime verification
 
+**Stage 0 authority (2026-10-16):** [D022](../DECISIONS.md#d022--stage-0-productux-authority-for-the-new-sequential-roadmap) supersedes conflicting future UX recommendations here. Baseline implementation/evidence below remains historical; no redesign was implemented in Stage 1.
+
 Stage 6 investigation, 2026-10-04, completed before relying on encoder behavior. Starting plugin commit: `4ef25ac918f1557c1dcdc87110414388c18e98df`. Rechecked Stage 1 D002/D007 and architecture audit, then inspected the exact retained package and pinned OpenDeck implementation.
 
 ## Versions and sources

@@ -1,5 +1,7 @@
 # Property Inspector settings routing
 
+**Stage 0 authority (2026-10-16):** [D022](../DECISIONS.md#d022--stage-0-productux-authority-for-the-new-sequential-roadmap) supersedes conflicting future UX recommendations here. Baseline implementation/evidence below remains historical; no redesign was implemented in Stage 1.
+
 **Correction after real Windows acceptance (2026-10-07):** Stage 5's outbound action-context inference was wrong. Stream Deck 7.4.2 rejects those overrides; use the inherited 3.3.4 PI methods with the **PI registration UUID** as outbound context. [Context-routing research](property-inspector-context-routing.md) records the runtime evidence, exact pinned source and regression tests; D021 supersedes that part of D015. The Stage 5 investigation date below remains historical.
 
 Stage 5 investigation, 2026-10-04. Reviewed per-action persistence, initial settings, host messages, and the existing framework before implementation.

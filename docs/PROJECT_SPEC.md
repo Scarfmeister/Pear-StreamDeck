@@ -1,5 +1,9 @@
 I want you to build a complete Stream Deck plugin for Pear Desktop, using the existing YTMD Connector Stream Deck plugin as the starting point.
 
+## Current authority — new roadmap Stage 1
+
+The original supplied specification below is historical input. [Stage 0 decisions D022](DECISIONS.md#d022--stage-0-productux-authority-for-the-new-sequential-roadmap) supersede conflicting future product/UX recommendations, including Control Dial naming, independent artwork/text, touch settings and immediate PI editing. [Baseline freeze](checkpoints/roadmap-stage-01-baseline-freeze.md) records what actually exists. These accepted future requirements are not implementation claims.
+
 You have permission to use my connected GitHub account. Carry this project through to a working implementation rather than stopping at a design or code examples.
 
 ## Repositories
@@ -535,5 +539,4 @@ At completion, give me:
 - Any remaining manual testing I need to perform on my Stream Deck Plus
 - Any Pear-side change still required
 GitHub
-
 

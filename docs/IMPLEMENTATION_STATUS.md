@@ -1,6 +1,10 @@
 # Implementation status
 
-Current work: **Authorized documentation-only Windows volume manual acceptance update**. No new stage is started.
+## New roadmap Stage 1 — baseline frozen
+
+Documentation-only baseline: [checkpoint](checkpoints/roadmap-stage-01-baseline-freeze.md). Runtime remains the PI-corrected implementation at `23cf3daa14d45a27310551d7ee727bdfaceba587`; pre-freeze documentation head is `7a843269dc8b327adbbc9646b75ab3259ab80f23`. The redesign has not started. D022 records accepted future UX, not shipped features; the installed dial still says Transport Dial, Track Info uses five text formats/static imagery, and PI editing still uses Save. Existing Queue/Seek/Add-to-Playlist proposals are not implemented. Next: D023 manual-test usability stage before Stage 2. Results below are retained historical validation, not Stage 1 reruns.
+
+Current work: **New roadmap Stage 1 documentation-only baseline freeze**. Historical results below remain scoped to their original validation; the redesign has not started.
 
 Automated implementation: **complete and verified** at **`23cf3daa14d45a27310551d7ee727bdfaceba587`**. The local full clean pipeline passes after restoring the locked framework's PI methods. [Fork PR #1](https://github.com/Scarfmeister/Pear-StreamDeck/pull/1) remains `dev/pear-port` → `master`, **unmerged**; its [checks](https://github.com/Scarfmeister/Pear-StreamDeck/pull/1/checks), remote and PR heads are verified before stopping. The closing `docs: record PI context bug fix and Windows retest` commit records the package/evidence; [bug-fix checkpoint](checkpoints/manual-bugfix-02-pi-context.md) gives exact commands and commit retrieval. Starting head was `4115640764a1ac449c0fa1bac9c7da34b1a6607e`; the previous Windows-manifest correction remains in place.
 

@@ -1,5 +1,9 @@
 # Pear Desktop Connector — final engineering handoff
 
+## New sequential roadmap — resume here
+
+Stage 1 baseline freeze completed as documentation work only; [checkpoint](checkpoints/roadmap-stage-01-baseline-freeze.md) pins both repositories and evidence. [D022](DECISIONS.md#d022--stage-0-productux-authority-for-the-new-sequential-roadmap) is the authoritative Stage 0 future UX overlay; earlier design recommendations remain historical. No full edited roadmap is stored here; use the external sequential roadmap for scheduling. Next action is the D023 manual-test tooling/usability stage **before Stage 2**, unless the user explicitly chooses direct Stage 2. Do not implement redesign, merge PR #1/integration branches, release, or open an upstream Pear PR from this handoff. Earlier “next action” paragraphs below are superseded by this ordering.
+
 Stage 9 completed the automated audit and opened the fork PR. The Windows-version correction remains in place: minimum **10** covers Windows 11's reported 10.0. Subsequent real Windows acceptance found that PI messages used the action instance context and were rejected by Stream Deck. [Manual bug fix 02](checkpoints/manual-bugfix-02-pi-context.md) restores the inherited PI registration routing, reruns all gates and supersedes the installer. Initial installation/action availability/backend startup were observed; corrected PI/approval/persistence acceptance is **Pending**. Windows volume keys and Plus dial now pass the observed subset with the corrected Pear build; other device/native playback gates remain unverified. This scoped fix starts no new stage; do not merge, release or open an upstream Pear PR.
 
 ## Repository and exact revisions

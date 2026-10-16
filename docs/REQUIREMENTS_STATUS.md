@@ -1,6 +1,19 @@
 # Requirements status — final Stage 9 audit
 
-Canonical requirements: [PROJECT_SPEC.md](PROJECT_SPEC.md), preserved unchanged. This matrix covers every substantive specification area and the persistent Stage 4–9 requirements. Read [Stage 9 validation](checkpoints/stage-09.md), [current status](IMPLEMENTATION_STATUS.md) and [manual acceptance](MANUAL_TESTING.md) together. An automated classification establishes the named code/contract boundary; it never establishes installed hardware or signed-in playback. “Manual hardware verification” below includes the necessary live Pear/host acceptance accompanying device tests.
+## New roadmap status overlay — 2026-10-16
+
+[Baseline checkpoint](checkpoints/roadmap-stage-01-baseline-freeze.md) freezes existing evidence. Original classifications below apply to the implemented baseline. [D022](DECISIONS.md#d022--stage-0-productux-authority-for-the-new-sequential-roadmap) supersedes conflicting future requirements.
+
+| Area | Implemented | Automated verified | Manually verified | Pending / deferred |
+| --- | --- | --- | --- | --- |
+| Existing keys, three dials, shared API/state and PI | Yes, within original matrix boundaries | Historical 129 tests /11 files; see PI checkpoint | Installation/backend and scoped Windows volume/mute observations only | Full corrected PI/auth/persistence; other controls/hosts/native playback Pending |
+| Windows minimum /PI context /Pear volume corrections | Yes | Historical source/package/protocol tests | Windows admission observed; corrected volume subset observed | PI full retest and complete K05/D01 remain Pending |
+| D022 Control Dial name/presentation/touch, Track Info artwork/text, PI immediate editing, startup icons | Accepted future requirements; not implemented as the complete model | Not verified | Not run | Deferred to authorized future roadmap stages; replaces prior optional-artwork deferral as product direction |
+| Playlist Follow default /selector wrapping | Existing implementation | Historical mode/selector tests | Full native/selector matrix not run | Preserve defaults; new presentation/add workflows are future work |
+| Queue Dial, Seek Dial, Add to Playlist, configured Play Music | Not implemented | Not verified | Not run | Accepted future scope in D022; no targetless queue action |
+| Manual-test usability | Issue recorded only | Not applicable | Not run | D023 stage before Stage 2; no runner built |
+
+Original requirements: [PROJECT_SPEC.md](PROJECT_SPEC.md), original body retained with a Stage 0 authority overlay. This matrix covers every substantive specification area and the persistent Stage 4–9 requirements. Read [Stage 9 validation](checkpoints/stage-09.md), [current status](IMPLEMENTATION_STATUS.md) and [manual acceptance](MANUAL_TESTING.md) together. An automated classification establishes the named code/contract boundary; it never establishes installed hardware or signed-in playback. “Manual hardware verification” below includes the necessary live Pear/host acceptance accompanying device tests.
 
 Allowed classifications are **Implemented — automatically verified**, **Implemented — requires manual hardware verification**, **Blocked by Pear upstream behavior**, **Blocked by Stream Deck/OpenDeck limitation**, **Not implemented — justified**, and **Defect found during final audit**. Resolved audit defects are recorded separately with their original classification and final disposition; there is no unresolved stage-caused automated defect.
 

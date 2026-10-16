@@ -1,5 +1,7 @@
 # Stage 5 playlist input, settings, and client boundary
 
+**Stage 0 authority (2026-10-16):** [D022](../DECISIONS.md#d022--stage-0-productux-authority-for-the-new-sequential-roadmap) supersedes conflicting future UX recommendations here. Baseline implementation/evidence below remains historical; no redesign was implemented in Stage 1.
+
 Reviewed 2026-10-04 before implementing the client interface. Sources: repository [Stage 3 investigation](../PLAYLIST_API_SPIKE.md), [D013](../DECISIONS.md#d013--stage-3-playlist-extension-contract) at Stage 5 starting commit `15bb236f17c69e49ee6002c004f992e4d1ae5f8e`, and its pinned Pear 3.12.0 commit `3f599b42724be827db51cd4689996dc3e48a9561`. No new live native-playback research or Pear modifications were performed.
 
 ## Conclusions and implementation effect
