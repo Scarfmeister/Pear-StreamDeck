@@ -3,8 +3,9 @@ import json
 import hashlib
 import os
 from pathlib import Path
+import platform
 import tempfile
-from .model import validate_session
+from .model import validate_session, migrate_session
 
 
 def atomic_text(path, text):
@@ -42,7 +43,7 @@ def save_session(path, session):
 
 def load_session(path):
     with Path(path).open(encoding='utf-8') as stream:
-        return validate_session(json.load(stream))
+        return migrate_session(json.load(stream))
 
 
 def file_sha256(path):
@@ -52,3 +53,33 @@ def file_sha256(path):
         for chunk in iter(lambda: stream.read(1024 * 1024), b''):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def application_state_directory(system=None, environ=None, home=None):
+    """Machine/user-local app state, never inferred from the source checkout."""
+    system = system or platform.system()
+    environ = os.environ if environ is None else environ
+    home = Path.home() if home is None else Path(home)
+    if system == 'Windows':
+        base = Path(environ['LOCALAPPDATA']) if environ.get('LOCALAPPDATA') else home / 'AppData/Local'
+        return base / 'PearStreamDeck/manual-testing'
+    base = Path(environ['XDG_STATE_HOME']) if environ.get('XDG_STATE_HOME') else home / '.local/state'
+    if not base.is_absolute():
+        base = home / '.local/state'
+    return base / 'pear-streamdeck/manual-testing'
+
+
+def remember_session(state_directory, session_path):
+    # This path is operational local state, not Runner Environment/export metadata.
+    atomic_text(Path(state_directory) / 'last-session.txt', str(Path(session_path).resolve()))
+
+
+def resume_session_path(state_directory):
+    pointer = Path(state_directory) / 'last-session.txt'
+    if not pointer.exists():
+        return None
+    text = pointer.read_text(encoding='utf-8').strip()
+    if not text:
+        return None
+    path = Path(text)
+    return path if path.is_absolute() and path.is_file() else None

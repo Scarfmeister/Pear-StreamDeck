@@ -1,5 +1,11 @@
 # Pear Desktop Connector — final engineering handoff
 
+## Current continuation — provenance fixed; Windows findings recorded
+
+Read [manual bugfix 04](checkpoints/manual-bugfix-04-test-environment-provenance.md) and the [corrected Windows run](manual-results/2026-10-16-windows-baseline-acceptance.md) first. The original runner conflated copied Linux/checkout metadata with installed-artifact evidence. Schema 2 now preserves authoritative Test Environment, refreshes separate privacy-minimal runner diagnostics, warns on material changes and uses machine-local resume state. Old sessions migrate without losing results; no hardware rerun is needed for migration. Updated GUI provenance controls await user verification; the supplied report establishes that the earlier tool was used for real Windows testing, not that its original metadata was correct.
+
+Current Windows matrix: 14 Pass /4 Fail /4 Blocked /3 Partial /17 Not Run /0 N/A. The [manual summary](MANUAL_TESTING.md#corrected-windows-baseline-acceptance--2026-10-16-current-evidence) lists exact IDs, environment and scenario gaps. Do not follow older blanket Pending/“proceed to Stage 2” scheduling prose below without this overlay. Recommend a separately authorized **P01 HTTP 503 playlist-start diagnostic micro-stage** first; P02–P04 depend on it. Queue K04 Pear zero/mute semantics, K06 pause reproduction (no actual detail), D04 image-on-Save persistence, D03 cause clarification and missing partial/Not Run cases. Keep K03 filled thumbs feedback in future D022 visuals. No plugin/Pear defect fixed, Stage 2 begun, merge or release authorized here.
+
 ## Stage 1.5 — current continuation
 
 The D023 manual-test interface is implemented: [launch/schema/smoke instructions](manual-testing/README.md), [Stage 1.5 checkpoint](checkpoints/roadmap-stage-01-5-manual-test-runner.md). It has 42 matrix definitions plus PI01, five suites, scenario results, local autosave/resume, failure clipboard reports and headless Markdown export. No plugin/Pear runtime change or new hardware evidence. GUI launch could not connect to this workstation's display; **user GUI smoke acceptance remains Pending**. This supersedes earlier “build the usability tool next” scheduling prose below. After user acceptance, next is **Stage 2 — Accept the currently implemented key actions**; do not begin it automatically.

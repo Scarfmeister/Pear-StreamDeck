@@ -1,5 +1,11 @@
 # Requirements status — final Stage 9 audit
 
+## Current manual overlay — corrected Windows evidence
+
+Use the [authoritative normalized Windows report](manual-results/2026-10-16-windows-baseline-acceptance.md) and [current evidence summary](MANUAL_TESTING.md#corrected-windows-baseline-acceptance--2026-10-16-current-evidence) for current results. **Pass:** H01/H02/A01/A02/R01/R02/R07/K01/K02/K03/K05/K08/D01/D02. **Partial:** H06/R06/K07. **Fail:** K04/K06/P01/D04. **Blocked:** P02/P03/P04 (P01 dependency), D03 (cause absent). The other 17 IDs remain Not Run. Counts: 14 Pass, 4 Fail, 4 Blocked, 3 Partial, 17 Not Run, 0 N/A. These are the actually recorded Windows catalog scenarios, not a full multi-host requirements certification. The older audit rows below remain historical; their Pending wording is superseded only by these named observations.
+
+K04 is a semantics/expectation investigation before attributing a plugin bug; K06 needs a pause reproduction; P01/D04 are focused bug candidates. No runtime fix or expectation change here. Runner provenance schema-2/headless migration checks are automated tooling verification, not new hardware/GUI acceptance.
+
 ## Stage 1.5 tooling status
 
 The [manual runner](manual-testing/README.md) implements D023's execution interface with 43 definitions (42 matrix + PI01) and five suites. Automated Python/headless checks verify tooling contracts and catalog integrity; **GUI desktop usability and all new hardware acceptance remain Pending/Not Run**. This supersedes the historical overlay's “no runner built” entry below; it changes no existing action classification or result. After user smoke acceptance, next is Stage 2 existing keys.

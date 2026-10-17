@@ -1,7 +1,7 @@
 """Human-readable reports using only public environment fields and typed results."""
 from pathlib import Path
 from .storage import atomic_text
-from .model import ENV_FIELDS, DISPLAY_STATUSES, progress, test_status, validate_session
+from .model import ENV_FIELDS, RUNNER_FIELDS, DISPLAY_STATUSES, progress, test_status, validate_session
 
 WARNING = 'Do not include access tokens, token-bearing URLs, passwords, or other secrets in test evidence.'
 
@@ -16,7 +16,7 @@ def test_report(session, test_id):
     result = session['results'][test_id]
     title = test['title'] if test else 'Orphaned historical result (definition unavailable)'
     lines = [f'Manual test: {test_id} — {title}', f'Status: {test_status(session, test_id)}', '',
-             'Environment:', *environment_lines(session), '', 'Steps:']
+             'Test Environment (authoritative):', *environment_lines(session), '', 'Steps:']
     lines += [f'{n}. {s}' for n, s in enumerate(test['steps'], 1)] if test else ['Definition unavailable; result retained.']
     lines += ['', 'Expected:', *(test['expected'] if test else []), '', 'Actual:', result['actual'],
               '', 'Evidence:', result['evidence'], '', 'Scenarios:']
@@ -40,7 +40,10 @@ def markdown_report(session):
     suite = next(s for s in catalog['suites'] if s['id'] == session['suite_id'])
     tests = [t for t in catalog['tests'] if t['id'] in suite['tests']]
     counts, scenario_counts = progress(session, tests)
-    lines = ['# Manual acceptance session', '', WARNING, '', '## Environment', '', *environment_lines(session), '',
+    lines = ['# Manual acceptance session', '', WARNING, '', '## Test Environment (authoritative)', '', *environment_lines(session), '',
+             '## Runner Environment (diagnostic only; not installed-plugin provenance)', '',
+             *[f'- {key.replace("_", " ")}: {session["runner_environment"].get(key, "")}' for key in RUNNER_FIELDS],
+             '', 'Legacy Test Environment review required: ' + str(session['test_environment_review_required']), '',
              f'Session ID: {session["session_id"]}',
              f'Definitions: {session["definition_version"]} / SHA-256 {session["definition_sha256"]}',
              '', f'Selected suite: {suite["name"]}', '', '## Selected-suite summary', '']

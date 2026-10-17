@@ -4,15 +4,19 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from .model import (STATUSES, DISPLAY_STATUSES, ENV_FIELDS, new_session, filtered_tests,
-                    progress, test_status, definition_changes)
-from .storage import save_session, load_session, atomic_text, file_sha256
+                    progress, test_status, definition_changes, detect_runner_environment,
+                    prepare_for_runner, use_current_machine, copy_checkout_revision)
+from .storage import (save_session, load_session, file_sha256, application_state_directory,
+                      remember_session, resume_session_path)
 from .exporter import WARNING, failure_report, export_session
 
 
 class Runner:
     def __init__(self, window, root, catalog, session_path=None):
         self.window, self.root, self.current_catalog = window, root, catalog
-        self.directory = root / '.manual-test-sessions'
+        self.state_directory = application_state_directory()
+        self.directory = self.state_directory / 'sessions'
+        self.runner_environment = detect_runner_environment(root)
         self.path = None
         self.session = None
         self.current = None
@@ -33,14 +37,12 @@ class Runner:
         if session_path:
             self.load(session_path)
         else:
-            pointer = self.directory / 'last-session.txt'
-            if pointer.exists():
-                try:
-                    previous = self.directory / Path(pointer.read_text(encoding='utf-8').strip()).name
-                    if previous.exists():
-                        self.load(previous)
-                except (OSError, ValueError) as error:
-                    messagebox.showwarning('Cannot resume session', str(error), parent=window)
+            try:
+                previous = resume_session_path(self.state_directory)
+                if previous is not None:
+                    self.load(previous)
+            except (OSError, ValueError) as error:
+                messagebox.showwarning('Cannot resume session', str(error), parent=window)
             if self.session is None:
                 self.new()
 
@@ -50,7 +52,7 @@ class Runner:
         toolbar = ttk.Frame(self.window, padding=6)
         toolbar.grid(row=0, column=0, sticky='ew')
         for button_index, (label, callback) in enumerate([('New', self.new), ('Open', self.open), ('Save', self.save),
-                                ('Environment', self.environment), ('Export Markdown', self.export),
+                                ('Test / Runner Environment', self.environment), ('Export Markdown', self.export),
                                 ('Copy Failure Report', self.copy_report), ('Help', self.help)]):
             toolbar.columnconfigure(button_index % 4, weight=1)
             ttk.Button(toolbar, text=label, command=callback, padding=5).grid(
@@ -216,7 +218,7 @@ class Runner:
     def new(self):
         if self.window.grab_current() is not None: return
         if not self.safe_leave(): return
-        self.install(new_session(self.current_catalog, self.root), None)
+        self.install(new_session(self.current_catalog, runner=self.runner_environment), None)
 
     def open(self):
         if self.window.grab_current() is not None: return
@@ -239,6 +241,7 @@ class Runner:
                 f'New IDs: {changes["added"] or "none"}. Start a new session to use current definitions.', parent=self.window)
 
     def install(self, session, path):
+        session, provenance_warning = prepare_for_runner(session, self.runner_environment)
         self.editing = True
         if self.pending is not None:
             self.window.after_cancel(self.pending)
@@ -258,11 +261,11 @@ class Runner:
         self.editing = False
         self.refresh()
         self.show_test(self.current)
-        self.save()
-        # Only default-folder sessions are auto-resumed; arbitrary files are opened explicitly.
-        if self.path.parent.resolve() == self.directory.resolve():
-            try: atomic_text(self.directory / 'last-session.txt', self.path.name)
-            except OSError as error: self.save_label.set(f'Session saved; resume pointer failed: {error}')
+        if self.save():
+            try: remember_session(self.state_directory, self.path)
+            except OSError as error: self.save_label.set(f'Session saved; local resume pointer failed: {error}')
+        if provenance_warning:
+            messagebox.showwarning('Review Test Environment', provenance_warning, parent=self.window)
 
     def visible(self):
         return filtered_tests(self.session, self.search.get(), self.status_filter.get(),
@@ -298,9 +301,11 @@ class Runner:
             + f'\nScenarios: {executed}/{sum(scenarios.values())} executed; '
             + ' | '.join(f'{s}: {scenarios[s]}' for s in STATUSES))
         env = self.session['environment']
-        self.header.set(f'{env.get("session_name", "")} | {env.get("tester", "")} | '
+        self.header.set(f'Test Environment: {env.get("session_name", "")} | {env.get("tester", "")} | '
                         f'{env.get("os_product", "")} | {env.get("host_application", "")} {env.get("host_version", "")}\n'
-                        f'Plugin {env.get("plugin_commit", "")} | Pear {env.get("pear_commit", "")}')
+                        f'Installed plugin {env.get("plugin_commit", "")} | Pear {env.get("pear_commit", "")}\n'
+                        f'Runner Environment: {self.runner_environment["os_product"]} | Python {self.runner_environment["python_version"]} | '
+                        f'checkout {self.runner_environment["checkout_branch"]} {self.runner_environment["checkout_head"]}')
 
     def select_test(self, event=None):
         selection = self.tree.selection()
@@ -410,7 +415,7 @@ class Runner:
 
     def environment(self):
         dialog = tk.Toplevel(self.window)
-        dialog.title('Session environment — edits autosave')
+        dialog.title('Test Environment (authoritative) / Runner Environment (diagnostic)')
         dialog.geometry('720x640')
         dialog.columnconfigure(0, weight=1)
         dialog.rowconfigure(0, weight=1)
@@ -424,8 +429,13 @@ class Runner:
         canvas.bind('<Configure>', lambda event: canvas.itemconfigure(item, width=event.width))
         frame.bind('<Configure>', lambda event: canvas.configure(scrollregion=canvas.bbox('all')))
         frame.columnconfigure(1, weight=1)
+        runner_info = 'Runner Environment (diagnostic only):\n' + '\n'.join(
+            f'{key.replace("_", " ")}: {value}' for key, value in self.runner_environment.items())
+        ttk.Label(frame, text=runner_info, wraplength=630).grid(row=0, column=0, columnspan=2, sticky='ew')
+        ttk.Label(frame, text='Test Environment — authoritative, editable; checkout is not installed-artifact proof.',
+                  wraplength=630).grid(row=1, column=0, columnspan=2, sticky='ew', pady=8)
         variables = {}
-        for row, field in enumerate(ENV_FIELDS):
+        for row, field in enumerate(ENV_FIELDS, 2):
             ttk.Label(frame, text=field.replace('_', ' ').title()).grid(row=row, column=0, sticky='w', pady=4)
             var = tk.StringVar(value=self.session['environment'].get(field, ''))
             variables[field] = var
@@ -448,8 +458,27 @@ class Runner:
                 except OSError as error: messagebox.showerror('Cannot hash installer', str(error), parent=dialog)
         buttons = ttk.Frame(dialog, padding=6)
         buttons.grid(row=1, sticky='ew')
-        ttk.Button(buttons, text='Hash installer locally…', command=hash_installer).pack(side='left')
-        ttk.Button(buttons, text='Done', command=lambda: (self.save(), dialog.destroy())).pack(side='right')
+        def use_machine():
+            use_current_machine(self.session, self.runner_environment)
+            for field in ('os_product', 'os_build'):
+                variables[field].set(self.session['environment'][field])
+        def copy_revision():
+            if messagebox.askyesno('Confirm installed artifact revision',
+                    'Only copy if you know this checkout revision matches the installed plugin. Copy it?', parent=dialog):
+                copy_checkout_revision(self.session, self.runner_environment)
+                for field in ('plugin_branch', 'plugin_commit'):
+                    variables[field].set(self.session['environment'][field])
+        def reviewed():
+            self.session['test_environment_review_required'] = False
+            self.changed()
+            self.save()
+            dialog.destroy()
+        ttk.Button(buttons, text='Use Current Machine as Test Environment', command=use_machine).grid(row=0, column=0, sticky='ew')
+        ttk.Button(buttons, text='Copy checkout revision to installed plugin fields', command=copy_revision).grid(row=1, column=0, sticky='ew')
+        ttk.Button(buttons, text='Hash installer locally…', command=hash_installer).grid(row=0, column=1, sticky='ew')
+        ttk.Button(buttons, text='Done (Test Environment reviewed)', command=reviewed).grid(row=1, column=1, sticky='ew')
+        buttons.columnconfigure(0, weight=1)
+        buttons.columnconfigure(1, weight=1)
         # Keep the session fixed while environment bindings are alive.
         dialog.transient(self.window)
         dialog.grab_set()
@@ -487,7 +516,7 @@ class Runner:
             'Tab / Shift+Tab move focus, arrows select tests/scenarios, Space activates buttons.\n\n'
             'Select a scenario, type actual/evidence, choose a status, then advance. Each scenario is required '
             'unless explicitly N/A. Test-level notes are separate. Autosave occurs after 350 ms and on navigation/close. '
-            'Filters affect progress; exports retain every recorded result. Startup resumes the last default-folder session.\n\n'
+            'Filters affect progress; exports retain every recorded result. Startup uses a machine-local resume pointer; copied checkout pointers are ignored.\n\n'
             'Historical evidence never sets a current Pass. Open older sessions with their saved definitions; '
             'start New for updated definitions. For schema/export/smoke instructions see docs/manual-testing/README.md.\n\n'
             + WARNING, parent=self.window)

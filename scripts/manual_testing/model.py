@@ -110,28 +110,94 @@ def blank_result(test):
         s['id']: {'status': 'Not Run', 'actual': '', 'evidence': ''} for s in test['scenarios']}}
 
 
-def new_session(catalog, root=None):
-    environment = dict.fromkeys(ENV_FIELDS, '')
-    environment.update(session_name='Untitled session', test_datetime=datetime.now().astimezone().isoformat(timespec='seconds'),
-                       os_product=platform.system() + ' ' + platform.release(), os_build=platform.version(),
-                       api_endpoint='127.0.0.1:26538', protocol='HTTP')
+RUNNER_FIELDS = ('os_system', 'os_product', 'os_build', 'python_version', 'checkout_branch', 'checkout_head')
+
+
+def detect_runner_environment(root=None):
+    """Privacy-minimal diagnostics; never installed-artifact or test-host assertions."""
+    system = platform.system()
+    runner = dict.fromkeys(RUNNER_FIELDS, '')
+    runner.update(os_system=system, os_product=system + ' ' + platform.release(),
+                  os_build=platform.version() if system == 'Windows' else platform.release(),
+                  python_version=platform.python_version())
     if root:
-        for field, args in [('plugin_branch', ['branch', '--show-current']), ('plugin_commit', ['rev-parse', 'HEAD'])]:
+        for field, args in [('checkout_branch', ['branch', '--show-current']),
+                            ('checkout_head', ['rev-parse', 'HEAD'])]:
             try:
-                environment[field] = subprocess.run(['git', *args], cwd=root, capture_output=True,
-                                                     text=True, timeout=2, check=True).stdout.strip()
+                runner[field] = subprocess.run(['git', *args], cwd=root, capture_output=True,
+                                              text=True, timeout=2, check=True).stdout.strip()
             except (OSError, subprocess.SubprocessError):
                 pass
-    return {'schema_version': 1, 'session_id': str(uuid.uuid4()),
+    return runner
+
+
+def use_current_machine(session, runner):
+    """Explicit user action: update only detectable Test Environment OS fields."""
+    session['environment']['os_product'] = runner.get('os_product', '')
+    session['environment']['os_build'] = runner.get('os_build', '')
+
+
+def copy_checkout_revision(session, runner):
+    """Explicit user assertion that checkout and installed artifact match."""
+    session['environment']['plugin_branch'] = runner.get('checkout_branch', '')
+    session['environment']['plugin_commit'] = runner.get('checkout_head', '')
+
+
+def migrate_session(session):
+    """Upgrade schema 1 additively, preserving all original evidence and unknown entries."""
+    require(isinstance(session, dict), 'Session must be an object')
+    migrated = deepcopy(session)
+    if type(migrated.get('schema_version')) is int and migrated['schema_version'] == 1:
+        migrated['schema_version'] = 2
+        # No way to infer the previous runner from the possibly stale Test Environment.
+        migrated.setdefault('runner_environment', {})
+        migrated.setdefault('runner_history', [])
+        migrated['test_environment_review_required'] = True
+    return validate_session(migrated)
+
+
+def prepare_for_runner(session, runner):
+    """Refresh diagnostics and explain material differences without touching evidence."""
+    updated = migrate_session(session)
+    previous = updated['runner_environment']
+    differences = [key for key in RUNNER_FIELDS if previous.get(key, '') != runner.get(key, '')]
+    warning = ''
+    if previous and differences:
+        warning = (f'This session was previously opened on {previous.get("os_product", "an unknown OS")} '
+                   f'and is now running on {runner.get("os_product", "an unknown OS")}. '
+                   f'Runner fields changed: {", ".join(differences)}. '
+                   'Review the Test Environment before continuing; it has not been changed.')
+        updated['runner_history'].append(deepcopy(previous))
+    if updated['test_environment_review_required']:
+        warning += (' Legacy session: runner provenance was not recorded separately. '
+                    'Its Test Environment may contain copied OS/checkout defaults. '
+                    'Review and explicitly correct it; existing results have been preserved.')
+    updated['runner_environment'] = {key: runner.get(key, '') for key in RUNNER_FIELDS}
+    return validate_session(updated), warning.strip()
+
+
+def new_session(catalog, root=None, runner=None):
+    environment = dict.fromkeys(ENV_FIELDS, '')
+    environment.update(session_name='Untitled session', test_datetime=datetime.now().astimezone().isoformat(timespec='seconds'),
+                       api_endpoint='127.0.0.1:26538', protocol='HTTP')
+    return {'schema_version': 2, 'session_id': str(uuid.uuid4()),
             'definition_version': catalog['definition_version'], 'definition_sha256': fingerprint(catalog),
             'catalog_snapshot': deepcopy(catalog), 'environment': environment,
+            'runner_environment': deepcopy(runner if runner is not None else detect_runner_environment(root)),
+            'runner_history': [], 'test_environment_review_required': False,
             'suite_id': 'full-matrix', 'selected_test': catalog['tests'][0]['id'],
             'results': {t['id']: blank_result(t) for t in catalog['tests']}}
 
 
 def validate_session(session):
     require(isinstance(session, dict) and type(session.get('schema_version')) is int
-            and session['schema_version'] == 1, 'Unsupported session schema_version')
+            and session['schema_version'] == 2, 'Unsupported session schema_version')
+    require(isinstance(session.get('runner_environment'), dict), 'Missing Runner Environment')
+    require(isinstance(session.get('runner_history'), list), 'Missing runner history')
+    for runner in [session['runner_environment'], *session['runner_history']]:
+        require(isinstance(runner, dict) and all(isinstance(v, str) for v in runner.values()),
+                'Runner Environment values must be text')
+    require(type(session.get('test_environment_review_required')) is bool, 'Missing provenance review flag')
     catalog = validate_catalog(session.get('catalog_snapshot'))
     require(session.get('definition_sha256') == fingerprint(catalog), 'Catalog snapshot hash mismatch')
     require(session.get('definition_version') == catalog['definition_version'], 'Definition version mismatch')

@@ -1,5 +1,11 @@
 # Implementation status
 
+## Current micro-stage — runner provenance and corrected Windows evidence
+
+[Manual bugfix 04](checkpoints/manual-bugfix-04-test-environment-provenance.md) separates authoritative Test Environment from diagnostic Runner Environment, migrates schema-1 sessions without altering evidence, and moves resume/default sessions to user-local app state. Installed plugin branch/commit no longer derive silently from checkout HEAD. No plugin/Pear runtime or version change.
+
+The [corrected Windows report](manual-results/2026-10-16-windows-baseline-acceptance.md) records **14 Pass /4 Fail /4 Blocked /3 Partial /17 Not Run /0 N/A**, scenarios **49 Pass /4 Fail /4 Blocked /52 Not Run /0 N/A**. [Current manual evidence](MANUAL_TESTING.md#corrected-windows-baseline-acceptance--2026-10-16-current-evidence) supplies exact environment/IDs and scoped observations. It supersedes older blanket Pending claims for the recorded Windows scenarios, not unrun variants or PI01. K04 needs Pear mute/zero semantics review; K06 pause failure lacks reproduction detail; P01 startup HTTP 503 blocks P02–P04; D03 has no recorded cause; D04 image field clears on Save. K03 is functionally Pass with visual backlog feedback. These findings are recorded only, not fixed. Next recommendation is a separately authorized P01 diagnosis micro-stage, not automatic Stage 2 development. Original automated/history sections below remain their dated evidence.
+
 ## New roadmap Stage 1.5 — manual-test tooling
 
 Implemented the standard-library [Python/Tkinter acceptance runner](manual-testing/README.md): 42 baseline matrix rows plus the seven-check PI01 retest, five suites, scenario/Partial results, editable environment, local atomic autosave/resume, filters/progress, clipboard failure reports and Markdown export. New sessions have no inherited Pass results. Pure-logic/headless validation passes; GUI runtime is **Not manually verified by Codex** (display connection unavailable). No runtime redesign, new installer or hardware acceptance. See [checkpoint](checkpoints/roadmap-stage-01-5-manual-test-runner.md). After user GUI acceptance: Stage 2 existing key acceptance. Earlier Stage 1 text is historical.

@@ -1,5 +1,7 @@
 # Roadmap Stage 1.5 — cross-platform manual-test runner
 
+**Later provenance/evidence micro-stage:** [manual bugfix 04](manual-bugfix-04-test-environment-provenance.md) corrects checkout-derived installed-plugin defaults and copied checkout-local resume state, adds schema-1 → 2 compatibility, and records the authoritative normalized Windows run. Original validation and pending-GUI statements below describe Stage 1.5 at its original commit; they are not rewritten as if provenance was correct then.
+
 Date: 2026-10-16 (America/Chicago). Repository: Scarfmeister/Pear-StreamDeck; branch `dev/pear-port`. Starting SHA: **`5af962d4413901bc5af335d66e09ead3c19aee06`**. Fetched all remotes, checked out required branch, pulled fast-forward-only, inspected recent commits and confirmed clean tree before edits. Read root instructions, Stage 1 freeze, D022/D023, manual matrix, current spec/status/requirements/handoff and relevant bug-fix evidence. No local work discarded.
 
 Final plugin SHA is the commit containing this checkpoint; after fetch resolve it with:

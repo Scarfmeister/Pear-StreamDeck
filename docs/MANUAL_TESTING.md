@@ -1,5 +1,33 @@
 # Manual testing
 
+## Corrected Windows baseline acceptance — 2026-10-16 (current evidence)
+
+Canonical run: [normalized Windows report](manual-results/2026-10-16-windows-baseline-acceptance.md), supplied by Scarfmeister. The tests physically ran on **Windows 11 Pro 25H2 /build 26200.9457**, Elgato Stream Deck **7.4.2.22730**, **Stream Deck Plus /firmware 2.0.3.7**. Session: **Windows baseline acceptance — 2026-10-16**, timestamp **2026-10-16T20:39:25-05:00**, tester **Scarfmeister**. Reported installed plugin: `dev/pear-port` /`a6f89eefc707d999478abce8c9e5ca8245381b09`; Pear: `feature/streamdeck-api-extensions` /`a9ea223c99ede0876343db5898b944ea5170ad1f`; API `127.0.0.1:26538`, HTTP, AUTH_AT_FIRST, English. Installer SHA-256 and Pear application version were not supplied and remain blank; do not infer them from older artifacts or package metadata.
+
+**Provenance correction:** the runner/source/session directory originated on Nobara Linux and was copied through a network share. Original export repeated stale Linux/checkout-derived metadata. The supplied canonical report explicitly normalizes per-test metadata to the actual Windows environment after export and corrects H06 to Partial. Observations otherwise remain as supplied; this is user evidence, not new Codex hardware testing. Original historical evidence below is retained. The [runner provenance fix](checkpoints/manual-bugfix-04-test-environment-provenance.md) prevents future silent installed-checkout assertions and copied-pointer resume; it does not retrospectively make the original export correct.
+
+| Result | Count | Matrix IDs |
+| --- | --- | --- |
+| Pass | 14 | H01, H02, A01, A02, R01, R02, R07, K01, K02, K03, K05, K08, D01, D02 |
+| Fail | 4 | K04, K06, P01, D04 |
+| Blocked | 4 | P02, P03, P04, D03 |
+| Partial | 3 | H06, R06, K07 |
+| Not Run | 17 | H03, H04, H05, A03, A04, A05, A06, R03, R04, R05, K09, P05, P06, D05, I01, I02, I03 |
+| Not Applicable | 0 | None |
+
+Scenario totals: **Not Run 52 /Pass 49 /Fail 4 /Blocked 4 /N/A 0**. Report totals are consistent: 19 Not Run scenarios in touched rows plus 33 in the 17 untouched rows. Pass labels apply only to the reported catalog scenarios on this Windows setup, not every variant/device/platform or full PI01. A01/A02 and R02 provide current connection/first-approval/restart evidence; A03/A06/I01 and the complete dedicated PI routing retest remain uncompleted. No Linux/OpenDeck/macOS pass is inferred.
+
+- **H06 Partial:** s1 Pass: Pear actions absent from Multi Action, Multi Action Switch and Random Action; present in Key Logic, Dial Stack, Action Wheel and Action Trigger. s2 retained aliases remains Not Run. Evaluate those other host categories later if needed; do not classify H06 Fail/full Pass.
+- **R06 Partial:** profile/PI switching Pass; rapid rotation/remove/disconnect Not Run. **K07 Partial:** normal shuffle toggle Pass; legacy-queue scenario Not Run.
+- **K04 Fail:** normal mute toggle/restore passed. Zero-volume distinction failed: Pear's own icon changes at zero and unmuting from that state sets volume to 5%. Investigate intended Pear mute semantics and whether the expectation is wrong or Pear behavior defective **before** declaring a plugin defect. Keep the recorded failure; do not change runtime/expectations here.
+- **K06 Fail:** all five format selections Pass; pause scenario Fail with **no useful actual-result explanation**. Long/Unicode/missing metadata and title override scenarios Not Run. Focused reproduction is required; no failure mechanism is assumed.
+- **P01 Fail:** key says Start failed /`Pear request failed (HTTP 503)` with public, unlisted and private playlists. Focused future startup investigation; **P02/P03/P04 Blocked by P01**, not independent plugin failures. Their unexecuted sub-checks remain Not Run.
+- **D03 Blocked:** supplied s1 “Save 0, 1, several and 16 selector entries” is Blocked with blank Actual/Evidence. No cause supplied. Other D03 scenarios Not Run; obtain the missing explanation before assigning a cause.
+- **D04 Fail:** s1 Actual: “When saving the action settings, the image file entry is cleared.” Future Playlist Selector/PI persistence bug candidate; other D04 scenarios Not Run.
+- **K03 remains Pass:** visual UX feedback asks for Pear/YouTube Music-style thumbs up/down with stronger, preferably filled active states instead of outline color alone. Record for future D022 visual/Control Dial redesign; no icon change here.
+
+Next recommended small micro-stage: **P01 HTTP 503 playlist-start reproduction/diagnosis**, since it blocks P02–P04. Capture sanitized dispatch/error details and exact installed revisions, distinguish safe player-not-ready/native failure from plugin behavior, and define a focused regression before any separately authorized fix. Other queued work: K04 semantics investigation, K06 pause reproduction, D04 image persistence, D03 clarification and remaining partial/Not Run scenarios. No runtime defect is fixed or Stage 2 begun in this provenance/evidence stage.
+
 ## Stage 1.5 — execution interface
 
 Use the [offline Python/Tkinter runner](manual-testing/README.md) to execute the committed 42-row baseline catalog and detailed Windows PI retest, save scenario-level sessions and export reviewed evidence. This document remains durable history; the runner never rewrites it. Historical observations below are unchanged and never pre-pass a new session. No new hardware acceptance is claimed. GUI runtime needs the documented user smoke test; after GUI acceptance, next is **Stage 2 — Accept the currently implemented key actions**.
