@@ -11,6 +11,7 @@
     "skipLibCheck": true,
     "outDir": "dist",
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "experimentalDecorators": true,
     "lib": [
       "dom",

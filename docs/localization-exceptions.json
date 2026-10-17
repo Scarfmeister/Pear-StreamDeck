@@ -1,0 +1,31 @@
+{
+  "de": {
+    "Name": "Stable Pear Desktop product/category name; intentionally untranslated.",
+    "Category": "Stable Pear Desktop product/category name; intentionally untranslated.",
+    "io.github.scarfmeister.pear-streamdeck.play-pause.States[1].Name": "Pause is also the correct German word for this label.",
+    "Localization.Strings.Host": "Standard networking/protocol term used in this locale.",
+    "Localization.Strings.Port": "Standard networking/protocol term used in this locale.",
+    "Localization.Strings.HTTPS": "Standard networking/protocol term used in this locale.",
+    "Localization.Strings.Album": "Album is also the correct German word for this label.",
+    "Localization.Strings.Playlist": "Established localized music-interface loanword; reused from upstream.",
+    "Localization.Strings.Name": "Name is also the correct German word for this label.",
+    "Localization.Strings.Normal": "Normal is also the correct German word for this label.",
+    "Localization.Strings.Pear offline": "Pear is a product name; offline is an established German loanword (including compact newline variant).",
+    "Localization.Strings.Pause": "Pause is also the correct German word for this label.",
+    "Localization.Strings.Pear\noffline": "Pear is a product name; offline is an established German loanword (including compact newline variant)."
+  },
+  "fr": {
+    "Name": "Stable Pear Desktop product/category name; intentionally untranslated.",
+    "Category": "Stable Pear Desktop product/category name; intentionally untranslated.",
+    "io.github.scarfmeister.pear-streamdeck.play-pause.States[1].Name": "Pause is also the correct French word for this label.",
+    "io.github.scarfmeister.pear-streamdeck.mute.States[0].Name": "Volume is also the correct French word for this label.",
+    "Localization.Strings.Port": "Standard networking/protocol term used in this locale.",
+    "Localization.Strings.HTTPS": "Standard networking/protocol term used in this locale.",
+    "Localization.Strings.Album": "Album is also the correct French word for this label.",
+    "Localization.Strings.Playlist": "Established localized music-interface loanword; reused from upstream.",
+    "Localization.Strings.Image": "Image is also the correct French word for this label.",
+    "Localization.Strings.Volume": "Volume is also the correct French word for this label.",
+    "Localization.Strings.Normal": "Normal is also the correct French word for this label.",
+    "Localization.Strings.Pause": "Pause is also the correct French word for this label."
+  }
+}

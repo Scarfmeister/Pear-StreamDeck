@@ -1,0 +1,1781 @@
+{
+  "schema_version": 1,
+  "definition_version": "baseline-2026-10-16.1",
+  "source": "docs/MANUAL_TESTING.md at 5af962d4413901bc5af335d66e09ead3c19aee06",
+  "context": [
+    "Frozen baseline: installed Transport Dial label, static Track Info imagery/five formats, explicit PI Save and refresh-only short touch. D022 future Control Dial / touch / artwork / Queue / Seek / Add-to-Playlist requirements are not current expectations.",
+    "W-K: Windows 11 x64 + Elgato 7.1+ + key device; W-+: same host + Plus; L-K/L-+: OpenDeck 2.14.0 + corresponding hardware; M: optional macOS 13+. Minimum 6.4 is a separate compatibility test. Platform filter describes eligibility, not a certification.",
+    "Record OS product AND numeric version, host/device/firmware, plugin/Pear commits and installer hash, auth, bind/protocol and language. Windows 11 reports NT 10.0; minimum 10 metadata does not certify Windows 10.",
+    "Load signed-in Pear player and enable API Server; explicitly bind 127.0.0.1:26538. Use combined Pear feature/streamdeck-api-extensions at a9ea223c99ede0876343db5898b944ea5170ad1f for playlist startup and corrected volume. Stock 3.12.0 rejection is tested separately.",
+    "Use a disposable profile and known playlist with at least three distinguishable tracks. Compare native Normal/Shuffle controls before connector startup. Native dispatch acknowledgment is not audio acceptance. Existing partial Windows evidence never passes a new session.",
+    "For P06 include the detailed Stage 7 lifecycle procedure: delay browse; cancel before permit and ensure no later dispatch; cancel after permit and record unknown without replay; reload/rebind/disable API and verify no obsolete sender/result/permit; re-enable after loaded player. Record native queue/events and first audible track without private payloads."
+  ],
+  "suites": [
+    {
+      "id": "windows-pi-retest",
+      "name": "Windows PI routing retest — start here",
+      "description": "Detailed seven-check corrected routing retest; no automatic cross-test results.",
+      "tests": [
+        "PI01"
+      ]
+    },
+    {
+      "id": "stage-2-keys",
+      "name": "Stage 2 — Existing key actions",
+      "description": "Current K01–K09 baseline, not future D022 redesign.",
+      "tests": [
+        "K01",
+        "K02",
+        "K03",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K08",
+        "K09"
+      ]
+    },
+    {
+      "id": "stage-3-baseline",
+      "name": "Stage 3 — Connection / PI / persistence / Plus baseline",
+      "description": "Detailed PI retest plus H/A/R/D/I baseline.",
+      "tests": [
+        "PI01",
+        "H01",
+        "H02",
+        "H03",
+        "H04",
+        "H05",
+        "H06",
+        "A01",
+        "A02",
+        "A03",
+        "A04",
+        "A05",
+        "A06",
+        "R01",
+        "R02",
+        "R03",
+        "R04",
+        "R05",
+        "R06",
+        "R07",
+        "D01",
+        "D02",
+        "D03",
+        "D04",
+        "D05",
+        "I01",
+        "I02",
+        "I03"
+      ]
+    },
+    {
+      "id": "playlists",
+      "name": "Playlist acceptance",
+      "description": "Current P01–P06, including signed-in native startup.",
+      "tests": [
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06"
+      ]
+    },
+    {
+      "id": "full-matrix",
+      "name": "Full current matrix — 42 rows",
+      "description": "All 42 Stage 8 matrix IDs. PI01 is separately available.",
+      "tests": [
+        "H01",
+        "H02",
+        "H03",
+        "H04",
+        "H05",
+        "H06",
+        "A01",
+        "A02",
+        "A03",
+        "A04",
+        "A05",
+        "A06",
+        "R01",
+        "R02",
+        "R03",
+        "R04",
+        "R05",
+        "R06",
+        "R07",
+        "K01",
+        "K02",
+        "K03",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K08",
+        "K09",
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "D01",
+        "D02",
+        "D03",
+        "D04",
+        "D05",
+        "I01",
+        "I02",
+        "I03"
+      ]
+    }
+  ],
+  "tests": [
+    {
+      "id": "H01",
+      "title": "Windows/macOS installer and key availability",
+      "platforms": [
+        "W-K",
+        "M"
+      ],
+      "platform_notes": "W-K, M",
+      "tags": [
+        "host",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Open the corrected `.streamDeckPlugin` installer; on Windows 11 record numeric OS version 10.0; confirm host prompt; place one of every key action."
+      ],
+      "expected": [
+        "Windows 11 is not rejected by an incorrect manifest minimum of 11; the packaged Windows minimum is 10. Pear Desktop category/name and 12 keys appear; no YTMD promotional/brand assets, missing icons or startup error."
+      ],
+      "prior_evidence": " Prior Windows 11 Pro 25H2 /10.0.26200, Stream Deck 7.4.2.22730: installation/actions/backend observed; PI remained Waiting for plugin / Checking and host rejected wrong-context getSettings/setSettings/sendToPlugin. Routing fixed at 23cf3daa14d45a27310551d7ee727bdfaceba587; full corrected approval/settings/persistence retest remains Pending. See docs/checkpoints/manual-bugfix-02-pi-context.md.",
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Open the corrected `.streamDeckPlugin` installer"
+        },
+        {
+          "id": "s2",
+          "title": "on Windows 11 record numeric OS version 10.0"
+        },
+        {
+          "id": "s3",
+          "title": "confirm host prompt"
+        },
+        {
+          "id": "s4",
+          "title": "place one of every key action"
+        }
+      ]
+    },
+    {
+      "id": "H02",
+      "title": "Plus installation and layouts",
+      "platforms": [
+        "W-+"
+      ],
+      "platform_notes": "W-+",
+      "tags": [
+        "host",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Install; place Volume, Transport, Selector on dials plus keys; clear custom title/icon overrides."
+      ],
+      "expected": [
+        "Dedicated dial actions appear; touch layouts occupy their own 200×100 segments, with readable PNGs/text and no overlap."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Install"
+        },
+        {
+          "id": "s2",
+          "title": "place Volume, Transport, Selector on dials plus keys"
+        },
+        {
+          "id": "s3",
+          "title": "clear custom title/icon overrides"
+        }
+      ]
+    },
+    {
+      "id": "H03",
+      "title": "OpenDeck package import",
+      "platforms": [
+        "L-K",
+        "L-+"
+      ],
+      "platform_notes": "L-K/L-+",
+      "tags": [
+        "host",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "OpenDeck plugin manager → Install from file; select the same installer; place keys/dials."
+      ],
+      "expected": [
+        "Archive imports its `.sdPlugin` directory; Linux override selects native HTML WebView, without requiring host Node/Wine for this plugin. Actual runtime/devices are recorded separately."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "OpenDeck plugin manager → Install from file"
+        },
+        {
+          "id": "s2",
+          "title": "select the same installer"
+        },
+        {
+          "id": "s3",
+          "title": "place keys/dials"
+        }
+      ]
+    },
+    {
+      "id": "H04",
+      "title": "OpenDeck/Flatpak loopback",
+      "platforms": [
+        "L-K",
+        "L-+"
+      ],
+      "platform_notes": "L-K/L-+, Flatpak if used",
+      "tags": [
+        "host",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Repeat install and connect to loopback Pear from the actual OpenDeck distribution/Flatpak."
+      ],
+      "expected": [
+        "Browser HTTP/WS and PI work. Record WebView/loopback/permission defects; do not infer a Flatpak pass from native Linux or source tests."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Repeat install and connect to loopback Pear from the actual OpenDeck distribution/Flatpak"
+        }
+      ]
+    },
+    {
+      "id": "H05",
+      "title": "Current and minimum host compatibility",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "All; optional 6.4",
+      "tags": [
+        "host",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Record current host pass; separately run the declared minimum host if available."
+      ],
+      "expected": [
+        "All used messages/features work on the tested version. Untested 6.4/other OS remains unverified; current host requirements still apply."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Record current host pass"
+        },
+        {
+          "id": "s2",
+          "title": "separately run the declared minimum host if available"
+        }
+      ]
+    },
+    {
+      "id": "H06",
+      "title": "Multi Actions and retained aliases",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "All",
+      "tags": [
+        "host",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Inspect host Multi Action availability; place each supported ordinary key/dial and the retained encoder aliases."
+      ],
+      "expected": [
+        "Pear actions are not offered for Multi Actions. Ordinary keys, dedicated encoders and documented aliases still operate; no unsupported absolute-state promise appears."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Inspect host Multi Action availability"
+        },
+        {
+          "id": "s2",
+          "title": "place each supported ordinary key/dial and the retained encoder aliases"
+        }
+      ]
+    },
+    {
+      "id": "A01",
+      "title": "Default API connection",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "All",
+      "tags": [
+        "auth",
+        "pi",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Enable Plugins → API Server [Beta] in Pear; set local bind 127.0.0.1:26538; start fresh connector with defaults."
+      ],
+      "expected": [
+        "One shared connection, matching defaults, initial snapshot; status becomes Connected. No companion port/connection is used."
+      ],
+      "prior_evidence": " Prior Windows 11 Pro 25H2 /10.0.26200, Stream Deck 7.4.2.22730: installation/actions/backend observed; PI remained Waiting for plugin / Checking and host rejected wrong-context getSettings/setSettings/sendToPlugin. Routing fixed at 23cf3daa14d45a27310551d7ee727bdfaceba587; full corrected approval/settings/persistence retest remains Pending. See docs/checkpoints/manual-bugfix-02-pi-context.md.",
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Enable Plugins → API Server [Beta] in Pear"
+        },
+        {
+          "id": "s2",
+          "title": "set local bind 127.0.0.1:26538"
+        },
+        {
+          "id": "s3",
+          "title": "start fresh connector with defaults"
+        }
+      ]
+    },
+    {
+      "id": "A02",
+      "title": "First authorization and shared connection",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "All",
+      "tags": [
+        "auth",
+        "pi",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Use Authorize at first request; approve once in Pear; close/reopen several PIs; add duplicate keys/dials."
+      ],
+      "expected": [
+        "One prompt for the shared client, Authorized status, working controls, no token in panel/status/logs; added contexts reuse the connection."
+      ],
+      "prior_evidence": " Prior Windows 11 Pro 25H2 /10.0.26200, Stream Deck 7.4.2.22730: installation/actions/backend observed; PI remained Waiting for plugin / Checking and host rejected wrong-context getSettings/setSettings/sendToPlugin. Routing fixed at 23cf3daa14d45a27310551d7ee727bdfaceba587; full corrected approval/settings/persistence retest remains Pending. See docs/checkpoints/manual-bugfix-02-pi-context.md.",
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Use Authorize at first request"
+        },
+        {
+          "id": "s2",
+          "title": "approve once in Pear"
+        },
+        {
+          "id": "s3",
+          "title": "close/reopen several PIs"
+        },
+        {
+          "id": "s4",
+          "title": "add duplicate keys/dials"
+        }
+      ]
+    },
+    {
+      "id": "A03",
+      "title": "Denied/interrupted approval recovery",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "All",
+      "tags": [
+        "auth",
+        "pi",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Deny or interrupt first approval; wait/restart host; then press Reauthorize and approve."
+      ],
+      "expected": [
+        "No automatic prompt loop across restart; explicit Reauthorize recovers. Repeated Reauthorize while pending does not duplicate requests."
+      ],
+      "prior_evidence": " Prior Windows 11 Pro 25H2 /10.0.26200, Stream Deck 7.4.2.22730: installation/actions/backend observed; PI remained Waiting for plugin / Checking and host rejected wrong-context getSettings/setSettings/sendToPlugin. Routing fixed at 23cf3daa14d45a27310551d7ee727bdfaceba587; full corrected approval/settings/persistence retest remains Pending. See docs/checkpoints/manual-bugfix-02-pi-context.md.",
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Deny or interrupt first approval"
+        },
+        {
+          "id": "s2",
+          "title": "wait/restart host"
+        },
+        {
+          "id": "s3",
+          "title": "then press Reauthorize and approve"
+        }
+      ]
+    },
+    {
+      "id": "A04",
+      "title": "Revoked authorization recovery",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "All",
+      "tags": [
+        "auth",
+        "pi",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "In a disposable setup invalidate/revoke saved authorization; send a control command; explicitly reauthorize."
+      ],
+      "expected": [
+        "No replay/prompt loop; status requires authorization; new approval restores a fresh snapshot. Invalid credentials are never shown/logged."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "In a disposable setup invalidate/revoke saved authorization"
+        },
+        {
+          "id": "s2",
+          "title": "send a control command"
+        },
+        {
+          "id": "s3",
+          "title": "explicitly reauthorize"
+        }
+      ]
+    },
+    {
+      "id": "A05",
+      "title": "No authorization (NONE)",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "All",
+      "tags": [
+        "auth",
+        "pi",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Configure Pear No authorization (`NONE`); use fresh settings or Reauthorize to clear an old credential."
+      ],
+      "expected": [
+        "Authentication disabled; no approval request/token needed; keys/dials use the same API. A previously accepted token alone cannot identify NONE."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Configure Pear No authorization (`NONE`)"
+        },
+        {
+          "id": "s2",
+          "title": "use fresh settings or Reauthorize to clear an old credential"
+        }
+      ]
+    },
+    {
+      "id": "A06",
+      "title": "Endpoint/protocol validation",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "All",
+      "tags": [
+        "auth",
+        "pi",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Save a different valid endpoint/protocol, then an invalid host/port; return to the original endpoint."
+      ],
+      "expected": [
+        "Valid change cancels old work and binds new auth; invalid edit reports an error and retains edits without changing the working connection. No old credential is reused for a new origin."
+      ],
+      "prior_evidence": " Prior Windows 11 Pro 25H2 /10.0.26200, Stream Deck 7.4.2.22730: installation/actions/backend observed; PI remained Waiting for plugin / Checking and host rejected wrong-context getSettings/setSettings/sendToPlugin. Routing fixed at 23cf3daa14d45a27310551d7ee727bdfaceba587; full corrected approval/settings/persistence retest remains Pending. See docs/checkpoints/manual-bugfix-02-pi-context.md.",
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Save a different valid endpoint/protocol, then an invalid host/port"
+        },
+        {
+          "id": "s2",
+          "title": "return to the original endpoint"
+        }
+      ]
+    },
+    {
+      "id": "R01",
+      "title": "Pear start/stop and reconnect",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "All",
+      "tags": [
+        "recovery",
+        "persistence",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Start host before Pear; later open/load Pear; stop/restart Pear while controls are visible."
+      ],
+      "expected": [
+        "Offline/unknown display during outage, bounded reconnect, fresh real state on recovery; queued commands are discarded and never replayed. Cold incomplete state remains unknown until available."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Start host before Pear"
+        },
+        {
+          "id": "s2",
+          "title": "later open/load Pear"
+        },
+        {
+          "id": "s3",
+          "title": "stop/restart Pear while controls are visible"
+        }
+      ]
+    },
+    {
+      "id": "R02",
+      "title": "Host restart and settings persistence",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "All",
+      "tags": [
+        "recovery",
+        "persistence",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Restart Stream Deck/OpenDeck after authorizing and saving per-action settings/selector selection."
+      ],
+      "expected": [
+        "Token/settings/selection persist in host storage; one fresh Pear connection; no unnecessary approval or playback on launch. Host disk persistence is a manual gate."
+      ],
+      "prior_evidence": " Prior Windows 11 Pro 25H2 /10.0.26200, Stream Deck 7.4.2.22730: installation/actions/backend observed; PI remained Waiting for plugin / Checking and host rejected wrong-context getSettings/setSettings/sendToPlugin. Routing fixed at 23cf3daa14d45a27310551d7ee727bdfaceba587; full corrected approval/settings/persistence retest remains Pending. See docs/checkpoints/manual-bugfix-02-pi-context.md.",
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Restart Stream Deck/OpenDeck after authorizing and saving per-action settings/selector selection"
+        }
+      ]
+    },
+    {
+      "id": "R03",
+      "title": "API disable/re-enable",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "All",
+      "tags": [
+        "recovery",
+        "persistence",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Disable API Server, press controls, re-enable it and load the player."
+      ],
+      "expected": [
+        "Offline/error/alert without invented state; automatic connection recovers and no failed command replays."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Disable API Server, press controls, re-enable it and load the player"
+        }
+      ]
+    },
+    {
+      "id": "R04",
+      "title": "WebSocket reconnect and duplicates",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "All",
+      "tags": [
+        "recovery",
+        "persistence",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Close/drop the Pear WebSocket in a controlled network session, restore connectivity, and change state in Pear."
+      ],
+      "expected": [
+        "One reconnect sequence and fresh snapshot; every visible duplicate updates from real state. No accumulating socket/timer/listener or repeated stale callback."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Close/drop the Pear WebSocket in a controlled network session, restore connectivity, and change state in Pear"
+        }
+      ]
+    },
+    {
+      "id": "R05",
+      "title": "Known silent half-open limitation",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "All",
+      "tags": [
+        "recovery",
+        "persistence",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Suspend messages while leaving the socket open; then close/restore the transport."
+      ],
+      "expected": [
+        "Record known half-open stale-state limitation; recovery refreshes state. Do not record continuous liveness detection as implemented."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Suspend messages while leaving the socket open"
+        },
+        {
+          "id": "s2",
+          "title": "then close/restore the transport"
+        }
+      ]
+    },
+    {
+      "id": "R06",
+      "title": "Context cleanup and bounded work",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "All",
+      "tags": [
+        "recovery",
+        "persistence",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Repeatedly switch profiles/open-close PIs; rotate rapidly, then remove actions/disconnect."
+      ],
+      "expected": [
+        "Shared connection remains one; contexts release work; at most bounded pending inputs; no late feedback on removed contexts or replay on reappearance."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Repeatedly switch profiles/open-close PIs"
+        },
+        {
+          "id": "s2",
+          "title": "rotate rapidly, then remove actions/disconnect"
+        }
+      ]
+    },
+    {
+      "id": "R07",
+      "title": "Release after removal/reassignment",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "All",
+      "tags": [
+        "recovery",
+        "persistence",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Hold a key, switch profile/remove/reassign its action before release, then press a newly visible action normally."
+      ],
+      "expected": [
+        "Release for an absent/replaced context sends no command. A matching newly visible key activates once. Record actual host lifecycle ordering, including Encoder aliases."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Hold a key, switch profile/remove/reassign its action before release, then press a newly visible action normally"
+        }
+      ]
+    },
+    {
+      "id": "K01",
+      "title": "Play / Pause",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+"
+      ],
+      "platform_notes": "W-K, L-K, Plus keys",
+      "tags": [
+        "keys",
+        "stage-2"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Play/pause/stop from Pear and from duplicate keys."
+      ],
+      "expected": [
+        "Play icon when paused/stopped, Pause while playing; both keys follow external updates. Command acceptance alone cannot confirm state."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Play/pause/stop from Pear and from duplicate keys"
+        }
+      ]
+    },
+    {
+      "id": "K02",
+      "title": "Next / Previous",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+"
+      ],
+      "platform_notes": "W-K, L-K, Plus keys",
+      "tags": [
+        "keys",
+        "stage-2"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Press Next/Previous and change tracks in Pear."
+      ],
+      "expected": [
+        "Correct transport once per press; Track Info/transport display follows the resulting track."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Press Next/Previous and change tracks in Pear"
+        }
+      ]
+    },
+    {
+      "id": "K03",
+      "title": "Like / Dislike",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+"
+      ],
+      "platform_notes": "W-K, L-K, Plus keys",
+      "tags": [
+        "keys",
+        "stage-2"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Like → press active Like to clear; Dislike → press active Dislike to clear; switch ratings/tracks."
+      ],
+      "expected": [
+        "Native supported transitions and real fetched rating appear; Like/Dislike states are distinct. Same-track external rating may remain stale (known 3.12.0 limitation)."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Like → press active Like to clear"
+        },
+        {
+          "id": "s2",
+          "title": "Dislike → press active Dislike to clear"
+        },
+        {
+          "id": "s3",
+          "title": "switch ratings/tracks"
+        }
+      ]
+    },
+    {
+      "id": "K04",
+      "title": "Mute",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+"
+      ],
+      "platform_notes": "W-K, L-K, Plus keys",
+      "tags": [
+        "keys",
+        "stage-2"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Toggle mute in Pear/key; set volume to zero while unmuted; restore volume."
+      ],
+      "expected": [
+        "Actual mute state/icon follows Pear; zero unmuted volume does not appear muted."
+      ],
+      "prior_evidence": "2026-10-07 user-reported Windows volume acceptance on combined Pear: direct API round-trips, visible changes, Up/Down and Plus directions/sequential changes passed; mute continued working. K05/D01/K04 are partial, not full-row passes. Bounds, custom/invalid settings, persistence and full mute cases remain unverified. Exact installed binaries were not captured. See docs/checkpoints/manual-verification-03-volume-api.md. This session has not executed these scenarios.",
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Toggle mute externally in Pear and from key"
+        },
+        {
+          "id": "s2",
+          "title": "Zero while unmuted remains distinct from mute"
+        },
+        {
+          "id": "s3",
+          "title": "Restore volume and verify real mute state"
+        }
+      ]
+    },
+    {
+      "id": "K05",
+      "title": "Volume Up / Down",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+"
+      ],
+      "platform_notes": "W-K, L-K, Plus keys",
+      "tags": [
+        "keys",
+        "stage-2"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Save steps 1, 5, 7 and 100; test Up at 97 and Down at 3; submit 0/negative/decimal/text; load malformed older settings."
+      ],
+      "expected": [
+        "Whole valid steps take effect; bounds stay 0–100; invalid edits do not save; invalid stored steps safely use 5. Display remains confirmed volume."
+      ],
+      "prior_evidence": "2026-10-07 user-reported Windows volume acceptance on combined Pear: direct API round-trips, visible changes, Up/Down and Plus directions/sequential changes passed; mute continued working. K05/D01/K04 are partial, not full-row passes. Bounds, custom/invalid settings, persistence and full mute cases remain unverified. Exact installed binaries were not captured. See docs/checkpoints/manual-verification-03-volume-api.md. This session has not executed these scenarios.",
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Save and exercise step = 1"
+        },
+        {
+          "id": "s2",
+          "title": "Save and exercise default step = 5"
+        },
+        {
+          "id": "s3",
+          "title": "Save and exercise step = 7"
+        },
+        {
+          "id": "s4",
+          "title": "Save and exercise step = 100"
+        },
+        {
+          "id": "s5",
+          "title": "Up at 97 and Down at 3: bounds"
+        },
+        {
+          "id": "s6",
+          "title": "Reject 0 / negative / decimal / text edits"
+        },
+        {
+          "id": "s7",
+          "title": "Malformed older settings safely default to 5"
+        },
+        {
+          "id": "s8",
+          "title": "Repeated volume changes and confirmed displays"
+        }
+      ]
+    },
+    {
+      "id": "K06",
+      "title": "Track Info formats",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+"
+      ],
+      "platform_notes": "W-K, L-K, Plus keys",
+      "tags": [
+        "keys",
+        "stage-2"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Select/save all five Track Info formats; pause; test long/Unicode/missing-album/podcast metadata; enable Show Title/clear custom title."
+      ],
+      "expected": [
+        "Correct per-key fields, bounded lines/ellipsis and localized fallbacks; supplied titles/artists remain unchanged. No remote artwork loading or stale artwork claim."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Select/save all five Track Info formats"
+        },
+        {
+          "id": "s2",
+          "title": "pause"
+        },
+        {
+          "id": "s3",
+          "title": "test long/Unicode/missing-album/podcast metadata"
+        },
+        {
+          "id": "s4",
+          "title": "enable Show Title/clear custom title"
+        }
+      ]
+    },
+    {
+      "id": "K07",
+      "title": "Shuffle",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+"
+      ],
+      "platform_notes": "W-K, L-K, Plus keys",
+      "tags": [
+        "keys",
+        "stage-2"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Toggle shuffle from Pear/key off→on→off; include a legacy queue if available."
+      ],
+      "expected": [
+        "Real off/on images update. Unsupported legacy off alerts and remains actual on; no guessed off transition."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Toggle shuffle from Pear/key off→on→off"
+        },
+        {
+          "id": "s2",
+          "title": "include a legacy queue if available"
+        }
+      ]
+    },
+    {
+      "id": "K08",
+      "title": "Repeat modes",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+"
+      ],
+      "platform_notes": "W-K, L-K, Plus keys",
+      "tags": [
+        "keys",
+        "stage-2"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Start at NONE; press through ALL, ONE, NONE; change repeat in Pear."
+      ],
+      "expected": [
+        "Native documented cycle and three distinct images/labels on every copy, including external changes."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Start at NONE"
+        },
+        {
+          "id": "s2",
+          "title": "press through ALL, ONE, NONE"
+        },
+        {
+          "id": "s3",
+          "title": "change repeat in Pear"
+        }
+      ]
+    },
+    {
+      "id": "K09",
+      "title": "Failure and state truthfulness",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+"
+      ],
+      "platform_notes": "W-K, L-K, Plus keys",
+      "tags": [
+        "keys",
+        "stage-2"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Force REST failure/timeout or an unconfirmed state change while pressing state-aware keys."
+      ],
+      "expected": [
+        "Alert and actual/unknown state, never a fabricated target; pending command is not automatically retried."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Force REST failure/timeout or an unconfirmed state change while pressing state-aware keys"
+        }
+      ]
+    },
+    {
+      "id": "P01",
+      "title": "Playlist configuration and validation",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "All",
+      "tags": [
+        "playlists"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Save raw ID and accepted playlist/watch URL; close/reopen PI; try missing/duplicate `list`, wrong host, malformed encoding and blank input."
+      ],
+      "expected": [
+        "URL normalizes to canonical case-sensitive ID; valid settings persist; invalid input reports a localized error without replacing saved configuration."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Save raw ID and accepted playlist/watch URL"
+        },
+        {
+          "id": "s2",
+          "title": "close/reopen PI"
+        },
+        {
+          "id": "s3",
+          "title": "try missing/duplicate `list`, wrong host, malformed encoding and blank input"
+        }
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "Native Always Normal",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "Keys/selector on all hosts",
+      "tags": [
+        "playlists"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "With extension, Always Normal from a different playlist and same playlist, old shuffle off/on; compare native normal baseline."
+      ],
+      "expected": [
+        "Supported native command gives normal startup before audio; queue/first-track/events match native behavior. Unsafe shuffled same-playlist legacy reuse returns Unavailable/501 before dispatch, not a false normal-start pass."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "With extension, Always Normal from a different playlist and same playlist, old shuffle off/on"
+        },
+        {
+          "id": "s2",
+          "title": "compare native normal baseline"
+        }
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "Native Always Shuffle",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "Keys/selector on all hosts",
+      "tags": [
+        "playlists"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Always Shuffle from same/different playlist and old shuffle off/on; compare native Shuffle Play; repeat several trials."
+      ],
+      "expected": [
+        "One native shuffle-start dispatch before playback, no normal-start/enable-shuffle/skip sequence. A first track selected by chance proves neither success nor failure; verify command and queue semantics."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Always Shuffle from same/different playlist and old shuffle off/on"
+        },
+        {
+          "id": "s2",
+          "title": "compare native Shuffle Play"
+        },
+        {
+          "id": "s3",
+          "title": "repeat several trials"
+        }
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "Follow real shuffle state",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "Keys/selector on all hosts",
+      "tags": [
+        "playlists"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Follow mode with actual shuffle off/on; externally change shuffle just before press; test unknown-state session."
+      ],
+      "expected": [
+        "Mode captures current real state; unknown gets one bounded refresh or clear failure without guessed startup. Keys and dials behave consistently."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Follow mode with actual shuffle off/on"
+        },
+        {
+          "id": "s2",
+          "title": "externally change shuffle just before press"
+        },
+        {
+          "id": "s3",
+          "title": "test unknown-state session"
+        }
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "Stock Pear and unavailable controls",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "Keys/selector on all hosts",
+      "tags": [
+        "playlists"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Run stock Pear 3.12.0; then extension with unavailable/private/empty/unsupported-native playlist."
+      ],
+      "expected": [
+        "Missing route visibly requires Update Pear; native unsupported gives Unavailable; other errors are honest. No fallback playback or claimed audible success from a dispatch response."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Run stock Pear 3.12.0"
+        },
+        {
+          "id": "s2",
+          "title": "then extension with unavailable/private/empty/unsupported-native playlist"
+        }
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "Concurrent startup and cancellation",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "Keys/selector on all hosts",
+      "tags": [
+        "playlists"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Overlap presses; delay browse/abort/reload/rebind/disable before and after dispatch permit."
+      ],
+      "expected": [
+        "One active start, bounded deadline, no stale permit/replay. Pre-dispatch rejection starts nothing; unknown post-permit outcome stays unknown even if playback began. Use Stage 7 acceptance details below."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Overlap presses"
+        },
+        {
+          "id": "s2",
+          "title": "delay browse/abort/reload/rebind/disable before and after dispatch permit"
+        }
+      ]
+    },
+    {
+      "id": "D01",
+      "title": "Volume Dial",
+      "platforms": [
+        "W-+",
+        "L-+"
+      ],
+      "platform_notes": "W-+, L-+",
+      "tags": [
+        "plus",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Rotate volume both ways with default/custom steps and near bounds; press; change volume/mute externally."
+      ],
+      "expected": [
+        "Signed step behavior/clamp, true mute, actual percentage/indicator/icon; press or rotation alone does not assume a result."
+      ],
+      "prior_evidence": "2026-10-07 user-reported Windows volume acceptance on combined Pear: direct API round-trips, visible changes, Up/Down and Plus directions/sequential changes passed; mute continued working. K05/D01/K04 are partial, not full-row passes. Bounds, custom/invalid settings, persistence and full mute cases remain unverified. Exact installed binaries were not captured. See docs/checkpoints/manual-verification-03-volume-api.md. This session has not executed these scenarios.",
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Rotate both directions with default step"
+        },
+        {
+          "id": "s2",
+          "title": "Rotate both directions with custom steps"
+        },
+        {
+          "id": "s3",
+          "title": "Rotate near lower and upper bounds"
+        },
+        {
+          "id": "s4",
+          "title": "Press toggles true mute"
+        },
+        {
+          "id": "s5",
+          "title": "External volume/mute changes and confirmed feedback"
+        }
+      ]
+    },
+    {
+      "id": "D02",
+      "title": "Transport Dial",
+      "platforms": [
+        "W-+",
+        "L-+"
+      ],
+      "platform_notes": "W-+, L-+",
+      "tags": [
+        "plus",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Rotate transport ±1/multiple detents; press once; test paused/stopped/external playback."
+      ],
+      "expected": [
+        "One Next/Previous per accepted detent, one play/pause on release, current real playback/title/artist. Oversized/error/disconnected work is bounded/discarded."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Rotate transport ±1/multiple detents"
+        },
+        {
+          "id": "s2",
+          "title": "press once"
+        },
+        {
+          "id": "s3",
+          "title": "test paused/stopped/external playback"
+        }
+      ]
+    },
+    {
+      "id": "D03",
+      "title": "Playlist Selector list and wrapping",
+      "platforms": [
+        "W-+",
+        "L-+"
+      ],
+      "platform_notes": "W-+, L-+",
+      "tags": [
+        "plus",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Save 0, 1, several and 16 selector entries; rotate/wrap; edit/remove/reorder; restart; use duplicate selectors."
+      ],
+      "expected": [
+        "Empty is explicit; one remains selected; wrapping/bounds/position persistence work; duplicates are independent. Rotation never plays or overwrites an unsaved PI draft."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Save 0, 1, several and 16 selector entries"
+        },
+        {
+          "id": "s2",
+          "title": "rotate/wrap"
+        },
+        {
+          "id": "s3",
+          "title": "edit/remove/reorder"
+        },
+        {
+          "id": "s4",
+          "title": "restart"
+        },
+        {
+          "id": "s5",
+          "title": "use duplicate selectors"
+        }
+      ]
+    },
+    {
+      "id": "D04",
+      "title": "Playlist Selector images and startup",
+      "platforms": [
+        "W-+",
+        "L-+"
+      ],
+      "platform_notes": "W-+, L-+",
+      "tags": [
+        "plus",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Add bounded PNG/JPEG images; switch entries including default-image entry; press with each mode; rotate before delayed failure."
+      ],
+      "expected": [
+        "Correct selected image/name/index/mode; stock/unsupported mode fails honestly. A delayed result cannot mark another selection as failed. IDs and selected index persist."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Add bounded PNG/JPEG images"
+        },
+        {
+          "id": "s2",
+          "title": "switch entries including default-image entry"
+        },
+        {
+          "id": "s3",
+          "title": "press with each mode"
+        },
+        {
+          "id": "s4",
+          "title": "rotate before delayed failure"
+        }
+      ]
+    },
+    {
+      "id": "D05",
+      "title": "Current touch, press and encoder aliases",
+      "platforms": [
+        "W-+",
+        "L-+"
+      ],
+      "platform_notes": "W-+, L-+",
+      "tags": [
+        "plus",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Tap/hold touch display, press down/up, and use inherited Volume Up/Play-Pause dial aliases."
+      ],
+      "expected": [
+        "Short touch only refreshes; hold/down sends no extra command; release acts once; aliases share dedicated dial behavior/connection."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Tap/hold touch display, press down/up, and use inherited Volume Up/Play-Pause dial aliases"
+        }
+      ]
+    },
+    {
+      "id": "I01",
+      "title": "PI settings, drafts and persistence",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "All",
+      "tags": [
+        "pi",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Save independent steps/formats/modes/entries; close/reopen/restart; change globals and receive status while editing."
+      ],
+      "expected": [
+        "Per-action values persist independently; globals stay centralized; updates do not erase drafts. PI settings writes use its registration UUID; `sendToPlugin` retains the action UUID; incoming settings match the action instance. No wrong-context warnings."
+      ],
+      "prior_evidence": " Prior Windows 11 Pro 25H2 /10.0.26200, Stream Deck 7.4.2.22730: installation/actions/backend observed; PI remained Waiting for plugin / Checking and host rejected wrong-context getSettings/setSettings/sendToPlugin. Routing fixed at 23cf3daa14d45a27310551d7ee727bdfaceba587; full corrected approval/settings/persistence retest remains Pending. See docs/checkpoints/manual-bugfix-02-pi-context.md.",
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Save independent steps/formats/modes/entries"
+        },
+        {
+          "id": "s2",
+          "title": "close/reopen/restart"
+        },
+        {
+          "id": "s3",
+          "title": "change globals and receive status while editing"
+        }
+      ]
+    },
+    {
+      "id": "I02",
+      "title": "English / German / French UI",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "All",
+      "tags": [
+        "pi",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Set host language English, German, French (restart as required); inspect names/states/forms/help/errors/editor controls."
+      ],
+      "expected": [
+        "Selected language appears throughout active controls, with documented proper/technical names intact; IDs/URLs/settings/metadata unchanged. Record idiom/glyph/truncation defects for native review."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Set host language English, German, French (restart as required)"
+        },
+        {
+          "id": "s2",
+          "title": "inspect names/states/forms/help/errors/editor controls"
+        }
+      ]
+    },
+    {
+      "id": "I03",
+      "title": "Icons and readability",
+      "platforms": [
+        "W-K",
+        "W-+",
+        "L-K",
+        "L-+",
+        "M"
+      ],
+      "platform_notes": "All",
+      "tags": [
+        "pi",
+        "stage-3"
+      ],
+      "prerequisites": [
+        "Read catalog setup notes; record exact environment/revisions. Use a disposable profile."
+      ],
+      "steps": [
+        "Inspect every generic icon/off/on/repeat variant on normal keys and Plus at normal brightness; clear custom overrides."
+      ],
+      "expected": [
+        "Consistent legible set; distinct Like/Dislike, mute, shuffle and all repeat modes; no ambiguous image lookup or proprietary promotional branding."
+      ],
+      "prior_evidence": null,
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Inspect every generic icon/off/on/repeat variant on normal keys and Plus at normal brightness"
+        },
+        {
+          "id": "s2",
+          "title": "clear custom overrides"
+        }
+      ]
+    },
+    {
+      "id": "PI01",
+      "title": "Corrected Windows PI routing retest",
+      "platforms": [
+        "W-K",
+        "W-+"
+      ],
+      "platform_notes": "Windows retest; record actual device",
+      "tags": [
+        "pi",
+        "stage-3",
+        "routing"
+      ],
+      "prerequisites": [
+        "Status: Pending. Use `build/io.github.scarfmeister.pear-streamdeck.streamDeckPlugin`, SHA-256 `00b598c005aa3f2938219ae926d689da19ceb4611af00dbe63a35ccd595068ac`, from tested implementation `23cf3daa14d45a27310551d7ee727bdfaceba587`. For a CI/reproduced installer, record its own hash and verify the run/checkout contains that implementation; ZIP timestamps can change hashes.",
+        "Use a disposable profile, loaded Pear player, API 127.0.0.1:26538 and AUTH_AT_FIRST."
+      ],
+      "steps": [
+        "In PowerShell run `Get-FileHash .\\io.github.scarfmeister.pear-streamdeck.streamDeckPlugin -Algorithm SHA256` on the downloaded local installer. Install/replace the plugin through Stream Deck, then fully quit/restart Stream Deck and reopen the PI so the old backend/WebView is not retained. Record Windows 11 Pro 25H2 / numeric version, host version, device, Pear version/commit and installer hash.",
+        "Keep Pear open with the player loaded and API Server enabled at `127.0.0.1:26538`, `AUTH_AT_FIRST`. Place/select **Volume Up** in a disposable profile. Verify the PI loads its saved action settings and leaves `Waiting for plugin` / `Checking` for an actual plugin status. Before approval, `Use Reauthorize` / `Authorization required` or an approval-in-progress status is valid; a permanent placeholder is a failure.",
+        "Enter **Host `127.0.0.1`, Port `26538`, Protocol HTTP**, then click **Save Connection**. Verify plugin status/normalized values return. Close/reopen the PI and verify the endpoint survives. Check the newly timestamped host log contains no `sendToPlugin` wrong-context warning from this attempt.",
+        "If an automatic first-run approval is already pending, finish it before retrying. Click **Reauthorize** once and approve the connector request in Pear when prompted. The PI must display approval progress and then **Connected / Authorized** after actual player state arrives. Do not paste the manually obtained PowerShell token anywhere; this request must be handled by the plugin. Check the button re-enables and no wrong-context warning occurs. A denial/error must be shown honestly rather than appearing as success.",
+        "Set the Volume Up step to **7**, click **Save action settings**, switch to another action and reopen Volume Up. Expect **7** to persist. With Pear unmuted at a safe value below 93, press once; Pear's real volume should rise by 7 and state-aware displays should follow the reported state. Inspect the host log for this attempt: no wrong-context `getSettings` or `setSettings` warnings.",
+        "Fully restart Stream Deck again with Pear open; reopen the PI. Verify endpoint and step **7** remain, the stored plugin credential reconnects without an unnecessary approval, and status updates. Reopen another Pear action's PI; connection settings are shared and its action settings stay independent. Review only new log entries and confirm none of the three wrong-context warnings recur; do not capture tokens or token-bearing URLs.",
+        "Record expected/actual **Pass/Fail/Blocked** separately for H01, A01/A02, explicit A03 recovery, A06 and I01/R02, including date/tester and sanitized logs. Leave denial/revocation, NONE, other hardware/OS, Plus and native playlist tests unrun until actually exercised. Report any remaining freeze with fresh host/plugin logs; do not mark this fix manually passed from unit/installer checks."
+      ],
+      "expected": [
+        "Follow each step’s explicit expected result. Settings/status must load; Save Connection and plugin-mediated Reauthorize must route; saved step 7 and shared endpoint/credential survive restart. No new wrong-context getSettings/setSettings/sendToPlugin warnings. Record affected matrix IDs separately; completing PI01 does not automatically pass them."
+      ],
+      "prior_evidence": "Initial routing failed on real Stream Deck 7.4.2.22730 despite connected backend/API. Framework registration UUID correction has automated coverage; complete corrected manual retest is Pending. No current-session Pass is inferred.",
+      "scenarios": [
+        {
+          "id": "s1",
+          "title": "Installer hash / replace / full host restart"
+        },
+        {
+          "id": "s2",
+          "title": "Initial action settings and real plugin status"
+        },
+        {
+          "id": "s3",
+          "title": "Save Connection and PI reopen"
+        },
+        {
+          "id": "s4",
+          "title": "Plugin-mediated Reauthorize / approval"
+        },
+        {
+          "id": "s5",
+          "title": "Step 7 Save / readback / real volume"
+        },
+        {
+          "id": "s6",
+          "title": "Host restart / persistence / fresh logs"
+        },
+        {
+          "id": "s7",
+          "title": "Record distinct affected IDs and pending cases"
+        }
+      ]
+    }
+  ]
+}
