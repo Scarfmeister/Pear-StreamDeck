@@ -11,3 +11,8 @@ bundle-pi.js
 bundle.js.map
 bundle-pi.js.map
 DistributionTool.exe
+
+# Local manual acceptance sessions and Python bytecode
+.manual-test-sessions/
+__pycache__/
+*.pyc

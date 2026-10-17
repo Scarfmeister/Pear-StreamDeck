@@ -1,5 +1,9 @@
 # Pear Desktop Connector — final engineering handoff
 
+## Stage 1.5 — current continuation
+
+The D023 manual-test interface is implemented: [launch/schema/smoke instructions](manual-testing/README.md), [Stage 1.5 checkpoint](checkpoints/roadmap-stage-01-5-manual-test-runner.md). It has 42 matrix definitions plus PI01, five suites, scenario results, local autosave/resume, failure clipboard reports and headless Markdown export. No plugin/Pear runtime change or new hardware evidence. GUI launch could not connect to this workstation's display; **user GUI smoke acceptance remains Pending**. This supersedes earlier “build the usability tool next” scheduling prose below. After user acceptance, next is **Stage 2 — Accept the currently implemented key actions**; do not begin it automatically.
+
 ## New sequential roadmap — resume here
 
 Stage 1 baseline freeze completed as documentation work only; [checkpoint](checkpoints/roadmap-stage-01-baseline-freeze.md) pins both repositories and evidence. [D022](DECISIONS.md#d022--stage-0-productux-authority-for-the-new-sequential-roadmap) is the authoritative Stage 0 future UX overlay; earlier design recommendations remain historical. No full edited roadmap is stored here; use the external sequential roadmap for scheduling. Next action is the D023 manual-test tooling/usability stage **before Stage 2**, unless the user explicitly chooses direct Stage 2. Do not implement redesign, merge PR #1/integration branches, release, or open an upstream Pear PR from this handoff. Earlier “next action” paragraphs below are superseded by this ordering.

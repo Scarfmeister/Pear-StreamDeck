@@ -31,6 +31,11 @@ jobs:
       - name: Test client, actions, settings, browser integration, and localization
         run: npm test
 
+      - name: Validate manual acceptance tooling (no display)
+        run: |
+          python3 -m unittest discover -s tests/manual-testing -v
+          python3 scripts/manual-test-runner.py --validate
+
       - name: Build plugin package
         run: npm run build
 

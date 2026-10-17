@@ -1,5 +1,9 @@
 # Manual testing
 
+## Stage 1.5 — execution interface
+
+Use the [offline Python/Tkinter runner](manual-testing/README.md) to execute the committed 42-row baseline catalog and detailed Windows PI retest, save scenario-level sessions and export reviewed evidence. This document remains durable history; the runner never rewrites it. Historical observations below are unchanged and never pre-pass a new session. No new hardware acceptance is claimed. GUI runtime needs the documented user smoke test; after GUI acceptance, next is **Stage 2 — Accept the currently implemented key actions**.
+
 ## New roadmap Stage 1 freeze and next acceptance
 
 [Baseline checkpoint](checkpoints/roadmap-stage-01-baseline-freeze.md) freezes the evidence below; Stage 1 runs no new hardware tests and changes no result to Pass. Before Stage 2, complete the [manual-test usability stage D023](DECISIONS.md#d023--manual-test-usability-prerequisite): investigate Python/Tkinter or a reorganized/generated document. This Markdown remains durable evidence, not necessarily the primary interactive interface. No tool was built here.

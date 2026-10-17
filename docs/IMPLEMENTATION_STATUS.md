@@ -1,5 +1,9 @@
 # Implementation status
 
+## New roadmap Stage 1.5 — manual-test tooling
+
+Implemented the standard-library [Python/Tkinter acceptance runner](manual-testing/README.md): 42 baseline matrix rows plus the seven-check PI01 retest, five suites, scenario/Partial results, editable environment, local atomic autosave/resume, filters/progress, clipboard failure reports and Markdown export. New sessions have no inherited Pass results. Pure-logic/headless validation passes; GUI runtime is **Not manually verified by Codex** (display connection unavailable). No runtime redesign, new installer or hardware acceptance. See [checkpoint](checkpoints/roadmap-stage-01-5-manual-test-runner.md). After user GUI acceptance: Stage 2 existing key acceptance. Earlier Stage 1 text is historical.
+
 ## New roadmap Stage 1 — baseline frozen
 
 Documentation-only baseline: [checkpoint](checkpoints/roadmap-stage-01-baseline-freeze.md). Runtime remains the PI-corrected implementation at `23cf3daa14d45a27310551d7ee727bdfaceba587`; pre-freeze documentation head is `7a843269dc8b327adbbc9646b75ab3259ab80f23`. The redesign has not started. D022 records accepted future UX, not shipped features; the installed dial still says Transport Dial, Track Info uses five text formats/static imagery, and PI editing still uses Save. Existing Queue/Seek/Add-to-Playlist proposals are not implemented. Next: D023 manual-test usability stage before Stage 2. Results below are retained historical validation, not Stage 1 reruns.

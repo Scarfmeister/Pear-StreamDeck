@@ -1,5 +1,9 @@
 # Requirements status — final Stage 9 audit
 
+## Stage 1.5 tooling status
+
+The [manual runner](manual-testing/README.md) implements D023's execution interface with 43 definitions (42 matrix + PI01) and five suites. Automated Python/headless checks verify tooling contracts and catalog integrity; **GUI desktop usability and all new hardware acceptance remain Pending/Not Run**. This supersedes the historical overlay's “no runner built” entry below; it changes no existing action classification or result. After user smoke acceptance, next is Stage 2 existing keys.
+
 ## New roadmap status overlay — 2026-10-16
 
 [Baseline checkpoint](checkpoints/roadmap-stage-01-baseline-freeze.md) freezes existing evidence. Original classifications below apply to the implemented baseline. [D022](DECISIONS.md#d022--stage-0-productux-authority-for-the-new-sequential-roadmap) supersedes conflicting future requirements.

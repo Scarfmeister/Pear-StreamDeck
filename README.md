@@ -1,8 +1,12 @@
 # Pear Desktop Connector
 
+## Manual acceptance tool
+
+Run `py -3 scripts\manual-test-runner.py` on Windows or `python3 scripts/manual-test-runner.py` on Linux. The offline Tkinter [manual-test runner guide](docs/manual-testing/README.md) covers Tk setup, suites, autosaved sessions, scenario results, keyboard use and Markdown export. Hardware evidence remains in MANUAL_TESTING.md and reviewed reports; Stage 1.5 adds no new acceptance results.
+
 ## Pre-redesign baseline
 
-[New roadmap Stage 1 checkpoint](docs/checkpoints/roadmap-stage-01-baseline-freeze.md) pins both integration repositories and separates existing automated results from partial device evidence. The redesign has not started. [Stage 0 decisions](docs/DECISIONS.md#d022--stage-0-productux-authority-for-the-new-sequential-roadmap) govern future UX: **Control Dial** is the planned name; the baseline installer still uses **Transport Dial**. Track Info remains the key name. Future artwork/text, touch, Queue/Seek and playlist-write requirements are not shipped. Next is the manual-test usability stage before Stage 2; no runner was implemented in Stage 1.
+[New roadmap Stage 1 checkpoint](docs/checkpoints/roadmap-stage-01-baseline-freeze.md) pins both integration repositories and separates existing automated results from partial device evidence. The redesign has not started. [Stage 0 decisions](docs/DECISIONS.md#d022--stage-0-productux-authority-for-the-new-sequential-roadmap) govern future UX: **Control Dial** is the planned name; the baseline installer still uses **Transport Dial**. Track Info remains the key name. Future artwork/text, touch, Queue/Seek and playlist-write requirements are not shipped. Stage 1.5 now supplies the runner; after user GUI acceptance, next is Stage 2 existing key acceptance.
 
 Control [Pear Desktop](https://github.com/pear-devs/pear-desktop) from Stream Deck keys and Stream Deck Plus dials. One shared connection uses Pear's local API Server; displays follow actual player state, including changes made in Pear.
 
