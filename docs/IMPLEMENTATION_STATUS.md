@@ -1,5 +1,11 @@
 # Implementation status
 
+## Current work — Stage 4 bounded reconciliation
+
+Completed source-level classification and [Stage 4 work queue](checkpoints/roadmap-stage-04-baseline-reconciliation.md), with [cross-repository source evidence](research/stage-04-baseline-findings.md). Both expected clean integration heads were confirmed: plugin `913715482ffd558742a3d5ff75fa0efd7900e200`, Pear `a9ea223c99ede0876343db5898b944ea5170ad1f`. This pass changes documentation only. Existing Windows results, catalog, code/package versions and baseline behavior are unchanged; observed failures are not converted to passes.
+
+P01 503 has multiple PLAYER_NOT_READY readiness/lifecycle origins and insufficient branch diagnostics in the supplied report. D04 Save recreates a blank file input while serializing image data separately; actual persistence loss is unproved. K04 native zero/mute/5% semantics, K06 pause symptom and D03 save blocker need focused evidence. Primary triage for those five is insufficient evidence, not a confirmed runtime-defect verdict. P02–P04 depend on P01; H06/R06 unrun parts remain gaps, K07 legacy remains conditional. Next authorization: **S4.1 P01 diagnostic only**, then the ordered packets/gate in the checkpoint. No Stage 5 redesign started. Earlier current-work paragraphs below are historical and superseded for scheduling by this section.
+
 ## Current micro-stage — runner provenance and corrected Windows evidence
 
 [Manual bugfix 04](checkpoints/manual-bugfix-04-test-environment-provenance.md) separates authoritative Test Environment from diagnostic Runner Environment, migrates schema-1 sessions without altering evidence, and moves resume/default sessions to user-local app state. Installed plugin branch/commit no longer derive silently from checkout HEAD. No plugin/Pear runtime or version change.

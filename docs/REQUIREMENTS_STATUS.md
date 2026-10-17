@@ -1,5 +1,11 @@
 # Requirements status — final Stage 9 audit
 
+## Stage 4 classification and Phase A gate
+
+[Reconciliation table and per-ID gate](checkpoints/roadmap-stage-04-baseline-reconciliation.md) supersede earlier tentative bug-owner language without altering reported statuses. K04, K06, P01, D03 and D04: **Insufficient evidence — reproduction needed**. P02/P03/P04: **Blocked by another defect** (reported P01 dependency; root owner not yet proved). H06/R06: **Not Run — still an acceptance gap, not a defect** for their unfinished parts. K07: **Known limitation /defer** for conditional legacy behavior. No new confirmed plugin/Pear defect or incorrect expectation is established. Detailed source/contract bounds: [source diagnosis](research/stage-04-baseline-findings.md).
+
+Before Stage 5: resolve startup/native mode acceptance, image-data persistence distinction, native mute contract, pause/list behavior and selected Windows auth/settings/lifecycle/no-replay/touch gaps; then full applicable automated regression review. Linux/Flatpak/other-host/minimum-version, full locale/visual certification and acknowledged conditional limitations can remain later release/platform gates as individually listed. All 17 Not Run IDs stay unrun; none is superseded by future design. D022 features are future requirements, not Phase A baseline fixes. Canonical Windows totals and original scenario evidence remain unchanged.
+
 ## Current manual overlay — corrected Windows evidence
 
 Use the [authoritative normalized Windows report](manual-results/2026-10-16-windows-baseline-acceptance.md) and [current evidence summary](MANUAL_TESTING.md#corrected-windows-baseline-acceptance--2026-10-16-current-evidence) for current results. **Pass:** H01/H02/A01/A02/R01/R02/R07/K01/K02/K03/K05/K08/D01/D02. **Partial:** H06/R06/K07. **Fail:** K04/K06/P01/D04. **Blocked:** P02/P03/P04 (P01 dependency), D03 (cause absent). The other 17 IDs remain Not Run. Counts: 14 Pass, 4 Fail, 4 Blocked, 3 Partial, 17 Not Run, 0 N/A. These are the actually recorded Windows catalog scenarios, not a full multi-host requirements certification. The older audit rows below remain historical; their Pending wording is superseded only by these named observations.

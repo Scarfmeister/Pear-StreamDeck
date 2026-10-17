@@ -1,5 +1,11 @@
 # Pear Desktop Connector — final engineering handoff
 
+## Resume at Stage 4 — one bounded packet at a time
+
+Read [Stage 4 reconciliation](checkpoints/roadmap-stage-04-baseline-reconciliation.md) and [pinned diagnosis](research/stage-04-baseline-findings.md) first. This pass confirms the expected plugin/Pear heads and preserves the canonical Windows report unchanged. It finds **insufficient evidence** to assign K04/K06/P01/D03/D04 as confirmed runtime defects; P02–P04 remain dependent Blocked, H06/R06 unfinished checks are acceptance gaps, and K07 legacy is conditional. The empty file-picker symptom and dynamic native mute behavior must not be mistaken for proven persistence/plugin bugs.
+
+Next single prompt is the checkpoint's **S4.1 P01 HTTP 503 diagnostic**: measure the safe response code/dispatch and actual native readiness/lifecycle guard before any fix. Then separate D04, K04, K06 and D03 packets, required Windows gap batches and the Phase A regression gate. Codex handles source/tests, User handles physical signed-in measurements, ChatGPT Work coordinates evidence. No micro-stage is started automatically; do not begin Stage 5 redesign, merge, release or modify Pear in this reconciliation. This ordering supersedes prior continuation prose below; it does not mark all Stage 2/3 scenarios complete.
+
 ## Current continuation — provenance fixed; Windows findings recorded
 
 Read [manual bugfix 04](checkpoints/manual-bugfix-04-test-environment-provenance.md) and the [corrected Windows run](manual-results/2026-10-16-windows-baseline-acceptance.md) first. The original runner conflated copied Linux/checkout metadata with installed-artifact evidence. Schema 2 now preserves authoritative Test Environment, refreshes separate privacy-minimal runner diagnostics, warns on material changes and uses machine-local resume state. Old sessions migrate without losing results; no hardware rerun is needed for migration. Updated GUI provenance controls await user verification; the supplied report establishes that the earlier tool was used for real Windows testing, not that its original metadata was correct.

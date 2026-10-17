@@ -1,5 +1,11 @@
 # Manual testing
 
+## Stage 4 triage — results retained, causes not yet assigned
+
+The [Stage 4 reconciliation](checkpoints/roadmap-stage-04-baseline-reconciliation.md) now classifies findings and defines the Phase A gate/ordered small packets; [pinned source diagnosis](research/stage-04-baseline-findings.md) supplies the complete playlist 503 inventory and exact K04/K06/D03/D04 reproduction procedures. **No new hardware test or historical status change.** Totals below remain 14 Pass /4 Fail /4 Blocked /3 Partial /17 Not Run /0 N/A.
+
+K04/K06/P01/D03/D04 primarily require focused reproduction; source does not yet establish a confirmed plugin/Pear defect or a wrong expectation. In particular, separate native mute flags do not prove zero/unmuted is reachable; an empty selector file picker does not prove stored image loss. P02–P04 remain dependent Blocked. H06/R06 unrun parts are acceptance gaps; K07's conditional legacy scenario can defer when unavailable. No catalog expectation/version changes are justified in this pass. Run the next separately authorized **S4.1 P01-only diagnostic** before fixes; do not start Stage 5 or sweep all platform tests into Phase A.
+
 ## Corrected Windows baseline acceptance — 2026-10-16 (current evidence)
 
 Canonical run: [normalized Windows report](manual-results/2026-10-16-windows-baseline-acceptance.md), supplied by Scarfmeister. The tests physically ran on **Windows 11 Pro 25H2 /build 26200.9457**, Elgato Stream Deck **7.4.2.22730**, **Stream Deck Plus /firmware 2.0.3.7**. Session: **Windows baseline acceptance — 2026-10-16**, timestamp **2026-10-16T20:39:25-05:00**, tester **Scarfmeister**. Reported installed plugin: `dev/pear-port` /`a6f89eefc707d999478abce8c9e5ca8245381b09`; Pear: `feature/streamdeck-api-extensions` /`a9ea223c99ede0876343db5898b944ea5170ad1f`; API `127.0.0.1:26538`, HTTP, AUTH_AT_FIRST, English. Installer SHA-256 and Pear application version were not supplied and remain blank; do not infer them from older artifacts or package metadata.
